@@ -27,7 +27,7 @@ const COMMENT_ID = '33333333-3333-4333-8333-333333333333';
 const SAME_UUID = 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const handlerSrc = readFileSync(join(__dirname, '../api/community-reaction.js'), 'utf8');
+const handlerSrc = readFileSync(join(__dirname, '../api/_community/community-reaction.js'), 'utf8');
 
 describe('buildVaultCommunityReactionUrl', () => {
   it('uses fixed reactions path only', () => {

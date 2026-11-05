@@ -1,12 +1,12 @@
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
   parseMentionsListQuery,
   parseVaultMentionsResponse,
-} from './_utils/communityMentionSanitize.js';
+} from '../_utils/communityMentionSanitize.js';
 import {
   buildVaultCommunityMentionsUrl,
   parseVaultApiOrigin,
-} from './_utils/vaultOrigin.js';
+} from '../_utils/vaultOrigin.js';
 
 const UPSTREAM_TIMEOUT_MS = 8000;
 

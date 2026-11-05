@@ -1,13 +1,13 @@
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
   MAX_REACTION_BODY_BYTES,
   parseCommunityReactionCommand,
   parseVaultReactionResponse,
-} from './_utils/communityFeedSanitize.js';
+} from '../_utils/communityFeedSanitize.js';
 import {
   buildVaultCommunityReactionUrl,
   parseVaultApiOrigin,
-} from './_utils/vaultOrigin.js';
+} from '../_utils/vaultOrigin.js';
 
 const UPSTREAM_TIMEOUT_MS = 12000;
 

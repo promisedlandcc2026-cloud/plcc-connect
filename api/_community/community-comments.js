@@ -1,4 +1,4 @@
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
   MAX_COMMENT_BODY_BYTES,
   parseCommentsListQuery,
@@ -7,11 +7,11 @@ import {
   parseEditCommentCommand,
   parseVaultCommentMutationResponse,
   parseVaultCommentsListResponse,
-} from './_utils/communityCommentSanitize.js';
+} from '../_utils/communityCommentSanitize.js';
 import {
   buildVaultCommunityCommentsUrl,
   parseVaultApiOrigin,
-} from './_utils/vaultOrigin.js';
+} from '../_utils/vaultOrigin.js';
 
 const UPSTREAM_TIMEOUT_MS = 12000;
 

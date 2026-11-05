@@ -1,19 +1,19 @@
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
   MAX_POST_MANAGE_BODY_BYTES,
   assertSelfOwnsPost,
   parsePostManageCommand,
   parseVaultDeletePostResponse,
   parseVaultEditPostResponse,
-} from './_utils/communityPostManageSanitize.js';
+} from '../_utils/communityPostManageSanitize.js';
 import {
   fetchVaultSanitizedPost,
   fetchVaultSelfUserId,
-} from './_utils/vaultCommunityOwnership.js';
+} from '../_utils/vaultCommunityOwnership.js';
 import {
   buildVaultCommunityPostsCreateUrl,
   parseVaultApiOrigin,
-} from './_utils/vaultOrigin.js';
+} from '../_utils/vaultOrigin.js';
 
 const UPSTREAM_TIMEOUT_MS = 20000;
 

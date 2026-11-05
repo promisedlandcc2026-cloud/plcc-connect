@@ -1,13 +1,13 @@
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
   MAX_POST_CREATE_BODY_BYTES,
   parseCreatePostCommand,
   parseVaultCreatePostResponse,
-} from './_utils/communityPostCreateSanitize.js';
+} from '../_utils/communityPostCreateSanitize.js';
 import {
   buildVaultCommunityPostsCreateUrl,
   parseVaultApiOrigin,
-} from './_utils/vaultOrigin.js';
+} from '../_utils/vaultOrigin.js';
 
 const UPSTREAM_TIMEOUT_MS = 45000;
 

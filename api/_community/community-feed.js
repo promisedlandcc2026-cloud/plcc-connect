@@ -1,10 +1,10 @@
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
-  parseCommunityPostQuery,
-  parseVaultSinglePostResponse,
-} from './_utils/communityFeedSanitize.js';
-import { fetchVaultSelfUserId } from './_utils/vaultCommunityOwnership.js';
-import { buildVaultCommunityPostUrl, parseVaultApiOrigin } from './_utils/vaultOrigin.js';
+  parseFeedPaginationQuery,
+  parseVaultCommunityFeedResponse,
+} from '../_utils/communityFeedSanitize.js';
+import { fetchVaultSelfUserId } from '../_utils/vaultCommunityOwnership.js';
+import { buildVaultCommunityFeedUrl, parseVaultApiOrigin } from '../_utils/vaultOrigin.js';
 
 const UPSTREAM_TIMEOUT_MS = 12000;
 
@@ -20,10 +20,10 @@ function json(res, status, body) {
 
 /**
  * Narrow same-origin bridge (read-only):
- * GET /api/community-post?id=<uuid>
- * → Vault GET …/feed&feedType=posts&id=<uuid>
+ * GET /api/community-feed → Vault Community feedType=posts
  *
- * Fixed upstream path. Never logs tokens. Never forwards cookies.
+ * Fixed upstream path. Pagination limited to validated limit/offset.
+ * Never logs Authorization tokens. Never forwards cookies.
  */
 export default async function handler(req, res) {
   setPrivateNoStore(res);
@@ -46,12 +46,12 @@ export default async function handler(req, res) {
     });
   }
 
-  const parsedQuery = parseCommunityPostQuery(req.query || {});
-  if (!parsedQuery.ok) {
+  const page = parseFeedPaginationQuery(req.query || {});
+  if (!page.ok) {
     return json(res, 400, {
       ok: false,
       code: 'invalid_query',
-      message: 'That post link is not valid.',
+      message: 'That feed request was not valid. Please try again.',
     });
   }
 
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
     allowHttpLocal,
   });
   if (!originResult.ok) {
-    console.error('[community-post] VAULT_API_ORIGIN invalid:', originResult.reason);
+    console.error('[community-feed] VAULT_API_ORIGIN invalid:', originResult.reason);
     return json(res, 503, {
       ok: false,
       code: 'bridge_unconfigured',
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const upstreamUrl = buildVaultCommunityPostUrl(originResult.origin, parsedQuery.id);
+  const upstreamUrl = buildVaultCommunityFeedUrl(originResult.origin, page);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
@@ -97,15 +97,7 @@ export default async function handler(req, res) {
       return json(res, 403, {
         ok: false,
         code: 'forbidden',
-        message:
-          'This post is unavailable or you may not have permission to view it.',
-      });
-    }
-    if (upstream.status === 404) {
-      return json(res, 404, {
-        ok: false,
-        code: 'not_found',
-        message: 'This post is no longer available.',
+        message: 'Community is not available for this account yet.',
       });
     }
     if (upstream.status === 429) {
@@ -115,8 +107,16 @@ export default async function handler(req, res) {
         message: 'Too many requests. Please wait a moment and try again.',
       });
     }
-    if (upstream.status >= 500 || !upstream.ok) {
-      console.error('[community-post] upstream status', upstream.status);
+    if (upstream.status >= 500) {
+      console.error('[community-feed] upstream status', upstream.status);
+      return json(res, 502, {
+        ok: false,
+        code: 'vault_unavailable',
+        message: 'Community is temporarily unavailable. Please try again.',
+      });
+    }
+    if (!upstream.ok) {
+      console.error('[community-feed] unexpected status', upstream.status);
       return json(res, 502, {
         ok: false,
         code: 'vault_unavailable',
@@ -128,7 +128,7 @@ export default async function handler(req, res) {
     try {
       body = await upstream.json();
     } catch {
-      console.error('[community-post] non-JSON upstream');
+      console.error('[community-feed] non-JSON upstream');
       return json(res, 502, {
         ok: false,
         code: 'invalid_upstream',
@@ -137,9 +137,9 @@ export default async function handler(req, res) {
     }
 
     const viewerId = selfResult.ok ? selfResult.id : null;
-    const parsed = parseVaultSinglePostResponse(body, { viewerId });
+    const parsed = parseVaultCommunityFeedResponse(body, { viewerId });
     if (!parsed.ok) {
-      console.error('[community-post] sanitize failed:', parsed.reason);
+      console.error('[community-feed] sanitize failed:', parsed.reason);
       return json(res, 502, {
         ok: false,
         code: 'invalid_upstream',
@@ -149,11 +149,12 @@ export default async function handler(req, res) {
 
     return json(res, 200, {
       ok: true,
-      post: parsed.post,
+      ...parsed.feed,
+      skipped: parsed.skipped,
     });
   } catch (err) {
     const aborted = err && (err.name === 'AbortError' || err.code === 'ABORT_ERR');
-    console.error('[community-post] upstream error:', aborted ? 'timeout' : 'network');
+    console.error('[community-feed] upstream error:', aborted ? 'timeout' : 'network');
     return json(res, 502, {
       ok: false,
       code: 'vault_unavailable',

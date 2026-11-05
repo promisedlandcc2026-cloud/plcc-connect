@@ -18,7 +18,7 @@ import {
   sanitizeHuddleFallbackPass,
 } from '../api/_utils/communityChatSanitize.js';
 import { buildVaultHuddleFailsafeUrl } from '../api/_utils/vaultOrigin.js';
-import chatHandler from '../api/community-chat.js';
+import chatHandler from '../api/_community/community-chat.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (p) => readFileSync(join(root, p), 'utf8');

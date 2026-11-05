@@ -368,7 +368,7 @@ describe('huddle status + token sanitize', () => {
 
 describe('Connect huddle bridge + UI wiring', () => {
   it('allows huddle resources including end; never forwards mod', () => {
-    const bridge = readFileSync(join(root, 'api/community-chat.js'), 'utf8');
+    const bridge = readFileSync(join(root, 'api/_community/community-chat.js'), 'utf8');
     const origin = readFileSync(join(root, 'api/_utils/vaultOrigin.js'), 'utf8');
     assert.ok(bridge.includes("'huddle-status'"));
     assert.ok(bridge.includes("'huddle-token'"));
@@ -501,7 +501,7 @@ describe('directory + dm + huddle-end parsers', () => {
 
 describe('Live Huddle start rule (members join, leaders/moderators start)', () => {
   it('passes Vault huddle_start_forbidden through as huddle_not_started on every start path', () => {
-    const bridge = readFileSync(join(root, 'api/community-chat.js'), 'utf8');
+    const bridge = readFileSync(join(root, 'api/_community/community-chat.js'), 'utf8');
     assert.ok(bridge.includes("body.code === 'huddle_start_forbidden'"));
     assert.ok(bridge.includes("code: 'huddle_not_started'"));
     // huddle-token, huddle-line, daily backup, and outage fallback

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { parseBearerAuthorization } from './_utils/memberIdentity.js';
+import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
   MAX_CHAT_BODY_BYTES,
   parseChatMessagesListQuery,
@@ -24,7 +24,7 @@ import {
   parseHuddleLineCommand,
   parseVaultDailyTokenResponse,
   parseVaultHuddleLineResponse,
-} from './_utils/communityChatSanitize.js';
+} from '../_utils/communityChatSanitize.js';
 import {
   buildVaultCommunityChatChannelsUrl,
   buildVaultCommunityChatDmChannelUrl,
@@ -37,7 +37,7 @@ import {
   buildVaultCommunityChatVoiceTokenUrl,
   parseVaultApiOrigin,
   buildVaultHuddleFailsafeUrl,
-} from './_utils/vaultOrigin.js';
+} from '../_utils/vaultOrigin.js';
 
 /**
  * Single serverless function for Connect chat bridges (Hobby function-count limit).

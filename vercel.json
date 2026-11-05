@@ -49,6 +49,10 @@
       "destination": "/api/vault-news?bridge=sso"
     },
     {
+      "source": "/api/(community-chat|community-comments|community-feed|community-mentions|community-post-manage|community-post|community-posts|community-reaction)",
+      "destination": "/api/community?fn=$1"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/$1"
     },
