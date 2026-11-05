@@ -81,20 +81,21 @@ export const MemberHomeHeader: React.FC<{ onLiveChange?: (live: boolean) => void
   return (
     <header className="relative px-5 pt-3 pb-1 space-y-6">
       {!live ? <StainedGlass /> : null}
-      <div className="relative flex items-center justify-between gap-3">
+      <div className="relative flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <AWCLogo size={44} className="block shrink-0 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.25)]" />
           <BackToAwcOne />
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={openAssistant}
-            className="inline-flex items-center gap-2 h-11 rounded-full bg-leaf text-wine pl-3.5 pr-4 text-sm font-bold shadow-sm active:scale-95 transition-transform motion-reduce:transition-none"
+            className="inline-flex items-center gap-1.5 h-11 rounded-full bg-leaf text-wine w-11 justify-center sm:w-auto sm:justify-start sm:pl-3 sm:pr-3.5 text-sm font-bold whitespace-nowrap shrink-0 shadow-sm active:scale-95 transition-transform motion-reduce:transition-none"
             aria-label="Ask PLCC Assistant"
           >
             <Sparkles size={16} fill="currentColor" aria-hidden />
-            Ask PLCC
+            {/* Phones: sparkle only, so everything fits on one line. */}
+            <span className="hidden sm:inline">Ask PLCC</span>
           </button>
           <HomeHeroActions showBell />
         </div>
