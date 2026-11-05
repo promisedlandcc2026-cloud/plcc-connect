@@ -13,14 +13,12 @@ const openaiKey =
   '';
 const geminiKey = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined)?.trim() || '';
 
+const REACH_US = CHURCH_INFO.phone ? `call us at ${CHURCH_INFO.phone}` : `email us at ${CHURCH_INFO.email}`;
+
 const CONNECT_ERROR =
-  "I'm having a little trouble connecting right now. Please try again or call us at " +
-  CHURCH_INFO.phone +
-  '.';
+  "I'm having a little trouble connecting right now. Please try again or " + REACH_US + '.';
 const NOT_CONFIGURED =
-  'The AI assistant is not configured yet. Please use the Connect Card or call us at ' +
-  CHURCH_INFO.phone +
-  '.';
+  'The AI assistant is not configured yet. Please use the Connect Card or ' + REACH_US + '.';
 
 async function buildSystemContext(): Promise<string> {
   let liveEvents = FALLBACK_EVENTS;
@@ -86,7 +84,7 @@ async function buildSystemContext(): Promise<string> {
     - Name: ${CHURCH_INFO.name}
     - Motto: ${CHURCH_INFO.motto}
     - Address: ${CHURCH_INFO.address}
-    - Phone: ${CHURCH_INFO.phone}
+    - Phone: ${CHURCH_INFO.phone || 'not listed (use email or the Connect Card)'}
     - Schedule: ${JSON.stringify(CHURCH_INFO.schedule)}
     - Ministry Teams: ${JSON.stringify(liveTeams)}
     - Announcements: ${JSON.stringify(liveAnnouncements)}
@@ -103,7 +101,7 @@ async function buildSystemContext(): Promise<string> {
     5. If asked about visiting or planning a visit, guide them to the "Plan a Visit" action in the app.
     6. If asked about what's happening at the church or the schedule, guide them to the "Upcoming Events" section.
     7. If a user expresses interest in serving, direct them to Ministries or the Connect Card.
-    8. If you don't have specific information, ask them to use the Connect Card or call ${CHURCH_INFO.phone}.
+    8. If you don't have specific information, ask them to use the Connect Card or ${REACH_US}.
   `;
 }
 

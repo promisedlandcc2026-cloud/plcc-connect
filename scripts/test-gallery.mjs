@@ -31,7 +31,7 @@ test('sanitize keeps only https or site-relative URLs and known fields', () => {
   assert.equal('extra' in item, false);
 });
 
-test('feed merges Leah, church photos, videos and admin uploads', async () => {
+test('feed merges church photos, videos and admin uploads (no AWC Pixieset album in PLCC)', async () => {
   const restore = mockFetch({
     '/api/gallery/pixieset': {
       items: [{ id: 'pixieset-1', type: 'image', url: 'https://images.pixieset.com/1/abc-xlarge.jpg', thumbnail: 'https://images.pixieset.com/1/abc-medium.jpg', width: 4024, height: 6048 }],
@@ -48,8 +48,7 @@ test('feed merges Leah, church photos, videos and admin uploads', async () => {
   });
   try {
     const feed = await buildGalleryFeed(ORIGIN);
-    assert.equal(feed.leah.length, 1);
-    assert.equal(feed.leah[0].credit.name, 'Leah');
+    assert.equal(feed.leah.length, 0);
     assert.deepEqual(feed.church.map((i) => i.id), ['c1', 'u1']);
     assert.equal(feed.videos.length, 1);
     assert.equal(feed.partial, false);
@@ -68,7 +67,7 @@ test('feed still returns what it can when a source is down', async () => {
     const feed = await buildGalleryFeed(ORIGIN);
     assert.equal(feed.leah.length, 0);
     assert.equal(feed.church.length, 1);
-    assert.equal(feed.partial, true);
+    assert.equal(feed.partial, false);
   } finally {
     restore();
   }

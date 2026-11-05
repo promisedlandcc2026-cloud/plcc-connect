@@ -85,7 +85,7 @@ function isLegacyPromo(item) {
 
 export async function buildGalleryFeed(origin = siteOrigin()) {
   const [leahRes, feedRes, uploadsRes] = await Promise.allSettled([
-    getJson(`${origin}/api/gallery/pixieset`),
+    Promise.resolve({ items: [] }), // AWC's Pixieset album is not PLCC's
     getJson(`${origin}/gallery-feed.json`),
     getJson(`${origin}/api/gallery`),
   ]);

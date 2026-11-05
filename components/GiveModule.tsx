@@ -26,27 +26,6 @@ const METHODS: Array<{ id: GiveMethod; title: string; note: string; icon: React.
     icon: <Landmark size={20} />,
     tint: 'bg-gold/15 text-burgundy',
   },
-  {
-    id: 'zelle',
-    title: 'Zelle',
-    note: 'From your bank app',
-    icon: <span className="font-black text-sm">Z</span>,
-    tint: 'bg-purple-50 text-purple-700',
-  },
-  {
-    id: 'cashapp',
-    title: 'Cash App',
-    note: '$awcgiveplus',
-    icon: <span className="font-black text-lg">$</span>,
-    tint: 'bg-green-50 text-green-700',
-  },
-  {
-    id: 'venmo',
-    title: 'Venmo',
-    note: 'Church business profile',
-    icon: <span className="font-black text-sm">V</span>,
-    tint: 'bg-sky-50 text-sky-700',
-  },
 ];
 
 export const GiveModule: React.FC<GiveModuleProps> = ({ isOpen, onClose }) => {
@@ -119,10 +98,6 @@ export const GiveModule: React.FC<GiveModuleProps> = ({ isOpen, onClose }) => {
                 </a>
               ))}
             </div>
-            <p className="text-xs text-gray-500 mt-3 leading-relaxed">
-              Zelle, Cash App and Venmo give you a short code to put in the note, so Finance can match your gift and send
-              your receipt.
-            </p>
           </div>
 
           <a
@@ -144,26 +119,10 @@ export const GiveModule: React.FC<GiveModuleProps> = ({ isOpen, onClose }) => {
               Mail checks to <span className="font-bold text-gray-600">{MAIL_ADDRESS}</span>
             </p>
             <p className="flex items-center justify-center gap-1.5">
-              <ShieldCheck size={14} /> Card and bank details are handled by Stripe, never stored by the church.
+              <ShieldCheck size={14} /> Card and bank details are handled by the payment provider, never stored by the church.
             </p>
           </div>
 
-          <div className="border-t border-gray-200 pt-4 text-xs text-gray-500 leading-relaxed">
-            <p className="font-semibold text-gray-600">Already give through Vanco?</p>
-            <p>
-              Your recurring gift keeps working.{' '}
-              <a
-                href="https://secure.myvanco.com/YKB0/campaign/C-1218F?access=tile_direct"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => void logGivingIntent('vanco_manage')}
-                className="text-burgundy font-semibold underline underline-offset-2"
-              >
-                Manage it on Vanco
-              </a>
-              . Text giving: 855-625-4703.
-            </p>
-          </div>
         </div>
       </div>
     </div>,

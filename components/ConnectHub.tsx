@@ -16,7 +16,7 @@ import { CHURCH_INFO } from '../data';
 import { useAuth } from '../context/AuthContext';
 
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(CHURCH_INFO.address)}`;
-const PHONE_HREF = `tel:${CHURCH_INFO.phone.replace(/\D/g, '')}`;
+const PHONE_HREF = CHURCH_INFO.phone ? `tel:${CHURCH_INFO.phone.replace(/\D/g, '')}` : '';
 
 export const ConnectHub: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -41,8 +41,8 @@ export const ConnectHub: React.FC = () => {
         {isAuthenticated ? 'Member Account' : 'Member Sign In'}
       </Link>
 
-      <div className="grid grid-cols-3 gap-2">
-        <a
+      <div className={`grid ${PHONE_HREF ? 'grid-cols-3' : 'grid-cols-2'} gap-2`}>
+        {PHONE_HREF ? <a
           href={PHONE_HREF}
           className="flex flex-col items-center justify-center gap-2 min-h-[88px] bg-white rounded-2xl border border-gray-100 shadow-sm active:scale-95 transition-all hover:border-burgundy/20"
         >
@@ -50,7 +50,7 @@ export const ConnectHub: React.FC = () => {
             <Phone size={18} />
           </div>
           <span className="text-xs font-bold text-[#1A1A1A] uppercase tracking-wide">Call</span>
-        </a>
+        </a> : null}
         <a
           href={`mailto:${CHURCH_INFO.email}`}
           className="flex flex-col items-center justify-center gap-2 min-h-[88px] bg-white rounded-2xl border border-gray-100 shadow-sm active:scale-95 transition-all hover:border-burgundy/20"
@@ -88,24 +88,28 @@ export const ConnectHub: React.FC = () => {
 
         <div className="pt-3 border-t border-gray-50 flex items-center justify-between gap-3">
           <div className="flex gap-5 text-gray-500">
+            {CHURCH_INFO.socials.facebook ? (
             <a
-              href={CHURCH_INFO.socials.facebook}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-burgundy transition-colors"
-              aria-label="Facebook"
-            >
-              <Facebook size={18} />
-            </a>
+                href={CHURCH_INFO.socials.facebook}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-burgundy transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook size={18} />
+              </a>
+            ) : null}
+            {CHURCH_INFO.socials.instagram ? (
             <a
-              href={CHURCH_INFO.socials.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-burgundy transition-colors"
-              aria-label="Instagram"
-            >
-              <Instagram size={18} />
-            </a>
+                href={CHURCH_INFO.socials.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-burgundy transition-colors"
+                aria-label="Instagram"
+              >
+                <Instagram size={18} />
+              </a>
+            ) : null}
             <a
               href={CHURCH_INFO.socials.youtube}
               target="_blank"

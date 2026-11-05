@@ -66,7 +66,7 @@ async function fetchLatestFromYouTubeChannel(): Promise<string | null> {
 
 /**
  * Resolve which YouTube video to feature in Watch Service.
- * Priority: env override → auto-fetch from @khiireofficial → data.ts fallback → Supabase.
+ * Priority: env override → auto-fetch from @plccgracelove → data.ts fallback → Supabase.
  */
 export async function resolveLatestVideoUrl(): Promise<string> {
   const envUrl = import.meta.env.VITE_LATEST_YOUTUBE_URL?.trim();

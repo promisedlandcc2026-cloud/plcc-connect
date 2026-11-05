@@ -53,7 +53,7 @@ const AUTHED_RESOURCES = new Set([
 const PUBLIC_RESOURCES = new Set(['invite-redeem', 'youtube']);
 const ALLOWED_RESOURCES = new Set([...AUTHED_RESOURCES, ...PUBLIC_RESOURCES]);
 
-const AWC_YOUTUBE_CHANNEL_ID = 'UCd7BAXFftbXrKrjiAniwIEQ';
+const CHURCH_YOUTUBE_CHANNEL_ID = 'UCecsx4U61ap-pbkLV42hcUA'; // PLCC GRACELOVE
 
 function setPrivateNoStore(res) {
   res.setHeader('Cache-Control', 'private, no-store');
@@ -93,7 +93,7 @@ async function handleYoutube(_req, res) {
   res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=3600');
   try {
     const response = await fetch(
-      `https://www.youtube.com/feeds/videos.xml?channel_id=${AWC_YOUTUBE_CHANNEL_ID}`
+      `https://www.youtube.com/feeds/videos.xml?channel_id=${CHURCH_YOUTUBE_CHANNEL_ID}`
     );
     if (!response.ok) {
       return res.status(502).json({ error: 'Could not reach YouTube feed' });

@@ -3,23 +3,25 @@ export const CHURCH_INFO = {
   name: "Promised Land Christian Center",
   motto: "Changing Hearts. Transforming Lives.",
   address: "Kira-Kitukutwe Trading Center, Wakiso District, Uganda",
-  phone: "(508) 454-3599",
-  email: "info@sanctum-live-nine.vercel.app",
+  /** Leave empty until PLCC gives a church phone — the Call button hides itself. */
+  phone: "",
+  email: "promisedlandcc2026@gmail.com",
   website: "https://sanctum-live-nine.vercel.app",
   schedule: [
     { day: "Sunday", time: "10:30 AM – 12:30 PM", event: "Sunday Celebration Service" },
     { day: "Wednesday", time: "7:30 PM – 9:30 PM", event: "Mid-Week Empowerment Bible Study" }
   ],
   socials: {
-    facebook: "https://www.facebook.com/AWCbelmont",
-    instagram: "https://www.instagram.com/awcbelmont/",
-    youtube: "https://www.youtube.com/@khiireofficial"
+    facebook: "",
+    instagram: "",
+    youtube: "https://www.youtube.com/@plccgracelove"
   }
 };
 
 /** Public YouTube channel — latest uploads fetched automatically via RSS. */
-export const YOUTUBE_CHANNEL_ID = 'UCd7BAXFftbXrKrjiAniwIEQ';
-export const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@khiireofficial';
+/** PLCC GRACELOVE (@plccgracelove). */
+export const YOUTUBE_CHANNEL_ID = 'UCecsx4U61ap-pbkLV42hcUA';
+export const YOUTUBE_CHANNEL_URL = 'https://www.youtube.com/@plccgracelove';
 
 /** Manual fallback only if auto-fetch fails. Leave empty to rely on YouTube RSS. */
 export const LATEST_YOUTUBE_VIDEO = '';
