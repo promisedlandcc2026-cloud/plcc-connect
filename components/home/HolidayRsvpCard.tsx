@@ -1,7 +1,7 @@
 /**
  * Featured holiday sign-up (Thanksgiving Dinner, then the Marrieds Dinner).
  * Shows from the feature date until RSVP closes, then disappears on its own.
- * The form lives on PLCC Vault (household, guests, allergies, Pledge vs Pay Now).
+ * The form lives on PLCC Canaan (household, guests, allergies, Pledge vs Pay Now).
  */
 import React from 'react';
 import { CalendarDays, Clock, ExternalLink, MapPin } from 'lucide-react';

@@ -1,6 +1,6 @@
 /**
  * Local QR camera for scanning the leader's rotating room code.
- * Mirrors PLCC Vault components/people/CardScannerCamera.tsx (light variant):
+ * Mirrors PLCC Canaan components/people/CardScannerCamera.tsx (light variant):
  * @yudiel/react-qr-scanner decodes on this device; the camera only mounts after
  * an explicit Start Camera tap (needed for reliable iOS decode).
  */

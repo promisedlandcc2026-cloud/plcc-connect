@@ -1,4 +1,4 @@
-/** Vault News + health DTO sanitizers for the Connect bridge. */
+/** Canaan News + health DTO sanitizers for the Connect bridge. */
 
 export const VAULT_NEWS_KINDS = new Set(['church', 'database', 'celebration', 'sympathy']);
 export const VAULT_NEWS_POST_ROLES = new Set(['SUPER_ADMIN', 'PASTOR', 'MINISTRY_LEADER']);

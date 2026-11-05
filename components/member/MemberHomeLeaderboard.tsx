@@ -1,6 +1,6 @@
 /**
  * Member Home: this season's check-in leaderboard (first name + last initial only).
- * Mirrors PLCC Vault components/Dashboard/HomeLeaderboard.tsx and uses the
+ * Mirrors PLCC Canaan components/Dashboard/HomeLeaderboard.tsx and uses the
  * current season accent. Compact: top 3 + your spot; My QR lives in the header
  * shortcuts. Renders nothing if points aren't available.
  */

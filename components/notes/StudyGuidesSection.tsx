@@ -1,6 +1,6 @@
 /**
  * "From PLCC" — sermon study guides the church published in RhemaNotes
- * (the same list as Sermon Notes in PLCC Vault). Sits above My notes.
+ * (the same list as Sermon Notes in PLCC Canaan). Sits above My notes.
  */
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';

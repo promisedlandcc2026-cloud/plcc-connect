@@ -130,7 +130,7 @@ function mapNewsUpstreamError(res, status) {
     return json(res, 403, {
       ok: false,
       code: 'forbidden',
-      message: 'Only Pastor, Ministry Leader, and Super Admin can post Vault News.',
+      message: 'Only Pastor, Ministry Leader, and Super Admin can post Canaan News.',
     });
   }
   if (status === 400) {
@@ -151,7 +151,7 @@ function mapNewsUpstreamError(res, status) {
   return json(res, 502, {
     ok: false,
     code: 'vault_unavailable',
-    message: 'Vault News is temporarily unavailable. Please try again.',
+    message: 'Canaan News is temporarily unavailable. Please try again.',
   });
 }
 
@@ -233,7 +233,7 @@ export default async function handler(req, res) {
     return json(res, 503, {
       ok: false,
       code: 'bridge_unconfigured',
-      message: 'Vault News is not available right now. Please try again later.',
+      message: 'Canaan News is not available right now. Please try again later.',
     });
   }
 
@@ -310,7 +310,7 @@ export default async function handler(req, res) {
             message:
               typeof setup?.error === 'string'
                 ? setup.error
-                : 'Vault News is not available right now. Please try again later.',
+                : 'Canaan News is not available right now. Please try again later.',
           });
         }
         return mapNewsUpstreamError(res, upstream.status);
@@ -322,7 +322,7 @@ export default async function handler(req, res) {
         return json(res, 502, {
           ok: false,
           code: 'invalid_upstream',
-          message: 'Vault News is temporarily unavailable. Please try again.',
+          message: 'Canaan News is temporarily unavailable. Please try again.',
         });
       }
       const item = parseVaultNewsItemResponse(body);
@@ -330,7 +330,7 @@ export default async function handler(req, res) {
         return json(res, 502, {
           ok: false,
           code: 'invalid_upstream',
-          message: 'Vault News is temporarily unavailable. Please try again.',
+          message: 'Canaan News is temporarily unavailable. Please try again.',
         });
       }
       return json(res, 201, { ok: true, item: item.item });
@@ -340,7 +340,7 @@ export default async function handler(req, res) {
       return json(res, 502, {
         ok: false,
         code: 'vault_unavailable',
-        message: 'Vault News is temporarily unavailable. Please try again.',
+        message: 'Canaan News is temporarily unavailable. Please try again.',
       });
     } finally {
       clearTimeout(timer);
@@ -369,7 +369,7 @@ export default async function handler(req, res) {
       return json(res, 502, {
         ok: false,
         code: 'invalid_upstream',
-        message: 'Vault News is temporarily unavailable. Please try again.',
+        message: 'Canaan News is temporarily unavailable. Please try again.',
       });
     }
     const parsed = parseVaultNewsListResponse(body);
@@ -377,7 +377,7 @@ export default async function handler(req, res) {
       return json(res, 502, {
         ok: false,
         code: 'invalid_upstream',
-        message: 'Vault News is temporarily unavailable. Please try again.',
+        message: 'Canaan News is temporarily unavailable. Please try again.',
       });
     }
     return json(res, 200, {
@@ -392,7 +392,7 @@ export default async function handler(req, res) {
     return json(res, 502, {
       ok: false,
       code: 'vault_unavailable',
-      message: 'Vault News is temporarily unavailable. Please try again.',
+      message: 'Canaan News is temporarily unavailable. Please try again.',
     });
   } finally {
     clearTimeout(timer);

@@ -1,6 +1,6 @@
 /**
  * Me tab: this season's points ring, rank, the season podium, recent awards,
- * and the leaderboard opt-out. Data mirrors PLCC Vault components/points/MyPointsCard.tsx.
+ * and the leaderboard opt-out. Data mirrors PLCC Canaan components/points/MyPointsCard.tsx.
  * Renders nothing if points aren't available, so it never breaks the page.
  */
 import React, { useEffect, useState } from 'react';

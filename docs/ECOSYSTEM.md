@@ -1,10 +1,10 @@
 # PLCC Connect Ecosystem
 
-PLCC Connect is the **public member PWA**. [PLCC Vault](../awc-vault-main) (separate repo) is the **admin back-office**. Both apps share one Supabase project.
+PLCC Connect is the **public member PWA**. [PLCC Canaan](../awc-vault-main) (separate repo) is the **admin back-office**. Both apps share one Supabase project.
 
 ## Schema ownership
 
-All database migrations live in **PLCC Vault**:
+All database migrations live in **PLCC Canaan**:
 
 ```
 awc-vault-main/supabase/migrations/
@@ -161,7 +161,7 @@ Public home keeps Welcome + Home eager. Member Sign In, Auth Callback, Account, 
 
 ## Check-in points + seasonal theme
 
-Same features as PLCC Vault, with **all point rules, the ledger, and QR signing kept in Vault** (`api/_utils/checkinPointsHandler.ts`, `memberPassHandler.ts`). The shared Supabase project already has `member_point_ledger`, `member_points_settings`, `attendance_sessions.points_enabled`, and the `attendance_self_checkin` / `points_leaderboard` / `points_member_summary` / `award_points_for_session` functions — **Connect ships no SQL** for this.
+Same features as PLCC Canaan, with **all point rules, the ledger, and QR signing kept in Vault** (`api/_utils/checkinPointsHandler.ts`, `memberPassHandler.ts`). The shared Supabase project already has `member_point_ledger`, `member_points_settings`, `attendance_sessions.points_enabled`, and the `attendance_self_checkin` / `points_leaderboard` / `points_member_summary` / `award_points_for_session` functions — **Connect ships no SQL** for this.
 
 **Bridge:** `GET|PATCH|POST /api/checkin-points?resource=…` rewrites onto `vault-news?bridge=points` (no new serverless function). Connect forwards the member Bearer token only to fixed Vault URLs:
 
@@ -213,7 +213,7 @@ Rules: UI text is **12px minimum** (count badges 11px). Inter (400–900 loaded)
 
 Bottom bar: **Home · Community · Events · Prayer · Me** (the Me tab shows the member's photo when they have one, plus the unread badge). `/me` (`pages/MemberMore.tsx`, exported as `MemberMePage`; `MemberMorePage` kept as an alias) replaces More; `/more` redirects to `/me`.
 
-Me = who you are (photo, name, **Edit** → `/profile`), the points card (Show my QR, Scan the room code, leaderboard switch), then grouped lists: **Mine** (My PLCC Card, Notifications, My Family, My Serving, My Attendance, Sermon Notes, Kids Plans), **Church life** (Give, Watch, Sunday Mode, Chat, Vault News, Ministries, Serve, Directory), **Account** (Edit profile, Settings, Open PLCC Vault for staff). Personal screens highlight Me and their back links return to Me. The Home header's account button opens Me for approved members.
+Me = who you are (photo, name, **Edit** → `/profile`), the points card (Show my QR, Scan the room code, leaderboard switch), then grouped lists: **Mine** (My PLCC Card, Notifications, My Family, My Serving, My Attendance, Sermon Notes, Kids Plans), **Church life** (Give, Watch, Sunday Mode, Chat, Vault News, Ministries, Serve, Directory), **Account** (Edit profile, Settings, Open PLCC Canaan for staff). Personal screens highlight Me and their back links return to Me. The Home header's account button opens Me for approved members.
 
 **One PLCC Card:** the check-in QR (Vault member-pass) and My PLCC Card read the same `member_digital_cards.qr_token`, so they are one concept. "Show my QR" / "My QR" open the **My PLCC Card** sheet (QR + backup code + link to the full card); `/card` explains it is also the check-in QR, links to `/scan-in`, and keeps the screen awake.
 

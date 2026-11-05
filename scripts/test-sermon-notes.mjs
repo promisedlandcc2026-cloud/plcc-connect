@@ -296,7 +296,7 @@ describe('API + SQL gate', () => {
 
   it('Vault migration exists locally and is not applied by Connect', (t) => {
     if (!vaultRoot) {
-      t.skip('PLCC Vault repo not checked out next to Connect (set VAULT_REPO to check it)');
+      t.skip('PLCC Canaan repo not checked out next to Connect (set VAULT_REPO to check it)');
       return;
     }
     const mig = join(vaultRoot, 'supabase/migrations/connect_phase_2_5_sermon_notes.sql');
@@ -364,7 +364,7 @@ describe('My Notes & Journal', () => {
 
   it('Vault migration adds the journal columns without touching RLS', (t) => {
     if (!vaultRoot) {
-      t.skip('PLCC Vault repo not checked out next to Connect');
+      t.skip('PLCC Canaan repo not checked out next to Connect');
       return;
     }
     const sql = readFileSync(join(vaultRoot, 'supabase/migrations/connect_notes_journal.sql'), 'utf8');

@@ -56,5 +56,5 @@ export function vaultNewsShareText(item: VaultNewsItem, homeUrl?: string): strin
   const home =
     homeUrl ||
     (typeof window !== 'undefined' ? window.location.origin : 'https://plcc-connect.vercel.app');
-  return [`Vault News · ${kind}`, item.title, '', item.body, '', `— ${who}`, 'Promised Land Christian Center', home].join('\n');
+  return [`Canaan News · ${kind}`, item.title, '', item.body, '', `— ${who}`, 'Promised Land Christian Center', home].join('\n');
 }

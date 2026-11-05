@@ -1,6 +1,6 @@
 /**
  * "Today at PLCC" — story circles for today's verse, the featured holiday
- * sign-up, Vault News, the prayer wall and praise reports (Vault News
+ * sign-up, Canaan News, the prayer wall and praise reports (Canaan News
  * celebrations). A gold ring means something new since you last looked.
  * Circles without content hide themselves; each source loads on its own.
  */
@@ -45,7 +45,7 @@ const SlideBody: React.FC<{ kicker: string; children: React.ReactNode; footer?: 
 const ctaClass =
   'flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[18px] bg-leaf text-base font-extrabold text-wine';
 
-/** `visitor`: no Vault News (members only); prayer CTA scrolls to the public wall. */
+/** `visitor`: no Canaan News (members only); prayer CTA scrolls to the public wall. */
 export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false }) => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -140,7 +140,7 @@ export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false 
                   goToHomeSection(location.pathname, navigate, 'vault-news');
                 }}
               >
-                Open Vault News
+                Open Canaan News
               </button>
             }
           >
@@ -156,7 +156,7 @@ export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false 
       }));
 
     if (news.length) {
-      out.push({ id: 'news', label: 'Vault News', eyebrow: 'PLCC · Vault News', icon: Newspaper, stamp: stampFor(news), slides: newsSlides(news, 'news') });
+      out.push({ id: 'news', label: 'Canaan News', eyebrow: 'PLCC · Canaan News', icon: Newspaper, stamp: stampFor(news), slides: newsSlides(news, 'news') });
     }
 
     if (prayers.length) {

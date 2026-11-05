@@ -105,7 +105,7 @@ const MORE_EMOJI: Record<string, string> = {
   Gallery: '📸',
   Give: '💝',
   Watch: '📺',
-  'Vault News': '📰',
+  'Canaan News': '📰',
   Ministries: '⛪',
   'Sunday Mode': '☀️',
   Serve: '🤲',
@@ -122,7 +122,7 @@ const MORE_EMOJI: Record<string, string> = {
   'Edit profile': '✏️',
   Settings: '⚙️',
   'Add to home screen': '📲',
-  'Open PLCC Vault': '🔐',
+  'Open PLCC Canaan': '🔐',
 };
 
 const GROUP_LABEL: Record<MoreGroup, string> = {
@@ -195,7 +195,7 @@ export const MemberMePage: React.FC = () => {
       group: 'church',
       kind: 'homeSection',
       sectionId: 'vault-news',
-      label: 'Vault News',
+      label: 'Canaan News',
       description: 'Church news, celebrations, and sympathy',
       icon: Megaphone,
     },
@@ -352,7 +352,7 @@ export const MemberMePage: React.FC = () => {
       group: 'account',
       kind: 'external',
       href: VAULT_PUBLIC_ORIGIN,
-      label: 'Open PLCC Vault',
+      label: 'Open PLCC Canaan',
       description: 'Staff / leadership tools (separate app)',
       icon: ExternalLink,
     });

@@ -16,7 +16,7 @@ import {
 } from '../lib/phoneAlerts';
 
 const TOPICS: { key: AlertTopic; label: string; hint: string; locked?: boolean }[] = [
-  { key: 'church', label: 'Church alerts', hint: "We're live, events, Vault News", locked: true },
+  { key: 'church', label: 'Church alerts', hint: "We're live, events, Canaan News", locked: true },
   { key: 'prayer', label: 'Prayer requests', hint: 'When someone shares a prayer request' },
   { key: 'community', label: 'My community', hint: 'Mentions, replies, huddles, PLCC Bucks' },
   { key: 'daily', label: 'Morning devotional', hint: 'Today’s devotional at 7 AM' },
@@ -103,7 +103,7 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
     content = (
       <>
         <p className="text-[15px] text-ink-soft">
-          Get a ping when service goes live, event reminders like “RSVP closes Friday,” and new Vault News. Free — no text messages.
+          Get a ping when service goes live, event reminders like “RSVP closes Friday,” and new Canaan News. Free — no text messages.
         </p>
         <Button size="lg" fullWidth disabled={busy} onClick={() => void turnOn()}>
           <BellRing className="h-5 w-5" aria-hidden />

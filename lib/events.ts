@@ -8,13 +8,13 @@ import {
 
 export const FELLOWSHIP_COOKOUT_ID = 'a1b2c3d4-e5f6-4789-a012-202609201400';
 
-/** Cookout cover image from PLCC Vault / Supabase storage */
+/** Cookout cover image from PLCC Canaan / Supabase storage */
 export const FELLOWSHIP_COOKOUT_IMAGE =
   'https://yrpwdrioomdihjlmcfnu.supabase.co/storage/v1/object/public/avatars/events/1787686538179-96c4zkjnj64.jpg';
 
 export const FELLOWSHIP_COOKOUT_LOCAL_IMAGE = '/events/fellowship-cookout.jpg';
 
-/** Full cookout signup (household, children, allergy consents) lives in PLCC Vault (hash routes). */
+/** Full cookout signup (household, children, allergy consents) lives in PLCC Canaan (hash routes). */
 export const FELLOWSHIP_COOKOUT_RSVP_URL = `${VAULT_PUBLIC_ORIGIN}/#/fellowship-cookout`;
 
 const COOKOUT_DESCRIPTION =

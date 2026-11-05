@@ -1,5 +1,5 @@
 /**
- * Live Huddle Play Music (mirrors PLCC Vault, Oct 2026).
+ * Live Huddle Play Music (mirrors PLCC Canaan, Oct 2026).
  * Run: node --test scripts/test-huddle-music.mjs
  */
 import { before, describe, it } from 'node:test';

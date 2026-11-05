@@ -191,7 +191,7 @@ describe('sanitizeNotification + destinations', () => {
     assert.equal(unknown.destination, null);
   });
 
-  it('maps Vault News fan-out (announcement + /dashboard) into the Connect inbox', () => {
+  it('maps Canaan News fan-out (announcement + /dashboard) into the Connect inbox', () => {
     assert.equal(isVaultNewsNotification('announcement', '/dashboard'), true);
     assert.equal(isVaultNewsNotification('announcement', '/communication/announcements'), false);
     assert.equal(isVaultNewsNotification('prayer', '/dashboard'), false);
@@ -206,10 +206,10 @@ describe('sanitizeNotification + destinations', () => {
     });
     assert.ok(news);
     assert.equal(news.type, 'vault_news');
-    assert.equal(news.typeLabel, 'Vault News');
+    assert.equal(news.typeLabel, 'Canaan News');
     assert.deepEqual(news.destination, {
       path: '/?section=vault-news',
-      label: 'View Vault News',
+      label: 'View Canaan News',
       kind: 'vault_news',
     });
     const church = sanitizeNotification({

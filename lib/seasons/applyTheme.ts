@@ -1,6 +1,6 @@
 /**
  * Connect seasonal theme publisher.
- * Same rules as PLCC Vault lib/seasons/applyTheme.ts, but the church setting
+ * Same rules as PLCC Canaan lib/seasons/applyTheme.ts, but the church setting
  * (organization_settings.system_settings.seasonal) comes through Connect's
  * same-origin bridge: GET /api/checkin-points?resource=season.
  *

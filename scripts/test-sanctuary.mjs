@@ -116,7 +116,7 @@ describe('order of service', () => {
 });
 
 describe('Today stories', () => {
-  it('splits Vault News: celebrations are Praise, ops notices hidden', async () => {
+  it('splits Canaan News: celebrations are Praise, ops notices hidden', async () => {
     const t = await load('lib/todayStories.ts');
     const items = [
       { id: 'a', kind: 'church', title: 'A', body: '' },
@@ -209,7 +209,7 @@ describe('motion and type', () => {
 });
 
 describe('visitor Home (Sanctuary)', () => {
-  it('visitor hero uses the stained glass, a Plan-a-visit ticket and stories without Vault News', () => {
+  it('visitor hero uses the stained glass, a Plan-a-visit ticket and stories without Canaan News', () => {
     const hero = read('components/home/HomeHero.tsx');
     assert.match(hero, /<StainedGlass \/>/);
     assert.match(hero, /<NextUpTicket next=\{next\} liveUrl=\{liveUrl\} visitor \/>/);
@@ -269,7 +269,7 @@ describe('Sermon Notes: study guides from Vault', () => {
     assert.equal(guide.coverUrl, 'https://x.test/c.jpg');
   });
 
-  it('rides the existing Vault News function (no new API file) to Vault rhemanotes', () => {
+  it('rides the existing Canaan News function (no new API file) to Vault rhemanotes', () => {
     const bridge = read('api/_utils/studyGuidesBridge.js');
     assert.match(bridge, /SHARE_TOKEN_RE\.test\(token\)/);
     assert.match(read('api/_utils/vaultOrigin.js'), /resource=rhemanotes&action=library/);

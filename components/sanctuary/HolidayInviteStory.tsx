@@ -1,6 +1,6 @@
 /**
  * Holiday sign-up as a story (Thanksgiving first, then the Marrieds Dinner):
- * the invitation, then how sign-up works. The form itself stays on PLCC Vault.
+ * the invitation, then how sign-up works. The form itself stays on PLCC Canaan.
  */
 import React, { useState } from 'react';
 import { Clock, ExternalLink, Leaf, Share2 } from 'lucide-react';
@@ -154,7 +154,7 @@ export function holidayInviteSlides(rsvp: HolidayRsvp, now: Date = new Date()): 
                 </li>
               ))}
             </ol>
-            <p className="mt-4 text-sm text-cream/80">The form opens on PLCC Vault, the church’s sign-up site.</p>
+            <p className="mt-4 text-sm text-cream/80">The form opens on PLCC Canaan, the church’s sign-up site.</p>
           </div>
           {actions}
         </>

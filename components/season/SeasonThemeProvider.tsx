@@ -1,6 +1,6 @@
 /**
  * Publishes the active season / holiday theme to <html data-season="…"> so the
- * --season-* CSS variables in index.css apply app-wide. Mirrors PLCC Vault's
+ * --season-* CSS variables in index.css apply app-wide. Mirrors PLCC Canaan's
  * SeasonThemeProvider; re-checks hourly, on tab focus, and when the member
  * signs in or out (the church setting needs a signed-in bridge call).
  */

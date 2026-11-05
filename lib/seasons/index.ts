@@ -1,4 +1,4 @@
-/** Mirrored from PLCC Vault lib/seasons/index.ts — keep in sync. */
+/** Mirrored from PLCC Canaan lib/seasons/index.ts — keep in sync. */
 export { addNyDays, dateOnNyDay, inNyWindow, nyKey, nyParts, parseNyKey } from './nyDate';
 export { getCurrentSeason, getSeasonWindow } from './season';
 export type { SeasonName, SeasonWindow } from './season';

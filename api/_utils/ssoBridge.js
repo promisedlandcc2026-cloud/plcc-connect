@@ -1,6 +1,6 @@
 /**
  * PLCC ONE one sign-on bridge (Connect → PLCC Chat):
- *   POST /api/sso   (Bearer)  → PLCC Vault POST /api/vault?resource=sso { target: 'chat' }
+ *   POST /api/sso   (Bearer)  → PLCC Canaan POST /api/vault?resource=sso { target: 'chat' }
  * Returns { ok, tokenHash } — a single-use sign-in token PLCC Chat verifies at /auth/sso.
  * Rides on api/vault-news.js (bridge=sso) for the Hobby function limit.
  * Fixed upstream and target; forwards only the member's Bearer token; never logs it.

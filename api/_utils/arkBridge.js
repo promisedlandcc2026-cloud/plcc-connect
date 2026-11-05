@@ -4,7 +4,7 @@
  *   GET  /api/ark?action=board&game=tetris&period=week|all
  *   POST /api/ark?action=score   { playerId, game, score, durationSec, stats }
  *   POST /api/ark?action=privacy { playerId, hideName }
- * → PLCC Vault  /api/vault?resource=ark (scores, leaderboards, PLCC Bucks rules).
+ * → PLCC Canaan  /api/vault?resource=ark (scores, leaderboards, PLCC Bucks rules).
  * Rides on api/vault-news.js (bridge=ark) for the Hobby function limit.
  * Fixed upstream; forwards only the member's Bearer token; never logs it.
  */

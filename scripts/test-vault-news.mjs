@@ -1,5 +1,5 @@
 /**
- * Vault News + database health bridge contracts.
+ * Canaan News + database health bridge contracts.
  * Run: node --test scripts/test-vault-news.mjs
  */
 import { describe, it } from 'node:test';

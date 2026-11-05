@@ -1,8 +1,8 @@
 /**
  * Check-in points client — profile points, Home leaderboard, room-code check-in,
  * and the member's own membership QR. Everything goes through the same-origin
- * bridge /api/checkin-points → PLCC Vault (point rules + QR signing stay there).
- * Types match PLCC Vault lib/checkinPointsClient.ts.
+ * bridge /api/checkin-points → PLCC Canaan (point rules + QR signing stay there).
+ * Types match PLCC Canaan lib/checkinPointsClient.ts.
  */
 import { getValidAccessToken, refreshAccessToken } from './authAccessToken';
 

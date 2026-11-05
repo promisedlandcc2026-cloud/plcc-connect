@@ -1,4 +1,4 @@
-/** Mirrored from PLCC Vault lib/seasons/nyDate.ts — keep in sync. */
+/** Mirrored from PLCC Canaan lib/seasons/nyDate.ts — keep in sync. */
 /** Calendar parts in Africa/Kampala. Noon UTC stays the same civil day in both EST and EDT. */
 
 export type NyDate = { year: number; month: number; day: number };

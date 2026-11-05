@@ -104,7 +104,7 @@ const NotificationCard: React.FC<{
 
 /**
  * Signed-in Notifications inbox — in-app only, no push.
- * Pending / phone-only accounts receive Vault News here too.
+ * Pending / phone-only accounts receive Canaan News here too.
  */
 export const MemberNotificationsPage: React.FC = () => {
   const { identity, memberAccessState } = useAuth();
@@ -249,7 +249,7 @@ export const MemberNotificationsPage: React.FC = () => {
 
       {memberAccessState === 'pending' && (
         <p className="mb-4 text-sm text-gray-600 leading-relaxed">
-          You’re signed in. Church Vault News still reaches this inbox while your member profile
+          You’re signed in. Church Canaan News still reaches this inbox while your member profile
           finishes setup.
         </p>
       )}

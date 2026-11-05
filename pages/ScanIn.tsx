@@ -1,6 +1,6 @@
 /**
  * Member self check-in: scan the leader's rotating room QR, earn points.
- * Route: /scan-in (also accepts /scan-in?c=TOKEN). Mirrors PLCC Vault pages/ScanIn.tsx.
+ * Route: /scan-in (also accepts /scan-in?c=TOKEN). Mirrors PLCC Canaan pages/ScanIn.tsx.
  * The code is verified and the points are awarded on Vault via /api/checkin-points.
  */
 import React, { useCallback, useEffect, useRef, useState } from 'react';

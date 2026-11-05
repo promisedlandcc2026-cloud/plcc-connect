@@ -1,6 +1,6 @@
 /**
  * The signed-in member's own membership QR, for a leader to scan at check-in.
- * Mirrors PLCC Vault components/points/MyPassQrModal.tsx. The pass comes from
+ * Mirrors PLCC Canaan components/points/MyPassQrModal.tsx. The pass comes from
  * Vault (member-pass) through Connect's bridge — Connect never mints or signs it.
  * Black-on-white with the screen kept awake so a scanner reads it quickly.
  */

@@ -33,7 +33,7 @@ export function isUnseen(seen: Record<string, string>, id: StoryId, stamp: strin
   return Boolean(stamp) && seen[id] !== stamp;
 }
 
-/** Church news & sympathy go in Vault News; celebrations are Praise. Ops notices stay out. */
+/** Church news & sympathy go in Canaan News; celebrations are Praise. Ops notices stay out. */
 export function splitVaultNews(items: VaultNewsItem[]): { news: VaultNewsItem[]; praise: VaultNewsItem[] } {
   const usable = (items || []).filter((n) => n && n.kind !== 'database');
   return {

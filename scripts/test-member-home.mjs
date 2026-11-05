@@ -277,7 +277,7 @@ describe('My PLCC sections contracts', () => {
   it('staff Vault link remains on More', () => {
     const more = readFileSync(join(root, 'pages/MemberMore.tsx'), 'utf8');
     assert.ok(more.includes('canOpenVaultStaffLink'));
-    assert.ok(more.includes('Open PLCC Vault'));
+    assert.ok(more.includes('Open PLCC Canaan'));
   });
 
   it('member shell / MemberNav still present', () => {

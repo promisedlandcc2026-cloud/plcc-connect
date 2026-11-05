@@ -466,7 +466,7 @@ function connectApiDevBridge() {
             JSON.stringify({
               ok: false,
               code: 'vault_unavailable',
-              message: 'Vault News is temporarily unavailable. Please try again.',
+              message: 'Canaan News is temporarily unavailable. Please try again.',
             })
           );
         }

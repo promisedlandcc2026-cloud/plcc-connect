@@ -20,7 +20,7 @@ import {
 } from '../../lib/vaultNewsClient';
 
 function emailShareHref(item: VaultNewsItem): string {
-  return `mailto:?subject=${encodeURIComponent(`Vault News: ${item.title}`)}&body=${encodeURIComponent(vaultNewsShareText(item))}`;
+  return `mailto:?subject=${encodeURIComponent(`Canaan News: ${item.title}`)}&body=${encodeURIComponent(vaultNewsShareText(item))}`;
 }
 
 function whatsappShareHref(item: VaultNewsItem): string {
@@ -55,7 +55,7 @@ export const MemberHomeVaultNews: React.FC = () => {
       fetchDatabaseHealth(),
       fetchVaultNews().catch((err: unknown) => {
         const message =
-          err instanceof Error ? err.message : 'Vault News is temporarily unavailable. Please try again.';
+          err instanceof Error ? err.message : 'Canaan News is temporarily unavailable. Please try again.';
         return { error: message as string };
       }),
     ]);
@@ -135,7 +135,7 @@ export const MemberHomeVaultNews: React.FC = () => {
   return (
     <MemberHomeSection
       id="vault-news"
-      title="Vault News"
+      title="Canaan News"
       aside={
         <span
           role="status"
@@ -208,7 +208,7 @@ export const MemberHomeVaultNews: React.FC = () => {
             {formError ? <p className="text-xs font-bold text-rose-700">{formError}</p> : null}
             {needsSetup ? (
               <p className="text-xs font-medium text-amber-900">
-                Vault News isn’t switched on yet. Post from PLCC Vault once setup is finished.
+                Canaan News isn’t switched on yet. Post from PLCC Canaan once setup is finished.
               </p>
             ) : null}
             <button

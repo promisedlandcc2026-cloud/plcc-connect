@@ -1,4 +1,4 @@
-/** Mirrored from PLCC Vault lib/seasons/season.ts — must match public.points_season_key(). */
+/** Mirrored from PLCC Canaan lib/seasons/season.ts — must match public.points_season_key(). */
 import { isLeapYear, nyKey, nyParts, type NyDate } from './nyDate';
 
 export type SeasonName = 'fall' | 'winter' | 'spring' | 'summer';

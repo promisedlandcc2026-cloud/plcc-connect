@@ -1,5 +1,5 @@
 /**
- * Sermon study guides published in RhemaNotes and shown in PLCC Vault's
+ * Sermon study guides published in RhemaNotes and shown in PLCC Canaan's
  * "Sermon Notes" page. Same-origin bridge: /api/study-guides → Vault.
  */
 import { getValidAccessToken, refreshAccessToken } from './authAccessToken';

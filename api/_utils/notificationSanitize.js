@@ -10,7 +10,7 @@ const MAX_PATCH_BODY_BYTES = 4096;
 /** Known Vault notification types (unknown types still render safely). */
 const TYPE_LABELS = {
   announcement: 'Announcement',
-  vault_news: 'Vault News',
+  vault_news: 'Canaan News',
   prayer: 'Prayer',
   assignment: 'Assignment',
   community_mention: 'Community',
@@ -167,7 +167,7 @@ export function resolveCommunityPostId(type, sourceId, rawLink) {
 }
 
 /**
- * Vault News fan-out uses type `announcement` + relative `/dashboard`.
+ * Canaan News fan-out uses type `announcement` + relative `/dashboard`.
  * Church Communication announcements use `/communication/announcements`.
  * @param {string} type
  * @param {string | null} rawLink
@@ -195,7 +195,7 @@ export function resolveNotificationDestination(type, sourceId, rawLink) {
   if (isVaultNewsNotification(t, rawLink || null)) {
     return {
       path: '/?section=vault-news',
-      label: 'View Vault News',
+      label: 'View Canaan News',
       kind: 'vault_news',
     };
   }
@@ -366,7 +366,7 @@ export function sanitizeNotification(row) {
   return {
     id,
     type: vaultNews ? 'vault_news' : type,
-    typeLabel: vaultNews ? 'Vault News' : TYPE_LABELS[type] || 'Notification',
+    typeLabel: vaultNews ? 'Canaan News' : TYPE_LABELS[type] || 'Notification',
     title,
     message,
     createdAt,

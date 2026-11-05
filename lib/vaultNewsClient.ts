@@ -66,7 +66,7 @@ export async function fetchVaultNews(): Promise<VaultNewsList> {
   if (!res.ok) {
     throw new VaultNewsError(
       String(body?.code || 'unavailable'),
-      String(body?.message || 'Vault News is temporarily unavailable. Please try again.')
+      String(body?.message || 'Canaan News is temporarily unavailable. Please try again.')
     );
   }
   const news = Array.isArray(body?.news) ? body.news.filter(isNewsItem) : [];

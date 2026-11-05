@@ -2,12 +2,12 @@
 
 Public member PWA for **Promised Land Christian Center** — sermons, events, prayer, giving, and more.
 
-Part of the PLCC ecosystem alongside [PLCC Vault](../awc-vault-main) (admin back-office).
+Part of the PLCC ecosystem alongside [PLCC Canaan](../awc-vault-main) (admin back-office).
 
 ## Prerequisites
 
 - Node.js 18+
-- Supabase project (shared with PLCC Vault)
+- Supabase project (shared with PLCC Canaan)
 
 ## Setup
 
@@ -23,7 +23,7 @@ Fill in `.env.local`:
 | `VITE_SUPABASE_URL` | Supabase project URL (same tenant as Vault) |
 | `VITE_SUPABASE_ANON_KEY` | Public anon key (RLS enforced) |
 | `VITE_AUTH_REDIRECT_URL` | Optional Auth callback URL (default `{origin}/auth/callback`) |
-| `VAULT_API_ORIGIN` | **Server-only** HTTPS origin of PLCC Vault (no path). Required for member identity verification. |
+| `VAULT_API_ORIGIN` | **Server-only** HTTPS origin of PLCC Canaan (no path). Required for member identity verification. |
 | `OPENAI_API_KEY` | OpenAI key for PLCC Assistant (primary; optional) |
 | `VITE_GEMINI_API_KEY` | Gemini fallback for PLCC Assistant (optional) |
 
@@ -47,7 +47,7 @@ npm run typecheck
 
 ## Database & admin
 
-Connect does not ship migrations. Schema is owned by **PLCC Vault** — see [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md).
+Connect does not ship migrations. Schema is owned by **PLCC Canaan** — see [docs/ECOSYSTEM.md](docs/ECOSYSTEM.md).
 
 Staff manage sermons, visits, connect cards, and prayer requests in Vault or Supabase directly.
 

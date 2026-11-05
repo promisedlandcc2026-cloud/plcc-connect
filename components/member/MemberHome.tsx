@@ -29,7 +29,7 @@ const SCROLL_SECTIONS = new Set(['vault-news', 'leaderboard', 'holiday-rsvp', 'w
  * four quick actions — or, on Sunday while service is live, the in-service view.
  * Feed, in groups: time-sensitive nudges → Today (devotional) → This week
  * (events, announcements) → Church family (birthdays, community, prayer) →
- * Watch (video + latest sermon in one place) → Vault News → Leaderboard.
+ * Watch (video + latest sermon in one place) → Canaan News → Leaderboard.
  * Empty sections hide themselves; unread count lives on the bell only.
  * Each feed section loads independently so one failure cannot blank the page.
  */

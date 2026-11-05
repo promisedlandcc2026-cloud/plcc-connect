@@ -1,4 +1,4 @@
-/** Mirrored from PLCC Vault lib/seasons/theme.ts — keep in sync. */
+/** Mirrored from PLCC Canaan lib/seasons/theme.ts — keep in sync. */
 import { getActiveHoliday, type AnniversarySetting, type HolidayName } from './holidays';
 import { getSeasonWindow, type SeasonName } from './season';
 

@@ -1,5 +1,5 @@
 /**
- * Holiday RSVPs (PLCC Vault → Events & Check-In → Holiday RSVPs · 2026).
+ * Holiday RSVPs (PLCC Canaan → Events & Check-In → Holiday RSVPs · 2026).
  * Mirrors the Vault Fellowship Event Kit (api/_utils/fellowshipEventConfig.ts):
  * same event ids, dates and RSVP close times. The sign-up form itself — household,
  * guests, allergy/injury consents, Pledge vs Pay Now — stays on Vault; Connect

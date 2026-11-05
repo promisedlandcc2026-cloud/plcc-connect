@@ -1,4 +1,4 @@
-/** Mirrored from PLCC Vault lib/seasons/holidays.ts — keep in sync. */
+/** Mirrored from PLCC Canaan lib/seasons/holidays.ts — keep in sync. */
 import { addNyDays, dateOnNyDay, inNyWindow, isLeapYear, nyParts, weekdayNy, type NyDate } from './nyDate';
 
 export type HolidayName = 'thanksgiving' | 'christmas' | 'new_year' | 'easter' | 'anniversary';

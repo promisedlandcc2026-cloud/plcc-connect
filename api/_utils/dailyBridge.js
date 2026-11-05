@@ -1,6 +1,6 @@
 /**
  * Daily devotional bridge (public — visitors can read it too):
- *   GET /api/daily?date=YYYY-MM-DD → PLCC Vault /api/vault?resource=daily&action=week
+ *   GET /api/daily?date=YYYY-MM-DD → PLCC Canaan /api/vault?resource=daily&action=week
  * Returns Monday–Sunday of that week (church-written days, starter set otherwise).
  * Rides on api/vault-news.js (bridge=daily) for the Hobby function limit.
  * Read-only: staff write devotionals in the Vault itself.

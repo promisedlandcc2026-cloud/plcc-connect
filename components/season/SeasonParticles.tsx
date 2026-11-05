@@ -1,5 +1,5 @@
 /**
- * Falling leaves / snow / petals / sparkles. Mirrored from PLCC Vault
+ * Falling leaves / snow / petals / sparkles. Mirrored from PLCC Canaan
  * components/Season/SeasonParticles.tsx (same colors, sizes and motion).
  * Connect adds `className` so the canvas can be confined to the hero.
  */
