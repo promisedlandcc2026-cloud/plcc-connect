@@ -16,6 +16,7 @@ import {
   type ActiveTheme,
   type SeasonalSettings,
 } from './index';
+import { fetchKampalaWeather, type TodayWeather } from './weather';
 
 export type PublishedSeason = {
   theme: ActiveTheme;
@@ -94,8 +95,23 @@ function prefersReducedMotion(): boolean {
   );
 }
 
-export function publishSeason(settings: SeasonalSettings, userId: string | null, date = new Date()) {
-  const theme = getActiveTheme(date, settings);
+export function publishSeason(
+  settings: SeasonalSettings,
+  userId: string | null,
+  date = new Date(),
+  weather: TodayWeather | null = null,
+) {
+  let theme = getActiveTheme(date, settings);
+  // Automatic and not a holiday: show Kampala's live weather (rain, sun, clouds…).
+  if (weather && settings.mode === 'automatic' && (theme.id === 'rainy' || theme.id === 'dry')) {
+    theme = {
+      ...theme,
+      mark: weather.mark,
+      effect: weather.effect,
+      weatherLabel:
+        weather.tempC !== null ? `${weather.label} · ${weather.tempC}°C in Kampala` : `${weather.label} in Kampala`,
+    };
+  }
   const showEffects =
     settings.effects && !readMemberEffectsOff(userId) && !prefersReducedMotion() && theme.effect !== 'none';
   published = { theme, showEffects };
@@ -111,5 +127,7 @@ export async function refreshSeasonTheme(userId: string | null): Promise<Publish
   // Paint immediately from cache, then settle on the church setting.
   publishSeason(readCachedSeasonal(), userId);
   const church = await loadChurchSeasonalSettings();
-  return publishSeason(church, userId);
+  publishSeason(church, userId);
+  const weather = church.mode === 'automatic' ? await fetchKampalaWeather() : null;
+  return publishSeason(church, userId, new Date(), weather);
 }

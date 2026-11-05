@@ -313,18 +313,17 @@ describe('seasons', () => {
   it('seasons, holidays and effects match the Vault calendar', async () => {
     const s = await loadSeasons();
     const at = (y, m, d) => s.dateOnNyDay(y, m, d);
-    assert.equal(s.getActiveTheme(at(2026, 10, 15)).id, 'fall');
-    assert.equal(s.getActiveTheme(at(2026, 10, 15)).effect, 'leaves');
-    // Thanksgiving 2026 is Nov 26 → window Nov 23–29
-    assert.equal(s.getActiveTheme(at(2026, 11, 23)).id, 'thanksgiving');
-    assert.equal(s.getActiveTheme(at(2026, 11, 22)).id, 'fall');
+    // Uganda: two rainy seasons (Mar–May, Sep–Nov), dry otherwise; no US Thanksgiving.
+    assert.equal(s.getActiveTheme(at(2026, 10, 15)).id, 'rainy');
+    assert.equal(s.getActiveTheme(at(2026, 11, 26)).id, 'rainy');
     assert.equal(s.getActiveTheme(at(2026, 12, 20)).id, 'christmas');
     assert.equal(s.getActiveTheme(at(2027, 1, 1)).id, 'new_year');
-    assert.equal(s.getActiveTheme(at(2027, 1, 15)).id, 'winter');
+    assert.equal(s.getActiveTheme(at(2027, 1, 15)).id, 'dry');
     // Easter 2027 is Mar 28 → Palm Sunday Mar 21 through Mar 29
     assert.equal(s.getActiveTheme(at(2027, 3, 21)).id, 'easter');
-    assert.equal(s.getActiveTheme(at(2027, 4, 10)).id, 'spring');
-    assert.equal(s.getActiveTheme(at(2027, 7, 4)).effect, 'none');
+    assert.equal(s.getActiveTheme(at(2027, 4, 10)).id, 'rainy');
+    assert.equal(s.getActiveTheme(at(2027, 7, 4)).effect, 'sun');
+    assert.notEqual(s.getActiveTheme(at(2026, 10, 15)).effect, 'leaves');
     assert.equal(s.getActiveTheme(at(2026, 10, 15), { mode: 'off' }).id, 'brand');
     assert.equal(s.getActiveTheme(at(2026, 10, 15), { mode: 'winter' }).id, 'winter');
     assert.equal(

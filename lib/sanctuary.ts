@@ -131,17 +131,21 @@ const SEASON_LABEL: Record<string, string> = {
   winter: 'Winter',
   spring: 'Spring',
   summer: 'Summer',
+  rainy: 'Rainy season',
+  dry: 'Dry season',
 };
 
 /** "Fall at PLCC · Thanksgiving Dinner in 38 days" (holiday part optional). */
 export function seasonChipLabel(opts: {
   season: string;
+  /** Kampala weather, e.g. "Light rain · 23°C in Kampala" — shown instead of the season. */
+  weatherLabel?: string | null;
   holidayTitle?: string | null;
   holidayDate?: string | null;
   now?: Date;
 }): string {
   const season = SEASON_LABEL[opts.season] || 'Season';
-  const base = `${season} at PLCC`;
+  const base = opts.weatherLabel || `${season} at PLCC`;
   if (!opts.holidayTitle || !opts.holidayDate) return base;
   const days = daysUntilDate(opts.holidayDate, opts.now);
   const when = days === 0 ? 'today' : days === 1 ? 'tomorrow' : `in ${days} days`;

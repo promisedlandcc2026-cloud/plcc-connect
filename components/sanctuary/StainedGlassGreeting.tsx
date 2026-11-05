@@ -4,7 +4,7 @@
  * follows the season accent (CSS: .awc-stained-glass).
  */
 import React from 'react';
-import { Leaf, Snowflake, Sprout, Sun } from 'lucide-react';
+import { CloudRain, Leaf, Snowflake, Sprout, Sun } from 'lucide-react';
 import { useFeaturedHolidayRsvp } from '../../lib/holidayRsvpLive';
 import { seasonChipLabel } from '../../lib/sanctuary';
 import { usePublishedSeason } from '../season/SeasonThemeProvider';
@@ -45,9 +45,16 @@ export const StainedGlassGreeting: React.FC<{
   const lead = comma > 0 ? greeting.slice(0, comma) : greeting;
   const name = comma > 0 ? greeting.slice(comma + 2) : null;
   const holiday = useFeaturedHolidayRsvp(now);
-  const SeasonIcon = SEASON_ICON[theme.season as keyof typeof SEASON_ICON] || Leaf;
+  // Uganda: rainy / dry seasons (with Kampala's weather when it loads), not US fall.
+  const uganda = theme.id === 'rainy' || theme.id === 'dry';
+  const SeasonIcon = uganda
+    ? theme.id === 'rainy'
+      ? CloudRain
+      : Sun
+    : SEASON_ICON[theme.season as keyof typeof SEASON_ICON] || Leaf;
   const chip = seasonChipLabel({
-    season: theme.season,
+    season: uganda ? theme.id : theme.season,
+    weatherLabel: uganda ? theme.weatherLabel ?? null : null,
     holidayTitle: holiday?.title ?? null,
     holidayDate: holiday?.date ?? null,
     now,

@@ -117,6 +117,82 @@ html[data-season='anniversary'] {
   --season-gradient: linear-gradient(180deg, rgba(201, 163, 90, 0.35), transparent);
 }
 
+/* Uganda seasons + Kampala weather (mirrored from PLCC Canaan index.css — keep in sync). */
+/* Home hero fall leaves — HTML so they stay visible in Chrome and Safari. */
+.awc-falling-leaf {
+  position: absolute;
+  top: 0;
+  line-height: 1;
+  animation-name: awc-leaf-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  filter: drop-shadow(0 2px 2px rgba(13, 26, 20, 0.35));
+}
+/* Travel in px. A % translate is the leaf's own height, so Chrome only
+   dropped them a short way under the top edge, then the loop hid them. */
+@keyframes awc-leaf-fall {
+  0% { transform: translate3d(0, -48px, 0) rotate(0deg); }
+  50% { transform: translate3d(-16px, 240px, 0) rotate(160deg); }
+  100% { transform: translate3d(28px, 560px, 0) rotate(320deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .awc-falling-leaf { animation: none; }
+}
+
+/* Home hero: Kampala weather */
+.plcc-sun-glow {
+  position: absolute;
+  top: -140px;
+  right: 8%;
+  width: 380px;
+  height: 380px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(255, 222, 140, 0.55) 0%, rgba(255, 196, 90, 0.22) 38%, transparent 70%);
+  animation: plcc-sun-breathe 7s ease-in-out infinite;
+}
+.plcc-sun-rays {
+  position: absolute;
+  top: -420px;
+  right: calc(8% - 230px);
+  width: 840px;
+  height: 840px;
+  border-radius: 9999px;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 226, 150, 0.10) 0deg 6deg, transparent 6deg 18deg);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 62%);
+  mask-image: radial-gradient(circle, #000 18%, transparent 62%);
+  animation: plcc-sun-spin 120s linear infinite;
+}
+@keyframes plcc-sun-breathe { 0%, 100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.08); opacity: 1; } }
+@keyframes plcc-sun-spin { to { transform: rotate(360deg); } }
+.plcc-cloud {
+  position: absolute;
+  left: 0;
+  border-radius: 9999px;
+  background: #fff;
+  filter: blur(22px);
+  animation-name: plcc-cloud-drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes plcc-cloud-drift {
+  from { transform: translateX(-420px); }
+  to { transform: translateX(110vw); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .plcc-sun-glow, .plcc-sun-rays { animation: none; }
+  .plcc-cloud { animation: none; transform: translateX(30vw); }
+}
+
+html[data-season='rainy'] {
+  --season-accent: #1e4d5c;
+  --season-accent-soft: #e6f1f4;
+}
+html[data-season='dry'] {
+  --season-accent: #854d0e;
+  --season-accent-soft: #fef9c3;
+}
+
+
 /* Home hub: seasonal wash + falling-effect canvas live behind the hero only. */
 .awc-home-shell > .season-wash {
   position: absolute;
