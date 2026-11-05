@@ -1,0 +1,72 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/latest-youtube",
+      "destination": "/api/family-huddle?resource=youtube"
+    },
+    {
+      "source": "/api/vault-health",
+      "destination": "/api/vault-news?probe=health"
+    },
+    {
+      "source": "/api/checkin-points",
+      "destination": "/api/vault-news?bridge=points"
+    },
+    {
+      "source": "/api/intercessors",
+      "destination": "/api/vault-news?bridge=intercessors"
+    },
+    {
+      "source": "/api/prayer",
+      "destination": "/api/vault-news?bridge=prayer"
+    },
+    {
+      "source": "/api/study-guides",
+      "destination": "/api/vault-news?bridge=study-guides"
+    },
+    {
+      "source": "/api/bible",
+      "destination": "/api/vault-news?bridge=bible"
+    },
+    {
+      "source": "/api/gallery",
+      "destination": "/api/vault-news?bridge=gallery"
+    },
+    {
+      "source": "/api/daily",
+      "destination": "/api/vault-news?bridge=daily"
+    },
+    {
+      "source": "/api/push",
+      "destination": "/api/vault-news?bridge=push"
+    },
+    {
+      "source": "/api/ark",
+      "destination": "/api/vault-news?bridge=ark"
+    },
+    {
+      "source": "/api/sso",
+      "destination": "/api/vault-news?bridge=sso"
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/ark",
+      "destination": "https://plcc-ark.vercel.app/ark/"
+    },
+    {
+      "source": "/ark/(.*)",
+      "destination": "https://plcc-ark.vercel.app/ark/$1"
+    },
+    {
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

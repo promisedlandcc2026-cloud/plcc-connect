@@ -1,0 +1,40 @@
+{
+    "short_name": "PLCC Connect",
+    "name": "Promised Land Christian Center Connect",
+    "icons": [
+        {
+            "src": "/favicon.png",
+            "sizes": "64x64 32x32 24x24 16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-192.png",
+            "type": "image/png",
+            "sizes": "192x192",
+            "purpose": "any"
+        },
+        {
+            "src": "/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ],
+    "start_url": ".",
+    "display": "standalone",
+    "theme_color": "#0e1512",
+    "background_color": "#0e1512",
+    "id": "/",
+    "related_applications": [
+        {
+            "platform": "webapp",
+            "url": "https://plcc-connect.vercel.app/manifest.json"
+        }
+    ]
+}
