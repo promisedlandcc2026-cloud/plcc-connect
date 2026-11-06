@@ -1,14 +1,14 @@
 -- =============================================================================
 -- PLCC Connect — attendance plans ("I'll be there" on the Home Next-up ticket)
 -- =============================================================================
--- Shared Supabase schema (Vault-owned). Review, then paste into the SQL editor.
+-- Shared Supabase schema (Canaan-owned). Review, then paste into the SQL editor.
 -- Additive only. Self-only RLS, same pattern as public.sermon_notes.
 --
 --   plan_key  'event:<events.id>'  for a calendar event
 --             'sunday:YYYY-MM-DD'  for the regular Sunday service
 --
 -- Staff headcount: public.attendance_plan_count(plan_key) returns a number only,
--- never names, so Vault can show "42 planning to come" later.
+-- never names, so Canaan can show "42 planning to come" later.
 -- =============================================================================
 
 BEGIN;

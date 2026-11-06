@@ -25,6 +25,7 @@ import {
   type RemoteParticipant,
   type RemoteTrack,
   type TrackPublication,
+  DisconnectReason,
 } from 'livekit-client';
 import {
   createFamilyHuddleInvite,
@@ -65,6 +66,23 @@ import {
 } from '../huddle/HuddleMobileTabs';
 import { HuddlePeoplePanel } from '../huddle/HuddlePeoplePanel';
 import { HuddleTabSheet } from '../huddle/HuddleTabSheet';
+
+/** LiveKit closed this copy on purpose (joined elsewhere, removed, or ended): do not auto-rejoin. */
+function huddleDisconnectIsFinal(reason?: DisconnectReason): boolean {
+  return (
+    reason === DisconnectReason.DUPLICATE_IDENTITY ||
+    reason === DisconnectReason.PARTICIPANT_REMOVED ||
+    reason === DisconnectReason.ROOM_DELETED
+  );
+}
+
+function huddleDisconnectMessage(reason?: DisconnectReason): string {
+  if (reason === DisconnectReason.DUPLICATE_IDENTITY) {
+    return 'You joined this huddle somewhere else (another tab, app or device). Tap Join to bring it back here.';
+  }
+  if (reason === DisconnectReason.PARTICIPANT_REMOVED) return 'You were removed from the huddle.';
+  return 'The huddle has ended.';
+}
 
 type ConnState = 'prejoin' | 'connecting' | 'reconnecting' | 'connected' | 'error';
 
@@ -413,7 +431,7 @@ export const FamilyVoiceHuddle: React.FC<Props> = ({
             }
             onChange();
           })
-          .on(RoomEvent.Disconnected, () => {
+          .on(RoomEvent.Disconnected, (reason?: DisconnectReason) => {
             if (!mountedRef.current) return;
             clearRemoteAudio();
             roomRef.current = null;
@@ -426,7 +444,13 @@ export const FamilyVoiceHuddle: React.FC<Props> = ({
               setConn('prejoin');
               return;
             }
-            if (reconnectAttemptsRef.current >= MAX_HUDDLE_RECONNECTS) {
+            if (huddleDisconnectIsFinal(reason)) {
+            lostConnectionRef.current = true;
+            setError(huddleDisconnectMessage(reason));
+            setConn('error');
+            return;
+          }
+          if (reconnectAttemptsRef.current >= MAX_HUDDLE_RECONNECTS) {
               lostConnectionRef.current = true;
               setError('Connection lost. Tap to rejoin Family Huddle.');
               setConn('error');

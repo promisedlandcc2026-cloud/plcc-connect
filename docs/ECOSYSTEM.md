@@ -10,7 +10,7 @@ All database migrations live in **PLCC Canaan**:
 awc-vault-main/supabase/migrations/
 ```
 
-Run migrations in the Supabase SQL editor or via Vault's migration scripts. Connect does not ship its own migrations.
+Run migrations in the Supabase SQL editor or via Canaan's migration scripts. Connect does not ship its own migrations.
 
 **Master sync file for Connect-facing tables:**
 
@@ -33,13 +33,13 @@ Run migrations in the Supabase SQL editor or via Vault's migration scripts. Conn
 | `giving_settings` | Give module |
 | `giving_intent` | Give intent tracking |
 | `videos` | Watch Live |
-| `vault_news` | Member Home Vault News (read; staff post via Connect/Vault API) |
+| `vault_news` | Member Home Canaan News (read; staff post via Connect/Canaan API) |
 | `event_run_of_show` | Sunday live Home order of service (read: title, time, duration only) |
-| `attendance_plans` | Home ticket "I'll be there" (self-only RLS; SQL in `docs/supabase/connect_attendance_plans.sql`, apply in Vault/Supabase) |
+| `attendance_plans` | Home ticket "I'll be there" (self-only RLS; SQL in `docs/supabase/connect_attendance_plans.sql`, apply in Canaan/Supabase) |
 
-## Admin workflows (Vault only)
+## Admin workflows (Canaan only)
 
-| Public Connect action | Vault admin page |
+| Public Connect action | Canaan admin page |
 |----------------------|------------------|
 | Plan a Visit | People → Plan a Visit |
 | Connect Card | People → Connect Cards |
@@ -55,10 +55,10 @@ See [sermon-data-sop/requirements.md](../.kiro/specs/sermon-data-sop/requirement
 
 Copy `.env.example` to `.env.local` and fill in:
 
-- `VITE_SUPABASE_URL` — same project as Vault
+- `VITE_SUPABASE_URL` — same project as Canaan
 - `VITE_SUPABASE_ANON_KEY` — public anon key (RLS enforced)
 - `VITE_AUTH_REDIRECT_URL` — optional; Connect Auth callback (defaults to `{origin}/auth/callback`)
-- `VAULT_API_ORIGIN` — **server-only**; HTTPS origin of Vault (e.g. `https://plcc-opal.vercel.app`). Used by `GET /api/member-self`. Never put this under `VITE_`.
+- `VAULT_API_ORIGIN` — **server-only**; HTTPS origin of Canaan (e.g. `https://plcc-opal.vercel.app`). Used by `GET /api/member-self`. Never put this under `VITE_`.
 - `OPENAI_API_KEY` — optional; primary provider for the PLCC Assistant (Vite client build; see `envPrefix`)
 - `VITE_GEMINI_API_KEY` — optional; Gemini fallback if OpenAI is unset or fails
 
@@ -66,19 +66,19 @@ Never put service-role keys in Connect.
 
 ## Member authentication (Phase 1)
 
-Connect uses the same Supabase Auth tenant as Vault. Sessions live on the **Connect origin only** (no cross-domain SSO). Visitor mode remains fully public.
+Connect uses the same Supabase Auth tenant as Canaan. Sessions live on the **Connect origin only** (no cross-domain SSO). Visitor mode remains fully public.
 
 **Sign-in channels:**
 - **Email OTP** — one-time code / magic link (unchanged).
-- **Phone + password** — same as Vault’s live phone path via same-origin `POST /api/auth-phone` → Vault `resource=auth-phone` (no SMS text codes). Phone-only accounts use Vault’s internal `@phone.awcvault.invalid` Auth email; Connect never shows that placeholder.
+- **Phone + password** — same as Canaan’s live phone path via same-origin `POST /api/auth-phone` → Canaan `resource=auth-phone` (no SMS text codes). Phone-only accounts use Canaan’s internal `@phone.awcvault.invalid` Auth email; Connect never shows that placeholder.
 
-Account → Security manages optional **2-Step Auth (TOTP)** via Supabase Auth client APIs — **no Vault security bridge**. TOTP factors live on the shared Auth user (Vault enrollments appear as Connected). Email OTP is not 2-Step Auth. Connect does **not** force an AAL2 challenge after OTP (parity with Vault login today). **Passkeys are not offered on Connect** while Vault and Connect use sibling `*.vercel.app` hosts (they cannot share a WebAuthn RP ID); passkeys remain available in Vault Settings.
+Account → Security manages optional **2-Step Auth (TOTP)** via Supabase Auth client APIs — **no Canaan security bridge**. TOTP factors live on the shared Auth user (Canaan enrollments appear as Connected). Email OTP is not 2-Step Auth. Connect does **not** force an AAL2 challenge after OTP (parity with Canaan login today). **Passkeys are not offered on Connect** while Canaan and Connect use sibling `*.vercel.app` hosts (they cannot share a WebAuthn RP ID); passkeys remain available in Canaan Settings.
 
 **Session stickiness:** AuthContext recovers on `visibilitychange` / `online` and only clears the session on fatal refresh errors. Bridge clients use `getValidAccessToken()` (refresh near expiry; one 401 retry). Live/Family Huddles auto-remint and reconnect after background disconnects (capped retries) and request a Screen Wake Lock while in-call.
 
 ## Member identity bridge (Phase 1.5)
 
-Authenticated browsers call same-origin `GET /api/member-self` with their Supabase Bearer token. Connect forwards that token only to Vault `GET /api/vault?resource=users&self=true`, then returns a sanitized identity DTO (`id`, `name`, `email`, `avatarUrl`, `role`, `approvalStatus`, `mediaNotice`). No general-purpose Vault proxy.
+Authenticated browsers call same-origin `GET /api/member-self` with their Supabase Bearer token. Connect forwards that token only to Canaan `GET /api/vault?resource=users&self=true`, then returns a sanitized identity DTO (`id`, `name`, `email`, `avatarUrl`, `role`, `approvalStatus`, `mediaNotice`). No general-purpose Canaan proxy.
 
 **Self-service approval:** Pending members use Account → **Complete setup**, which calls `PATCH /api/member-self` with `{ action: "complete_onboarding" }`. Connect merges `notification_prefs.onboarding.completedAt` on Vault; Vault auto-promotes `PENDING` → `MEMBER`. Staff can still change roles in Vault.
 
@@ -86,39 +86,39 @@ Authenticated browsers call same-origin `GET /api/member-self` with their Supaba
 
 ## Community feed (Phase 2 — read-only)
 
-Approved members open `/community`, which loads `GET /api/community-feed`. Connect forwards the Bearer token only to Vault `GET /api/vault?resource=community&subResource=feed&feedType=posts` with validated `limit`/`offset`. The browser never queries Community tables directly. Later phases add posting, comments, and reactions via additional narrow bridges.
+Approved members open `/community`, which loads `GET /api/community-feed`. Connect forwards the Bearer token only to Canaan `GET /api/vault?resource=community&subResource=feed&feedType=posts` with validated `limit`/`offset`. The browser never queries Community tables directly. Later phases add posting, comments, and reactions via additional narrow bridges.
 
 ## Member notifications (Phase 3 — in-app inbox)
 
-Signed-in members (including pending / phone-only accounts) open `/notifications`, which uses same-origin `GET`/`PATCH /api/member-notifications`. Connect forwards the Bearer token only to Vault `GET`/`PATCH /api/vault?resource=notifications`. Vault enforces per-user ownership. Connect maps destinations safely (Community → `/community`; Vault News → `/?section=vault-news`; admin/chat/huddle links are never opened). Vault News posts fan out as `announcement` + `/dashboard` to every `users` row (including `@phone.awcvault.invalid`); Connect labels those as Vault News and lights the bell. No push, no second notification table.
+Signed-in members (including pending / phone-only accounts) open `/notifications`, which uses same-origin `GET`/`PATCH /api/member-notifications`. Connect forwards the Bearer token only to Canaan `GET`/`PATCH /api/vault?resource=notifications`. Canaan enforces per-user ownership. Connect maps destinations safely (Community → `/community`; Canaan News → `/?section=vault-news`; admin/chat/huddle links are never opened). Canaan News posts fan out as `announcement` + `/dashboard` to every `users` row (including `@phone.awcvault.invalid`); Connect labels those as Canaan News and lights the bell. No push, no second notification table.
 
 ## Community post deep links (Phase 3.5 — read-only)
 
-Community notifications with a safely resolved post ID open `/community/post/:postId`. Connect loads `GET /api/community-post?id=<uuid>`, which forwards only to Vault `GET …/feed&feedType=posts&id=<uuid>`. Comment/mention-comment notifications use Vault’s feed link pattern to recover the parent post ID (`source_id` is the comment id). Feed cards also open the focused post view. Posting, comments, and reactions remain out of scope.
+Community notifications with a safely resolved post ID open `/community/post/:postId`. Connect loads `GET /api/community-post?id=<uuid>`, which forwards only to Canaan `GET …/feed&feedType=posts&id=<uuid>`. Comment/mention-comment notifications use Canaan’s feed link pattern to recover the parent post ID (`source_id` is the comment id). Feed cards also open the focused post view. Posting, comments, and reactions remain out of scope.
 
 ## Community reactions (Phase 4)
 
-Approved members can toggle Vault reactions (`love`, `pray`, `praise`, `like`) via `POST /api/community-reaction` → Vault `POST …/feed&feedType=reactions` with `{ targetType: 'post', targetId, reaction }` (legacy Connect body `{ postId, reaction }` still accepted). Same reaction toggles off; different reactions may coexist per Vault’s uniqueness model. Connect does not create reaction notifications (Vault defers them).
+Approved members can toggle Canaan reactions (`love`, `pray`, `praise`, `like`) via `POST /api/community-reaction` → Canaan `POST …/feed&feedType=reactions` with `{ targetType: 'post', targetId, reaction }` (legacy Connect body `{ postId, reaction }` still accepted). Same reaction toggles off; different reactions may coexist per Canaan’s uniqueness model. Connect does not create reaction notifications (Canaan defers them).
 
 ## Community comments (Phase 5)
 
-Focused posts load `GET/POST/PATCH/DELETE /api/community-comments`, forwarding only to Vault `…/feed&feedType=comments`. Members may create comments and edit/delete **their own** only (moderator remove is never exposed). Vault list is newest-100 chronological with no offset. Comment notifications can deep-link to `/community/post/:postId?comment=:commentId`. Mention autocomplete remained deferred until Phase 8.
+Focused posts load `GET/POST/PATCH/DELETE /api/community-comments`, forwarding only to Canaan `…/feed&feedType=comments`. Members may create comments and edit/delete **their own** only (moderator remove is never exposed). Canaan list is newest-100 chronological with no offset. Comment notifications can deep-link to `/community/post/:postId?comment=:commentId`. Mention autocomplete remained deferred until Phase 8.
 
 ## Community post creation (Phase 6)
 
-Approved members create posts from `/community` via `POST /api/community-posts` → Vault `POST …/feed&feedType=posts` with `category` forced to `general`. Optional single image uses Vault’s JSON `{ mimeType, fileBase64 }` contract (JPG/PNG/WebP; magic-byte checked; no client storage paths). Vault owns author identity, storage under `community-files`, mentions, and notifications. Post edit/delete and mention autocomplete remain deferred.
+Approved members create posts from `/community` via `POST /api/community-posts` → Canaan `POST …/feed&feedType=posts` with `category` forced to `general`. Optional single image uses Canaan’s JSON `{ mimeType, fileBase64 }` contract (JPG/PNG/WebP; magic-byte checked; no client storage paths). Canaan owns author identity, storage under `community-files`, mentions, and notifications. Post edit/delete and mention autocomplete remain deferred.
 
 ## Community post self-management (Phase 7)
 
-Approved members edit or delete **their own** posts via `POST /api/community-post-manage`. Connect verifies Vault self-user ID against the post author ID before every mutation (so Vault moderator delete rights never become Connect moderation). Edit is **text-only** — Vault’s PATCH does not replace/remove images. Delete soft-removes the post in Vault. Pin/unpin and moderating others’ posts are never exposed.
+Approved members edit or delete **their own** posts via `POST /api/community-post-manage`. Connect verifies Canaan self-user ID against the post author ID before every mutation (so Canaan moderator delete rights never become Connect moderation). Edit is **text-only** — Canaan’s PATCH does not replace/remove images. Delete soft-removes the post in Canaan. Pin/unpin and moderating others’ posts are never exposed.
 
 ## Community @mentions (Phase 8)
 
-Approved members search mention candidates via `GET /api/community-mentions?q=` → Vault `…/feed&feedType=mention-candidates`. Connect strips Vault `role` / `emailHint`, requires a non-empty bounded query (no empty directory browse), and inserts Vault’s `@[Name](mention:uuid)` tokens. Posts and comments display as `@Name` without exposing UUIDs. Vault parses tokens and sends notifications; Connect does not send `mentionedUserIds` or create notification rows.
+Approved members search mention candidates via `GET /api/community-mentions?q=` → Canaan `…/feed&feedType=mention-candidates`. Connect strips Canaan `role` / `emailHint`, requires a non-empty bounded query (no empty directory browse), and inserts Canaan’s `@[Name](mention:uuid)` tokens. Posts and comments display as `@Name` without exposing UUIDs. Canaan parses tokens and sends notifications; Connect does not send `mentionedUserIds` or create notification rows.
 
 ## Community comment reactions (Phase 9)
 
-The same `POST /api/community-reaction` bridge accepts `{ targetType: 'comment', targetId, reaction }`. Vault verifies Community eligibility at the feed gate, rejects soft-deleted comments, and cascades comment soft-delete when a parent post is removed. Reaction summaries on comment lists include `reactedByMe`. Connect keys viewer reaction state by `post:` / `comment:` so IDs cannot collide, clears overlays on sign-out / account change / comment or parent-post delete, and never creates reaction notifications.
+The same `POST /api/community-reaction` bridge accepts `{ targetType: 'comment', targetId, reaction }`. Canaan verifies Community eligibility at the feed gate, rejects soft-deleted comments, and cascades comment soft-delete when a parent post is removed. Reaction summaries on comment lists include `reactedByMe`. Connect keys viewer reaction state by `post:` / `comment:` so IDs cannot collide, clears overlays on sign-out / account change / comment or parent-post delete, and never creates reaction notifications.
 
 ## Community chat + Live Huddle
 
@@ -133,7 +133,7 @@ Approved members open `/community/chat` for Vault text channels (ACL filtered up
 **Family Huddle** is a private LiveKit room for **verified household adults** plus optional **guest invite links** (copy / WhatsApp share; no email). Vault owns LiveKit secrets and membership:
 
 - Room prefix: `awc-family-{householdId}` (parallel to community `awc-channel-…`).
-- Vault API: `resource=family&subResource=huddle` with `huddleType=status|token|end|invite-create|invite-redeem|invite-lock`. Household is resolved **server-side from the caller JWT**; clients never send `householdId`.
+- Canaan API: `resource=family&subResource=huddle` with `huddleType=status|token|end|invite-create|invite-redeem|invite-lock`. Household is resolved **server-side from the caller JWT**; clients never send `householdId`.
 - Invites: opaque token (store SHA-256 hash), **2h expiry**, max uses (10), lockable. Guests redeem with `{ token, displayName }` (no church account); redeem does **not** add them to `household_members`.
 - Dependents / children are listed on My Family but are **not** LiveKit participants in v1. No recording.
 
@@ -143,15 +143,15 @@ Out of scope (v1): email invites, recording, dependents on camera, auto-adding i
 
 ## Kids View + PLCC Bucks (read-only)
 
-Household adults open `/family/kids/:cardRef` from a child row on My Family (same guardian `cardRef` as `/family/card/:cardRef`). It is the Vault Kids View (Soft Garden / Adventure theme, streak, badges, level, check-in QR) plus the child's **PLCC Bucks** wallet.
+Household adults open `/family/kids/:cardRef` from a child row on My Family (same guardian `cardRef` as `/family/card/:cardRef`). It is PLCC Canaan Kids View (Soft Garden / Adventure theme, streak, badges, level, check-in QR) plus the child's **PLCC Bucks** wallet.
 
-- Bridge: `GET /api/family-huddle?resource=kids-view&cardRef=AWCD.…` → Vault `resource=family&subResource=dependents&action=kids-view&cardRef=`; `POST ?resource=kids-theme { cardRef, kidsTheme }` → Vault `action=kids-theme` (PATCH, theme only). No new `api/*.js`, no SQL.
-- Vault resolves `cardRef` through `dependent_digital_cards`, keeps the household child check, and omits `child.id`. `api/_utils/kidsViewSanitize.js` is a fail-closed whitelist (no member, household, or ledger UUIDs).
-- PLCC Bucks are **awarded only by leaders on Vault** (`resource=kids-bucks`). Connect has no award, reverse, or caps UI. Wallet is hidden when Vault returns `bucks: null` (migration not run). Adult check-in points (`/points`) are separate and are not PLCC Bucks.
+- Bridge: `GET /api/family-huddle?resource=kids-view&cardRef=AWCD.…` → Canaan `resource=family&subResource=dependents&action=kids-view&cardRef=`; `POST ?resource=kids-theme { cardRef, kidsTheme }` → Canaan `action=kids-theme` (PATCH, theme only). No new `api/*.js`, no SQL.
+- Canaan resolves `cardRef` through `dependent_digital_cards`, keeps the household child check, and omits `child.id`. `api/_utils/kidsViewSanitize.js` is a fail-closed whitelist (no member, household, or ledger UUIDs).
+- PLCC Bucks are **awarded only by leaders on Canaan** (`resource=kids-bucks`). Connect has no award, reverse, or caps UI. Wallet is hidden when Canaan returns `bucks: null` (migration not run). Adult check-in points (`/points`) are separate and are not PLCC Bucks.
 
-## Vault News + database health
+## Canaan News + database health
 
-Approved members see **Vault News** on Home (`#vault-news`) — the same `public.vault_news` feed as Vault Dashboard. Bridge: `GET|POST /api/vault-news` → Vault `resource=vault-news` (Bearer). Pastor / Ministry Leader / Super Admin may post from Connect; Vault still enforces those roles. Visitors do not see this feed (Vault RLS is authenticated-only).
+Approved members see **Canaan News** on Home (`#vault-news`) — the same `public.vault_news` feed as Canaan Dashboard. Bridge: `GET|POST /api/vault-news` → Canaan `resource=vault-news` (Bearer). Pastor / Ministry Leader / Super Admin may post from Connect; Canaan still enforces those roles. Visitors do not see this feed (Canaan RLS is authenticated-only).
 
 **Database health** is Vault’s public `resource=health` probe (users `id` limit 1). Connect exposes same-origin `GET /api/vault-health` (rewrite onto `vault-news?probe=health`). The probe is unauthenticated and **always HTTP 200** with `{ ok: true, database: 'healthy' | 'unavailable' }` so Home can still render during an outage. Connect never embeds Vault Repair.
 
@@ -161,11 +161,11 @@ Public home keeps Welcome + Home eager. Member Sign In, Auth Callback, Account, 
 
 ## Check-in points + seasonal theme
 
-Same features as PLCC Canaan, with **all point rules, the ledger, and QR signing kept in Vault** (`api/_utils/checkinPointsHandler.ts`, `memberPassHandler.ts`). The shared Supabase project already has `member_point_ledger`, `member_points_settings`, `attendance_sessions.points_enabled`, and the `attendance_self_checkin` / `points_leaderboard` / `points_member_summary` / `award_points_for_session` functions — **Connect ships no SQL** for this.
+Same features as PLCC Canaan, with **all point rules, the ledger, and QR signing kept in Canaan** (`api/_utils/checkinPointsHandler.ts`, `memberPassHandler.ts`). The shared Supabase project already has `member_point_ledger`, `member_points_settings`, `attendance_sessions.points_enabled`, and the `attendance_self_checkin` / `points_leaderboard` / `points_member_summary` / `award_points_for_session` functions — **Connect ships no SQL** for this.
 
 **Bridge:** `GET|PATCH|POST /api/checkin-points?resource=…` rewrites onto `vault-news?bridge=points` (no new serverless function). Connect forwards the member Bearer token only to fixed Vault URLs:
 
-| Connect `resource` | Method | Vault |
+| Connect `resource` | Method | Canaan |
 |---|---|---|
 | `my-points` | GET / PATCH `{ showOnLeaderboard }` | `attendance` → `my-points` |
 | `leaderboard` | GET | `attendance` → `points-leaderboard` |
@@ -181,14 +181,14 @@ Leader routes (`self-qr`, points on/off) are never exposed from Connect. Respons
 
 ## Holiday RSVPs (Thanksgiving / Marrieds Dinner)
 
-Mirrors Vault → Events & Check-In → Holiday RSVPs · 2026. `lib/holidayRsvps.ts` carries the Vault Fellowship Event Kit ids, dates and RSVP close times (`api/_utils/fellowshipEventConfig.ts` on Vault — keep in sync). Kit events get RSVP unless Vault sets `rsvp_enabled = false`, same rule as Vault's `runtimeConfigFromDbEvent`. The form itself (household, guests, allergy/injury consents, Pledge vs Pay Now) stays on Vault.
+Mirrors Canaan → Events & Check-In → Holiday RSVPs · 2026. `lib/holidayRsvps.ts` carries PLCC Canaan Fellowship Event Kit ids, dates and RSVP close times (`api/_utils/fellowshipEventConfig.ts` on Canaan — keep in sync). Kit events get RSVP unless Canaan sets `rsvp_enabled = false`, same rule as Canaan's `runtimeConfigFromDbEvent`. The form itself (household, guests, allergy/injury consents, Pledge vs Pay Now) stays on Canaan.
 
-- Links use Vault **hash routes**: `https://plcc-opal.vercel.app/#/events/:id/rsvp` (and `/#/fellowship-cookout`). Stored Vault links without `#` are normalized.
+- Links use Canaan **hash routes**: `https://plcc-opal.vercel.app/#/events/:id/rsvp` (and `/#/fellowship-cookout`). Stored Canaan links without `#` are normalized.
 - Home (members and visitors) features the nearest open sign-up from its `featureFrom` date until RSVP closes, with "RSVP by …" and a last-week countdown. Event details show "RSVP by …", then "RSVP closed".
 
 ## Member Home (Phase 1 redesign)
 
-Burgundy top: greeting by first name + date, season chip, **Next up** (happening now / next calendar event / Sunday service fallback, with Details and Directions; "Live now" when the YouTube stream is live), and four quick actions: Give, My QR, Prayer, Watch. Feed order: install prompt, Sunday Mode, holiday sign-up, leaderboard, Upcoming, Community, Announcements, Vault News, Prayer, latest message, Watch, Ministries. Empty Community/Upcoming/Announcements sections hide themselves. The 8-tile hub, Today, and Notifications sections were removed from member Home (bottom bar + bell cover them); the public Home keeps the hub.
+Burgundy top: greeting by first name + date, season chip, **Next up** (happening now / next calendar event / Sunday service fallback, with Details and Directions; "Live now" when the YouTube stream is live), and four quick actions: Give, My QR, Prayer, Watch. Feed order: install prompt, Sunday Mode, holiday sign-up, leaderboard, Upcoming, Community, Announcements, Canaan News, Prayer, latest message, Watch, Ministries. Empty Community/Upcoming/Announcements sections hide themselves. The 8-tile hub, Today, and Notifications sections were removed from member Home (bottom bar + bell cover them); the public Home keeps the hub.
 
 ## Design kit (Phase 2)
 
@@ -213,20 +213,20 @@ Rules: UI text is **12px minimum** (count badges 11px). Inter (400–900 loaded)
 
 Bottom bar: **Home · Community · Events · Prayer · Me** (the Me tab shows the member's photo when they have one, plus the unread badge). `/me` (`pages/MemberMore.tsx`, exported as `MemberMePage`; `MemberMorePage` kept as an alias) replaces More; `/more` redirects to `/me`.
 
-Me = who you are (photo, name, **Edit** → `/profile`), the points card (Show my QR, Scan the room code, leaderboard switch), then grouped lists: **Mine** (My PLCC Card, Notifications, My Family, My Serving, My Attendance, Sermon Notes, Kids Plans), **Church life** (Give, Watch, Sunday Mode, Chat, Vault News, Ministries, Serve, Directory), **Account** (Edit profile, Settings, Open PLCC Canaan for staff). Personal screens highlight Me and their back links return to Me. The Home header's account button opens Me for approved members.
+Me = who you are (photo, name, **Edit** → `/profile`), the points card (Show my QR, Scan the room code, leaderboard switch), then grouped lists: **Mine** (My PLCC Card, Notifications, My Family, My Serving, My Attendance, Sermon Notes, Kids Plans), **Church life** (Give, Watch, Sunday Mode, Chat, Canaan News, Ministries, Serve, Directory), **Account** (Edit profile, Settings, Open PLCC Canaan for staff). Personal screens highlight Me and their back links return to Me. The Home header's account button opens Me for approved members.
 
 **One PLCC Card:** the check-in QR (Vault member-pass) and My PLCC Card read the same `member_digital_cards.qr_token`, so they are one concept. "Show my QR" / "My QR" open the **My PLCC Card** sheet (QR + backup code + link to the full card); `/card` explains it is also the check-in QR, links to `/scan-in`, and keeps the screen awake.
 
-## Live Huddle fail-safes (mirrors Vault, Oct 2026)
+## Live Huddle fail-safes (mirrors Canaan, Oct 2026)
 
-Connect now gets the same protection Vault added on Oct 14 (`huddleFallbackPass.ts`, `huddleProvider.ts`):
+Connect now gets the same protection Canaan added on Oct 14 (`huddleFallbackPass.ts`, `huddleProvider.ts`):
 
-1. **Database down** — `huddle-token` passes Vault's signed 12-hour `fallbackPass` through (opaque). Connect keeps it on the phone (`awc_huddle_fallback_<channelId>`, same key as Vault). If minting fails with a server error or an unverifiable session, Connect calls `POST /api/community-chat?resource=huddle-token-fallback { channelId, fallbackPass }` → Vault `voice-token-fallback`, which opens LiveKit without Supabase. No Bearer needed on that route; the pass is the credential.
-2. **LiveKit out of minutes** — `lib/livekitConnect.ts` (from Vault) turns a LiveKit 429 into `LiveKitQuotaError`. Connect then moves the huddle to the **backup line** (Daily) via `resource=huddle-daily-token` → Vault `voice-daily-token` (needs `DAILY_API_KEY` on Vault). Before joining, `resource=huddle-line` → Vault `voice-huddle-provider` says which line the channel is on, so Connect and Vault members always share a line; after a LiveKit join Connect claims `livekit` and follows Vault if the channel already moved. `DailyBackupHuddle` (lazy-loaded) is audio-first with roster, mute, raise hand (`awc.huddle.hand`, same as Vault) and leave.
+1. **Database down** — `huddle-token` passes Canaan's signed 12-hour `fallbackPass` through (opaque). Connect keeps it on the phone (`awc_huddle_fallback_<channelId>`, same key as Canaan). If minting fails with a server error or an unverifiable session, Connect calls `POST /api/community-chat?resource=huddle-token-fallback { channelId, fallbackPass }` → Canaan `voice-token-fallback`, which opens LiveKit without Supabase. No Bearer needed on that route; the pass is the credential.
+2. **LiveKit out of minutes** — `lib/livekitConnect.ts` (from Canaan) turns a LiveKit 429 into `LiveKitQuotaError`. Connect then moves the huddle to the **backup line** (Daily) via `resource=huddle-daily-token` → Canaan `voice-daily-token` (needs `DAILY_API_KEY` on Canaan). Before joining, `resource=huddle-line` → Canaan `voice-huddle-provider` says which line the channel is on, so Connect and Canaan members always share a line; after a LiveKit join Connect claims `livekit` and follows Canaan if the channel already moved. `DailyBackupHuddle` (lazy-loaded) is audio-first with roster, mute, raise hand (`awc.huddle.hand`, same as Canaan) and leave.
 3. **Hiccups** — a failed start retries twice (0.7s, 1.8s) before the fallback or a clear message.
 4. **Database healthy badge** — re-checks every minute and when the app returns to the foreground; when unavailable it explains that huddles still open.
 
-Tests: `scripts/test-huddle-failsafe.mjs`. Family Huddle has no Vault fallback yet, so it is unchanged.
+Tests: `scripts/test-huddle-failsafe.mjs`. Family Huddle has no Canaan fallback yet, so it is unchanged.
 
 ## Accessibility (Phase 4)
 

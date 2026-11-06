@@ -2,9 +2,9 @@
 -- (sessionless supabasePublic). RLS already allows status = 'Published',
 -- but table privileges were missing — anon got:
 --   42501 permission denied for table prayer_requests
--- Vault still showed prayers because it uses the service_role API.
+-- Canaan still showed prayers because it uses the service_role API.
 --
--- Run in Supabase SQL Editor (same project as Connect + Vault).
+-- Run in Supabase SQL Editor (same project as Connect + Canaan).
 
 grant usage on schema public to anon, authenticated;
 
@@ -22,7 +22,7 @@ create policy "Public requests are viewable by everyone"
   to anon, authenticated
   using (status = 'Published');
 
--- Backfill Vault-approved public rows so is_confidential is never null-mismatch
+-- Backfill Canaan-approved public rows so is_confidential is never null-mismatch
 update public.prayer_requests
 set is_confidential = false
 where status = 'Published'
