@@ -3,6 +3,7 @@ import { parseBearerAuthorization } from './_utils/memberIdentity.js';
 import { handleCheckinPointsBridge } from './_utils/checkinPointsBridge.js';
 import { handleStudyGuidesBridge } from './_utils/studyGuidesBridge.js';
 import { handlePrayerBridge } from './_utils/prayerBridge.js';
+import { handleReportBridge } from './_utils/reportBridge.js';
 import { handleIntercessorsBridge } from './_utils/intercessorsBridge.js';
 import {
   MAX_NEWS_POST_BODY_BYTES,
@@ -194,6 +195,9 @@ export default async function handler(req, res) {
   }
   if (isPrayerBridge(req)) {
     return handlePrayerBridge(req, res);
+  }
+  if (String(req.query?.bridge || '').toLowerCase() === 'report') {
+    return handleReportBridge(req, res);
   }
   if (isIntercessorsBridge(req)) {
     return handleIntercessorsBridge(req, res);

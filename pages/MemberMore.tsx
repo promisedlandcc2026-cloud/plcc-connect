@@ -27,9 +27,12 @@ import {
   UserRound,
   Users,
   Wallet,
+  Flag,
+  ShieldAlert,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { openReport } from '../lib/report';
 import { useNotifications } from '../context/NotificationsContext';
 import { goToHomeSection } from '../lib/homeSectionNav';
 import { canOpenVaultStaffLink, VAULT_PUBLIC_ORIGIN } from '../lib/staffVaultAccess';
@@ -50,12 +53,12 @@ import {
   prefetchDirectoryChunk,
 } from '../lib/prefetchMemberChunks';
 
-type MoreGroup = 'church' | 'mine' | 'account';
+type MoreGroup = 'church' | 'mine' | 'help' | 'account';
 
 type MoreLink = { group: MoreGroup } & (
   | {
       kind: 'modal';
-      modal: 'give';
+      modal: 'give' | 'report-problem' | 'report-safety';
       label: string;
       description: string;
       icon: LucideIcon;
@@ -123,11 +126,14 @@ const MORE_EMOJI: Record<string, string> = {
   Settings: '⚙️',
   'Add to home screen': '📲',
   'Open PLCC Canaan': '🔐',
+  'Report a problem': '🛠️',
+  'Report harassment or a scam': '🛡️',
 };
 
 const GROUP_LABEL: Record<MoreGroup, string> = {
   mine: 'Mine',
   church: 'Church life',
+  help: 'Help & safety',
   account: 'Account',
 };
 
@@ -336,6 +342,25 @@ export const MemberMePage: React.FC = () => {
     },
   ];
 
+  items.push(
+    {
+      group: 'help',
+      kind: 'modal',
+      modal: 'report-problem',
+      label: 'Report a problem',
+      description: 'Something wrong in Chat, Canaan, Connect or Sanctum',
+      icon: Flag,
+    },
+    {
+      group: 'help',
+      kind: 'modal',
+      modal: 'report-safety',
+      label: 'Report harassment or a scam',
+      description: 'Someone pretending to be a leader, asking for money, or bothering you',
+      icon: ShieldAlert,
+    }
+  );
+
   if (!isRunningInstalled()) {
     items.push({
       group: 'account',
@@ -384,7 +409,11 @@ export const MemberMePage: React.FC = () => {
       return (
         <ListRow
           key={key}
-          onClick={() => setGiveOpen(true)}
+          onClick={() => {
+            if (item.modal === 'report-problem') openReport({ kind: 'problem', app: 'connect' });
+            else if (item.modal === 'report-safety') openReport({ kind: 'safety' });
+            else setGiveOpen(true);
+          }}
           title={item.label}
           subtitle={item.description}
           icon={item.icon} emoji={MORE_EMOJI[item.label]}
@@ -460,7 +489,7 @@ export const MemberMePage: React.FC = () => {
       </div>
 
       <div className="space-y-6">
-        {(['mine', 'church', 'account'] as MoreGroup[]).map((group) => {
+        {(['mine', 'church', 'help', 'account'] as MoreGroup[]).map((group) => {
           const groupItems = items
             .map((item, index) => ({ item, index }))
             .filter(({ item }) => item.group === group)

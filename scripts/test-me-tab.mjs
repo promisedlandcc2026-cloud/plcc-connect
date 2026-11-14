@@ -40,13 +40,15 @@ describe('navigation', () => {
 });
 
 describe('Me hub', () => {
-  it('shows who you are, your points, then Mine / Church life / Account', () => {
+  it('shows who you are, your points, then Mine / Church life / Help & safety / Account', () => {
     const me = read('pages/MemberMore.tsx');
     assert.match(me, /export const MemberMePage/);
     assert.match(me, /export const MemberMorePage = MemberMePage/);
     assert.match(me, /<MyPointsCard \/>/);
     assert.match(me, /to="\/profile"/);
-    assert.match(me, /\['mine', 'church', 'account'\]/);
+    assert.match(me, /\['mine', 'church', 'help', 'account'\]/);
+    assert.match(me, /openReport\(\{ kind: 'problem'/);
+    assert.match(me, /openReport\(\{ kind: 'safety' \}\)/);
     assert.match(me, /to: '\/my-attendance'/);
     assert.equal(read('pages/MemberProfile.tsx').includes('<MyPointsCard'), false, 'points live on Me, not twice');
   });

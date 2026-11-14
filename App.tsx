@@ -25,6 +25,7 @@ const MemberSignIn = lazy(() =>
 import SsoHandoff from './pages/SsoHandoff';
 import { OpenAwcChat } from './components/routing/OpenAwcChat';
 import { CHAT_MOVED } from './lib/awcChatMove';
+import ReportHost from './components/report/ReportHost';
 const AuthCallback = lazy(() =>
   import('./pages/AuthCallback').then((m) => ({ default: m.AuthCallback }))
 );
@@ -564,6 +565,7 @@ const App: React.FC = () => {
                 hasSeenSplash={hasSeenSplash}
                 onSplashComplete={() => setHasSeenSplash(true)}
               />
+              <ReportHost />
             </HuddleLiveProvider>
           </NotificationsProvider>
         </SeasonThemeProvider>

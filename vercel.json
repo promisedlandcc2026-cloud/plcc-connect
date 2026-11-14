@@ -21,6 +21,10 @@
       "destination": "/api/vault-news?bridge=prayer"
     },
     {
+      "source": "/api/report",
+      "destination": "/api/vault-news?bridge=report"
+    },
+    {
       "source": "/api/study-guides",
       "destination": "/api/vault-news?bridge=study-guides"
     },
