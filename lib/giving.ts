@@ -1,5 +1,5 @@
 /**
- * Giving goes through PLCC Tithe so every gift is confirmed (by Stripe, or by
+ * Giving goes through Firstfruits so every gift is confirmed (by Stripe, or by
  * Finance for Zelle / Venmo / Cash App) and recorded in the Digital
  * Contribution Book. Connect only links to it.
  */

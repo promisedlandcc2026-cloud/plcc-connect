@@ -236,7 +236,7 @@ export const MemberAccount: React.FC = () => {
         {memberAccessState === 'pending' && (
           <div className="rounded-2xl bg-gold/10 border border-gold/20 p-4 text-left space-y-3">
             <p className="text-xs font-black uppercase tracking-widest text-burgundy">
-              Welcome to PLCC Connect
+              Welcome to Tribes
             </p>
             <p className="text-sm text-gray-700 leading-relaxed">
               Thank you for joining us. Finish setup to unlock Community, your profile, Chat, and

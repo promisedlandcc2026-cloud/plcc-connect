@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 const give = readFileSync(new URL('../components/GiveModule.tsx', import.meta.url), 'utf8');
 const lib = readFileSync(new URL('../lib/giving.ts', import.meta.url), 'utf8');
 
-test('Give sheet sends every method through PLCC Tithe', () => {
+test('Give sheet sends every method through Firstfruits', () => {
   assert.match(give, /giveUrl\(\)/);
   assert.match(give, /giveUrl\(m\.id\)/);
   for (const m of ['card', 'bank', 'zelle', 'cashapp', 'venmo']) assert.match(give, new RegExp(`id: '${m}'`));

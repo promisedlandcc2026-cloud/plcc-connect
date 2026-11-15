@@ -367,7 +367,7 @@ export const MemberMePage: React.FC = () => {
       kind: 'route',
       to: '/install',
       label: 'Add to home screen',
-      description: 'Put PLCC Connect on your phone like an app',
+      description: 'Put Tribes on your phone like an app',
       icon: Smartphone,
     });
   }

@@ -116,7 +116,7 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ variant = 'public' }) => {
 
   return (
     <header className="relative px-5 pt-3 pb-1 space-y-6">
-      <h1 className="sr-only">PLCC Connect — Promised Land Christian Center</h1>
+      <h1 className="sr-only">Tribes — Promised Land Christian Center</h1>
       <StainedGlass />
       <div className="relative flex items-center justify-between gap-3">
         <AWCLogo size={52} className="block rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.25)]" />

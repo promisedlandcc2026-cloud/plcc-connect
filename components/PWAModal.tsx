@@ -24,7 +24,7 @@ export const PWAModal: React.FC<PWAModalProps> = ({ isOpen, onClose }) => {
           <div className="w-16 h-16 bg-gold text-[#1A1A1A] rounded-2xl flex items-center justify-center mb-4 shadow-lg rotate-3">
             <Smartphone size={32} />
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">PLCC Connect App</h2>
+          <h2 className="text-xl font-bold text-white mb-2">Tribes App</h2>
           <p className="text-gray-500 text-sm mb-8">Access church updates faster by adding this page to your home screen.</p>
 
           <div className="w-full space-y-6 text-left">

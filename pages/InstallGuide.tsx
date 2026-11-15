@@ -23,13 +23,13 @@ type Step = { say: React.ReactNode; more?: React.ReactNode; photos?: Photo[]; no
 
 const PHOTO = {
   safari: { src: '/install/safari-icon.webp', alt: 'A pen pointing at the Safari compass icon on the home screen' },
-  openButton: { src: '/install/open-button.webp', alt: 'The gold Open PLCC Connect button on the church website' },
+  openButton: { src: '/install/open-button.webp', alt: 'The gold Open Tribes button on the church website' },
   shareIpad: { src: '/install/share-button-ipad.webp', alt: 'A pen pointing at the Share button at the top right of Safari on an iPad' },
   viewMore: { src: '/install/view-more.webp', alt: 'The Share menu, with a pen pointing at View More' },
   addToHome: { src: '/install/add-to-home-screen.webp', alt: 'The longer Share menu with Add to Home Screen at the bottom of the list' },
   tapAdd: { src: '/install/tap-add.webp', alt: 'The Add to Home Screen screen with Open as Web App on and a pen pointing at Add' },
   androidChrome: { src: '/install/android-chrome-icon.webp', alt: 'A pen pointing at the Chrome app icon on an Android home screen' },
-  androidOpenButton: { src: '/install/android-open-button.webp', alt: 'The gold Open PLCC Connect button on the church website in Chrome' },
+  androidOpenButton: { src: '/install/android-open-button.webp', alt: 'The gold Open Tribes button on the church website in Chrome' },
   androidDots: { src: '/install/android-menu-dots.webp', alt: 'A pen pointing at the three dots menu in Chrome' },
   androidInstallDialog: { src: '/install/android-install-dialog.webp', alt: 'The Install and create shortcut box with a pen pointing at Install' },
   androidInstall: { src: '/install/android-install-shortcut.webp', alt: "Chrome's menu with a pen pointing at Install and create shortcut" },
@@ -125,7 +125,7 @@ const SAFARI_FIRST: Step = {
 const ADD_ICON = <SquarePlus size={18} aria-hidden />;
 
 /**
- * Public step-by-step guide: add PLCC Connect to an iPhone or Android home screen.
+ * Public step-by-step guide: add Tribes to an iPhone or Android home screen.
  * Linked from the install prompt, the Welcome screen and the Me tab; safe to share as /install.
  */
 export const InstallGuidePage: React.FC = () => {
@@ -232,7 +232,7 @@ export const InstallGuidePage: React.FC = () => {
       ),
       more: (
         <>
-          Type it in the address bar at the top, or tap the gold <b>Open PLCC Connect</b> button on the church
+          Type it in the address bar at the top, or tap the gold <b>Open Tribes</b> button on the church
           website.
         </>
       ),
@@ -303,7 +303,7 @@ export const InstallGuidePage: React.FC = () => {
       ),
       more: (
         <>
-          Type it in the address bar at the top, or tap the gold <b>Open PLCC Connect</b> button on the church
+          Type it in the address bar at the top, or tap the gold <b>Open Tribes</b> button on the church
           website.
         </>
       ),
@@ -319,7 +319,7 @@ export const InstallGuidePage: React.FC = () => {
       more: (
         <>
           On some phones the three dots are at the bottom right instead. Check the address bar says{' '}
-          <b>plcc-connect.vercel.app</b> first, so you add PLCC Connect and not the church website.
+          <b>plcc-connect.vercel.app</b> first, so you add Tribes and not the church website.
         </>
       ),
       photos: [PHOTO.androidDots],
@@ -350,7 +350,7 @@ export const InstallGuidePage: React.FC = () => {
         </>
       ),
       photos: [PHOTO.androidInstallDialog],
-      note: 'Your icon will be the PLCC Connect logo.',
+      note: 'Your icon will be the Tribes logo.',
     },
   ];
 
@@ -376,17 +376,17 @@ export const InstallGuidePage: React.FC = () => {
     <div className="min-h-screen bg-eggshell px-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(3rem+env(safe-area-inset-bottom))]">
       <div className="max-w-[560px] mx-auto flex flex-col gap-6">
         <Link to="/" className="self-start inline-flex items-center gap-2 min-h-[44px] text-burgundy font-bold">
-          <ArrowLeft size={18} aria-hidden /> Back to PLCC Connect
+          <ArrowLeft size={18} aria-hidden /> Back to Tribes
         </Link>
 
         <header className="flex flex-col gap-2">
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-burgundy">Promised Land Christian Center</p>
-          <h1 className="font-display text-[32px] leading-tight font-bold text-ink">Put PLCC Connect on your phone</h1>
+          <h1 className="font-display text-[32px] leading-tight font-bold text-ink">Put Tribes on your phone</h1>
           <p className="text-lg text-ink-muted">
-            It takes about one minute. When you're done, PLCC Connect sits on your home screen like any other app.
+            It takes about one minute. When you're done, Tribes sits on your home screen like any other app.
           </p>
           <p className="rounded-2xl bg-burgundy/[0.07] px-4 py-3 text-base text-ink">
-            <b className="text-burgundy">Good to know:</b> you won't find PLCC Connect in the App Store or Google Play.
+            <b className="text-burgundy">Good to know:</b> you won't find Tribes in the App Store or Google Play.
             You add it straight from the website, using the steps below.
           </p>
         </header>
@@ -473,7 +473,7 @@ export const InstallGuidePage: React.FC = () => {
         <div className="flex items-center gap-3 rounded-2xl border-2 border-dashed border-gold bg-white p-4">
           <img src="/icon-192.png" alt="" className="w-14 h-14 rounded-2xl shrink-0" />
           <p className="font-bold text-ink">
-            Done! Go to your home screen and tap the <b>PLCC Connect</b> icon to open it.
+            Done! Go to your home screen and tap the <b>Tribes</b> icon to open it.
           </p>
         </div>
 
@@ -510,21 +510,21 @@ export const InstallGuidePage: React.FC = () => {
                 iPhone: swipe down on the home screen and type <b>PLCC</b> to search.
               </li>
               <li>
-                Android: swipe up to open all your apps and look for <b>PLCC Connect</b>.
+                Android: swipe up to open all your apps and look for <b>Tribes</b>.
               </li>
             </ul>
           </details>
           <details className="rounded-2xl bg-white border border-black/10 p-4">
             <summary className="cursor-pointer font-extrabold text-[17px] text-ink">Do I need a password?</summary>
             <p className="mt-2.5 text-base text-ink">
-              Sign in once with the same email you use for PLCC Connect. After that, the icon opens PLCC Connect straight
+              Sign in once with the same email you use for Tribes. After that, the icon opens Tribes straight
               away.
             </p>
           </details>
           <details className="rounded-2xl bg-white border border-black/10 p-4">
             <summary className="cursor-pointer font-extrabold text-[17px] text-ink">Is it safe?</summary>
             <p className="mt-2.5 text-base text-ink">
-              Yes. It is the same PLCC Connect website, with a shortcut on your phone. Nothing extra is downloaded, and
+              Yes. It is the same Tribes website, with a shortcut on your phone. Nothing extra is downloaded, and
               you can remove it any time by pressing and holding the icon.
             </p>
           </details>

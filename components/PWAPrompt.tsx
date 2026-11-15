@@ -14,7 +14,7 @@ import {
 } from '../lib/installPrompt';
 
 /**
- * Asks visitors once to add PLCC Connect to their home screen.
+ * Asks visitors once to add Tribes to their home screen.
  * "Not now" and "I've added it" are remembered, and it never shows inside the
  * installed app — see lib/installPrompt.ts.
  */
@@ -91,7 +91,7 @@ export const PWAPrompt: React.FC = () => {
           />
           <div>
             <p id="awc-install-title" className="text-base font-bold leading-snug">
-              Get the PLCC Connect app
+              Get the Tribes app
             </p>
             <p className="text-sm text-gray-300 leading-snug">
               Free · Opens from your home screen like any app
@@ -101,7 +101,7 @@ export const PWAPrompt: React.FC = () => {
 
         {native && (
           <p className="mt-4 text-sm text-gray-300">
-            One tap adds PLCC Connect to your phone — no app store needed.
+            One tap adds Tribes to your phone — no app store needed.
           </p>
         )}
 

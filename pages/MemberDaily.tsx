@@ -564,7 +564,7 @@ const ReminderCard: React.FC = () => {
   } else if (state?.kind === 'blocked') {
     control = (
       <p className="text-[15px] text-[#F3EAD8]">
-        Alerts are blocked for PLCC Connect. Turn on notifications for it in your phone’s <b>Settings</b>, then come back here.
+        Alerts are blocked for Tribes. Turn on notifications for it in your phone’s <b>Settings</b>, then come back here.
       </p>
     );
   }

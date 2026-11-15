@@ -1,5 +1,5 @@
 /**
- * PLCC Ark bridge (same origin for the Ark, which PLCC Connect serves at /ark):
+ * PLCC Ark bridge (same origin for the Ark, which Tribes serves at /ark):
  *   GET  /api/ark?action=me
  *   GET  /api/ark?action=board&game=tetris&period=week|all
  *   POST /api/ark?action=score   { playerId, game, score, durationSec, stats }

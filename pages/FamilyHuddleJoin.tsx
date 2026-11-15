@@ -12,7 +12,7 @@ const NAME_MAX = 40;
 
 /**
  * Public guest join — invite link only. No church account required.
- * Soft gate copy: invited by a family on PLCC Connect.
+ * Soft gate copy: invited by a family on Tribes.
  */
 export const FamilyHuddleJoinPage: React.FC = () => {
   const [params] = useSearchParams();
@@ -85,11 +85,11 @@ export const FamilyHuddleJoinPage: React.FC = () => {
     <main className="min-h-[100dvh] flex flex-col bg-[#faf7f5]">
       <div className="flex-1 flex flex-col justify-center px-5 py-12 max-w-[420px] w-full mx-auto">
         <p className="text-xs font-black uppercase tracking-widest text-burgundy/70 mb-2">
-          PLCC Connect
+          Tribes
         </p>
         <h1 className="text-2xl font-black text-[#1A1A1A] mb-2">Family Huddle</h1>
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
-          You were invited by a family on PLCC Connect. Enter a display name to join
+          You were invited by a family on Tribes. Enter a display name to join
           their private live huddle. This does not create a church account or add you
           to their household.
         </p>

@@ -1,5 +1,5 @@
 /**
- * Open the shared Report dialog from anywhere in PLCC Connect.
+ * Open the shared Report dialog from anywhere in Tribes.
  * The dialog itself (<ReportHost />) is mounted once in App.
  * (Shared types with PLCC Canaan — keep the two copies in sync.)
  */

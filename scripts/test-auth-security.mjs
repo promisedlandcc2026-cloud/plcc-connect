@@ -36,14 +36,14 @@ function normalisePhone(value) {
 }
 
 describe('auth security helpers', () => {
-  it('exports MFA helpers with AWCConnect issuer (no passkeys)', () => {
+  it('exports MFA helpers with PLCC Tribes issuer (no passkeys)', () => {
     const src = read('lib/authSecurity.ts');
     assert.ok(src.includes('export async function listMfaFactors'));
     assert.ok(src.includes('export async function startMfaEnroll'));
     assert.ok(src.includes('export async function confirmMfaEnroll'));
     assert.ok(src.includes('export async function removeMfaFactor'));
-    assert.ok(src.includes("encodeURIComponent('AWCConnect')"));
-    assert.ok(src.includes('AWCConnect:'));
+    assert.ok(src.includes("encodeURIComponent('PLCC Tribes')"));
+    assert.ok(src.includes('PLCC Tribes:'));
     assert.equal(src.includes('AWCVault'), false);
     assert.equal(src.includes('listPasskeys'), false);
     assert.equal(src.includes('signInWithPasskey'), false);

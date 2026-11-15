@@ -80,7 +80,7 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
     content = (
       <>
         <p className="text-[15px] text-ink-soft">
-          Get a ping when service goes live, plus event reminders and church news. On iPhone, first add PLCC Connect to your Home Screen,
+          Get a ping when service goes live, plus event reminders and church news. On iPhone, first add Tribes to your Home Screen,
           then open it from there and tap “Turn on alerts.”
         </p>
         <ButtonLink to="/install" size="lg" fullWidth>
@@ -95,7 +95,7 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
   } else if (state.kind === 'blocked') {
     content = (
       <p className="text-[15px] text-ink-soft">
-        Alerts are blocked for PLCC Connect. To allow them, open your phone’s <b>Settings</b>, find <b>PLCC Connect</b> (or your browser),
+        Alerts are blocked for Tribes. To allow them, open your phone’s <b>Settings</b>, find <b>Tribes</b> (or your browser),
         tap <b>Notifications</b>, and turn them on. Then come back here.
       </p>
     );

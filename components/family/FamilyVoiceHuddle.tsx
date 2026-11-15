@@ -667,7 +667,7 @@ export const FamilyVoiceHuddle: React.FC<Props> = ({
     const created = invite || (await ensureInvite());
     if (!created) return;
     const url = absoluteInviteUrl(created.path);
-    const text = `Join our Family Huddle on PLCC Connect (${inviteExpiryLabel(created.expiresAt)})`;
+    const text = `Join our Family Huddle on Tribes (${inviteExpiryLabel(created.expiresAt)})`;
     try {
       if (navigator.share) {
         await navigator.share({ title: 'Family Huddle', text, url });

@@ -1,4 +1,4 @@
-# PLCC Connect
+# Tribes
 
 Public member PWA for **Promised Land Christian Center** — sermons, events, prayer, giving, and more.
 

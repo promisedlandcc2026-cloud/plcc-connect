@@ -1,5 +1,5 @@
 /**
- * Phone alerts (web push) for PLCC Connect.
+ * Phone alerts (web push) for Tribes.
  *
  * - The service worker (/sw.js) shows alerts and opens Connect when tapped.
  * - Turning alerts on asks the phone for permission, then saves this phone's

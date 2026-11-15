@@ -1,5 +1,5 @@
 /*
- * PLCC Connect service worker — phone alerts only.
+ * Tribes service worker — phone alerts only.
  * It does not cache pages or files (Connect always loads fresh), so a deploy
  * can never leave members stuck on an old version.
  */
@@ -23,7 +23,7 @@ self.addEventListener('push', (event) => {
   } catch (_) {
     data = { body: event.data ? event.data.text() : '' };
   }
-  const title = String(data.title || 'PLCC Connect').slice(0, 80);
+  const title = String(data.title || 'Tribes').slice(0, 80);
   event.waitUntil(
     self.registration.showNotification(title, {
       body: String(data.body || '').slice(0, 200),

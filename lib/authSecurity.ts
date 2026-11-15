@@ -41,13 +41,13 @@ function formatTotpSecret(secret: string): string {
 
 /**
  * Build a Google Authenticator–friendly otpauth URI.
- * Issuer is AWCConnect so apps distinguish Connect vs Vault enrollments.
+ * Issuer is PLCC Tribes so apps distinguish Connect vs Vault enrollments.
  */
 function buildTotpUri(secret: string, email: string): string {
   const cleanSecret = String(secret || '').replace(/\s+/g, '').toUpperCase();
   const account = (email || 'member').replace(/\s+/g, '');
-  const label = encodeURIComponent(`AWCConnect:${account}`);
-  const issuer = encodeURIComponent('AWCConnect');
+  const label = encodeURIComponent(`PLCC Tribes:${account}`);
+  const issuer = encodeURIComponent('PLCC Tribes');
   return `otpauth://totp/${label}?secret=${cleanSecret}&issuer=${issuer}&algorithm=SHA1&digits=6&period=30`;
 }
 

@@ -69,7 +69,7 @@ export const VisitorWelcomeStrip: React.FC = () => {
         </div>
 
         <p className="text-xs text-gray-500 leading-relaxed">
-          New to PLCC Connect? Create an account with your email — we’ll send a one-time code. Already
+          New to Tribes? Create an account with your email — we’ll send a one-time code. Already
           have one? Sign in. Members unlock Sunday Mode, notes, and community after church approval.
         </p>
       </section>

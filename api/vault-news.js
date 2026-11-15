@@ -167,7 +167,7 @@ function mapNewsUpstreamError(res, status) {
  * GET  /api/intercessors        → Intercessors prayer list (see _utils/intercessorsBridge.js)
  * GET  /api/bible               → licensed Bible text, NIV via API.Bible (see _utils/bibleBridge.js)
  * *    /api/ark                 → PLCC Ark scores + leaderboards (see _utils/arkBridge.js)
- * POST /api/sso                 → PLCC ONE sign-on token for PLCC Chat (see _utils/ssoBridge.js)
+ * POST /api/sso                 → PLCC ONE sign-on token for Jordan (see _utils/ssoBridge.js)
  * GET  /api/gallery             → church photo gallery from the website (see _utils/galleryBridge.js)
  *
  * The extra routes ride on this function via vercel.json rewrites (Hobby function-count limit).

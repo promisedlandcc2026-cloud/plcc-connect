@@ -100,7 +100,7 @@ export const MemberFamilyPage: React.FC = () => {
     try {
       const invite = await createFamilyHuddleInvite();
       const url = `${window.location.origin}${invite.path}`;
-      const text = `Join our Family Huddle on PLCC Connect (${inviteExpiryLabel(invite.expiresAt)})`;
+      const text = `Join our Family Huddle on Tribes (${inviteExpiryLabel(invite.expiresAt)})`;
       if (navigator.share) {
         try {
           await navigator.share({ title: 'Family Huddle', text, url });

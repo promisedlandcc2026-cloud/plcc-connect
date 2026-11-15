@@ -27,7 +27,7 @@ const rows = readdirSync(assets)
   })
   .sort((a, b) => b.rawKb - a.rawKb);
 
-console.log('PLCC Connect production assets\n');
+console.log('Tribes production assets\n');
 for (const r of rows) {
   console.log(`${r.file.padEnd(42)} raw ${String(r.rawKb).padStart(8)} kB  gzip ${String(r.gzipKb).padStart(7)} kB`);
 }

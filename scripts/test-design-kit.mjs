@@ -73,9 +73,9 @@ describe('kit components', () => {
     assert.match(more, /<GiveModule/);
   });
 
-  it('page headers drop the repeated "PLCC Connect" eyebrow', () => {
+  it('page headers drop the repeated "Tribes" eyebrow', () => {
     for (const f of walk('pages')) {
-      assert.equal(read(f).includes('eyebrow="PLCC Connect"'), false, f);
+      assert.equal(read(f).includes('eyebrow="Tribes"'), false, f);
     }
   });
 

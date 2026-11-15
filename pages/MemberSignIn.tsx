@@ -293,7 +293,7 @@ export const MemberSignIn: React.FC = () => {
             }}
             className="mt-3 text-[13px] font-bold text-burgundy min-h-[44px] inline-flex items-center"
           >
-            New to PLCC Connect? Create an account
+            New to Tribes? Create an account
           </Link>
         ) : (
           <Link

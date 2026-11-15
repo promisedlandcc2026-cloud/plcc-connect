@@ -1,6 +1,6 @@
-# PLCC Connect Ecosystem
+# Tribes Ecosystem
 
-PLCC Connect is the **public member PWA**. [PLCC Canaan](../awc-vault-main) (separate repo) is the **admin back-office**. Both apps share one Supabase project.
+Tribes is the **public member PWA**. [PLCC Canaan](../awc-vault-main) (separate repo) is the **admin back-office**. Both apps share one Supabase project.
 
 ## Schema ownership
 

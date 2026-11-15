@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature defines the Standard Operating Procedure (SOP) for church administrators and pastors at Promised Land Christian Center (PLCC) to manage sermon data in Supabase so that the PLCC Connect app displays current, accurate sermon content. The SOP covers adding new sermons, updating existing sermons, and structuring the fill-in-the-blank outline format that appears in the Message Guide section of the app.
+This feature defines the Standard Operating Procedure (SOP) for church administrators and pastors at Promised Land Christian Center (PLCC) to manage sermon data in Supabase so that the Tribes app displays current, accurate sermon content. The SOP covers adding new sermons, updating existing sermons, and structuring the fill-in-the-blank outline format that appears in the Message Guide section of the app.
 
 The `sermons` table in Supabase is the single source of truth for the SermonNotes component. When the table is empty or no record exists for the current date, the app falls back to a static placeholder. This SOP ensures non-technical staff can confidently manage that data without developer assistance.
 
@@ -10,12 +10,12 @@ The `sermons` table in Supabase is the single source of truth for the SermonNote
 
 - **Admin**: A church staff member or pastor authorized to access the Supabase dashboard and manage sermon data.
 - **Supabase Dashboard**: The web-based interface at supabase.com where the Admin manages database records.
-- **sermons Table**: The Supabase database table that stores all sermon records for the PLCC Connect app.
+- **sermons Table**: The Supabase database table that stores all sermon records for the Tribes app.
 - **Outline**: A JSON array of sermon points stored in the `outline` column, each containing a fill-in-the-blank sentence and its answer.
 - **OutlinePoint**: A single object within the Outline array with fields `id`, `text`, and `missingWord`.
 - **Fill-in-the-Blank**: A sermon outline sentence where `________` (eight underscores) marks the word the congregation must supply.
 - **missingWord**: The correct answer for a fill-in-the-blank point; used by the app to verify the congregation member's input.
-- **SermonNotes Component**: The React component in the PLCC Connect app that fetches and displays the latest sermon from Supabase.
+- **SermonNotes Component**: The React component in the Tribes app that fetches and displays the latest sermon from Supabase.
 - **Latest Sermon**: The sermon record with the most recent `date` value that is on or before today's date, as determined by the app's query (`ORDER BY date DESC LIMIT 1`).
 
 ---
@@ -64,7 +64,7 @@ The `sermons` table in Supabase is the single source of truth for the SermonNote
 3. THE Admin SHALL enter the `date` value as the Sunday date of the service in `YYYY-MM-DD` format before saving.
 4. THE Admin SHALL paste the complete, valid JSON array into the `outline` field before saving.
 5. WHEN the Admin saves the record, THE Supabase Dashboard SHALL confirm the insert with no error messages.
-6. WHEN the PLCC Connect app is refreshed after the record is saved, THE SermonNotes Component SHALL display the new sermon if its `date` is the most recent date on or before today.
+6. WHEN the Tribes app is refreshed after the record is saved, THE SermonNotes Component SHALL display the new sermon if its `date` is the most recent date on or before today.
 
 ---
 
@@ -77,7 +77,7 @@ The `sermons` table in Supabase is the single source of truth for the SermonNote
 1. WHEN the Admin locates the target sermon row in the Supabase Table Editor and clicks the row to edit it, THE Dashboard SHALL allow inline editing of any field.
 2. THE Admin SHALL update only the fields that require correction and leave all other fields unchanged.
 3. WHEN the Admin saves the updated record, THE Supabase Dashboard SHALL confirm the update with no error messages.
-4. WHEN the PLCC Connect app is refreshed after the update, THE SermonNotes Component SHALL display the corrected sermon data.
+4. WHEN the Tribes app is refreshed after the update, THE SermonNotes Component SHALL display the corrected sermon data.
 5. IF the Admin changes the `date` field of a sermon to a future date, THEN THE SermonNotes Component SHALL no longer display that sermon until that date is reached.
 
 ---
@@ -102,7 +102,7 @@ The `sermons` table in Supabase is the single source of truth for the SermonNote
 #### Acceptance Criteria
 
 1. THE SOP SHALL provide a minimal JSON template with one OutlinePoint that the Admin can copy and extend.
-2. THE SOP SHALL provide a complete worked example with three OutlinePoints matching the style used in the PLCC Connect app.
+2. THE SOP SHALL provide a complete worked example with three OutlinePoints matching the style used in the Tribes app.
 3. THE SOP SHALL include a checklist the Admin can follow before saving to verify the JSON is correctly formatted.
 4. WHEN the Admin uses the provided template verbatim and replaces only the placeholder values, THE resulting JSON SHALL be valid and accepted by the Supabase Dashboard without errors.
 

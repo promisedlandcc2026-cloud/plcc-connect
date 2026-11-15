@@ -168,7 +168,7 @@ export const DailyBackupHuddle: React.FC<Props> = ({ creds, title, onClose, embe
         const msg = String((err as { message?: string })?.message || '');
         setError(
           /permission|notallowed|denied/i.test(msg)
-            ? 'Allow microphone access for PLCC Connect, then try again.'
+            ? 'Allow microphone access for Tribes, then try again.'
             : 'Could not join the backup line. Please try again.'
         );
         setState('error');

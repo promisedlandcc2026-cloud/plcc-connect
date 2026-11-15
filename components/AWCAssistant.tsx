@@ -51,7 +51,7 @@ export const AWCAssistant: React.FC<{ showLauncher?: boolean }> = ({ showLaunche
     return () => window.removeEventListener(ASSISTANT_OPEN_EVENT, open);
   }, []);
   const [messages, setMessages] = useState<{ role: 'user' | 'bot'; text: string }[]>([
-    { role: 'bot', text: 'Welcome to PLCC Connect! How can I help you today?' },
+    { role: 'bot', text: 'Welcome to Tribes! How can I help you today?' },
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);

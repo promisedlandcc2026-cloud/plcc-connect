@@ -16,7 +16,7 @@ export const Footer: React.FC = () => {
         &copy; {new Date().getFullYear()} Promised Land Christian Center
       </p>
       <p className="text-xs text-gray-500 mt-2 italic">
-        Powered by PLCC Connect
+        Powered by Tribes
       </p>
     </footer>
   );
