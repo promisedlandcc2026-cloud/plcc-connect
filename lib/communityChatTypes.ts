@@ -81,7 +81,8 @@ export type CommunityChatErrorCode =
   | 'backup_line_unconfigured'
   | 'backup_line_unavailable'
   | 'huddle_line_busy'
-  | 'huddle_not_started';
+  | 'huddle_not_started'
+  | 'huddle_room_full';
 
 export class CommunityChatError extends Error {
   code: CommunityChatErrorCode;
