@@ -1,7 +1,7 @@
 /**
- * PLCC ONE one sign-on bridge (Connect → Jordan):
+ * PLCC ONE one sign-on bridge (Connect → Ka Link):
  *   POST /api/sso   (Bearer)  → PLCC Canaan POST /api/vault?resource=sso { target: 'chat' }
- * Returns { ok, tokenHash } — a single-use sign-in token Jordan verifies at /auth/sso.
+ * Returns { ok, tokenHash } — a single-use sign-in token Ka Link verifies at /auth/sso.
  * Rides on api/vault-news.js (bridge=sso) for the Hobby function limit.
  * Fixed upstream and target; forwards only the member's Bearer token; never logs it.
  */

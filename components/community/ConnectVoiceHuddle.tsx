@@ -1507,7 +1507,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     );
   }
 
-  // Full-screen huddle: the approved PLCC prayer-room design (same as PLCC Jordan and PLCC Sanctum's
+  // Full-screen huddle: the approved PLCC prayer-room design (same as PLCC Ka Link and PLCC Sanctum's
   // overflow room via prayer-room.css). The embedded Prayer Watch panel keeps the compact
   // dark layout below.
   if (!embedded) {
@@ -2059,7 +2059,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                   <p className="pr-card-text">
                     {prayerWatch
                       ? 'A voice prayer call for the Intercessors.'
-                      : 'A live prayer huddle for our church family. The main worldwide prayer room is in PLCC Jordan.'}
+                      : 'A live prayer huddle for our church family. The main worldwide prayer room is in PLCC Ka Link.'}
                   </p>
                   <ul className="pr-rules">
                     <li><Headphones size={22} aria-hidden />{audioOnly || prayerWatch ? 'Audio only (no video)' : 'Audio first (camera optional)'}</li>
