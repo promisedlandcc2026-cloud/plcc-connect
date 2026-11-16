@@ -212,7 +212,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4"
+      className="fixed inset-0 z-[130] flex items-end sm:items-center justify-center bg-black/40 p-0 sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
@@ -233,7 +233,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
           </button>
         </div>
 
-        <div className="p-4 space-y-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="p-4 space-y-4">
           <div className="flex items-start gap-3">
             <AuthorAvatar name={displayName} avatarUrl={avatarUrl} />
             <div className="min-w-0 flex-1 text-left">
@@ -264,7 +264,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
 
           {verse ? (
             <div>
-              <VerseCard verse={verse} />
+              <VerseCard verse={verse} lines={5} />
               {onRemoveVerse ? (
                 <button type="button" onClick={onRemoveVerse} disabled={posting} className="mt-1 min-h-[40px] text-sm font-semibold text-gray-500 underline underline-offset-2">
                   Remove verse
@@ -307,7 +307,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
             </p>
           )}
 
-          <div className="flex flex-wrap items-center gap-2 pt-1">
+          <div className="sticky bottom-0 -mx-4 -mb-4 flex flex-wrap items-center gap-2 border-t border-gray-100 bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
