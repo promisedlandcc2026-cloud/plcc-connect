@@ -15,12 +15,17 @@ import {
   type PreparedCommunityPostImage,
 } from '../lib/communityPostImagePrepare';
 import { CommunityMentionTextarea } from './CommunityMentionTextarea';
+import { VerseCard } from './VerseCard';
+import { buildVerseMessage, type SharedVerse } from '../lib/verseShare';
 import { Button } from './ui/Button';
 
 type Props = {
   open: boolean;
   onClose: () => void;
   onCreated: (post: CommunityFeedPost) => void;
+  /** A Bible verse from the church Bible reader ("Post to Tribes"), shown under the message. */
+  verse?: SharedVerse | null;
+  onRemoveVerse?: () => void;
 };
 
 function AuthorAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | null }) {
@@ -52,7 +57,7 @@ function AuthorAvatar({ name, avatarUrl }: { name: string; avatarUrl: string | n
  * Mobile-friendly Community post composer (approved members only).
  * Draft stays in memory until Vault confirms create — never localStorage.
  */
-export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreated }) => {
+export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreated, verse, onRemoveVerse }) => {
   const { identity, memberAccessState, user } = useAuth();
   const titleId = useId();
   const textareaId = useId();
@@ -70,7 +75,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
   const approved = memberAccessState === 'approved_member';
   const displayName = identity?.name || 'Member';
   const avatarUrl = identity?.avatarUrl || null;
-  const hasDraft = Boolean(content.trim() || pendingImage);
+  const hasDraft = Boolean(content.trim() || pendingImage || verse);
 
   const revokePreview = () => {
     setPreviewUrl((prev) => {
@@ -164,7 +169,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
 
   const submit = async () => {
     if (postingRef.current || preparingImage) return;
-    const text = content.trim();
+    const text = verse ? buildVerseMessage(content, verse) : content.trim();
     if (!text && !pendingImage) {
       setError('Write something or add a photo before posting.');
       return;
@@ -248,7 +253,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
               maxLength={COMMUNITY_POST_MAX_CHARS}
               rows={5}
               disabled={posting}
-              placeholder="What’s on your heart?"
+              placeholder={verse ? 'Add a message about this verse (optional)' : 'What’s on your heart?'}
               aria-label="Post text"
               className="w-full resize-y min-h-[120px] rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-[#1A1A1A] placeholder:text-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/40 disabled:opacity-60"
             />
@@ -256,6 +261,17 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
               {content.length}/{COMMUNITY_POST_MAX_CHARS}
             </p>
           </div>
+
+          {verse ? (
+            <div>
+              <VerseCard verse={verse} />
+              {onRemoveVerse ? (
+                <button type="button" onClick={onRemoveVerse} disabled={posting} className="mt-1 min-h-[40px] text-sm font-semibold text-gray-500 underline underline-offset-2">
+                  Remove verse
+                </button>
+              ) : null}
+            </div>
+          ) : null}
 
           {previewUrl && (
             <div className="relative rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
@@ -312,7 +328,7 @@ export const CommunityPostComposer: React.FC<Props> = ({ open, onClose, onCreate
             <Button
               type="button"
               onClick={() => void submit()}
-              disabled={posting || preparingImage || (!content.trim() && !pendingImage)}
+              disabled={posting || preparingImage || (!content.trim() && !pendingImage && !verse)}
             >
               {posting ? (
                 <span role="status" className="inline-flex items-center gap-2">

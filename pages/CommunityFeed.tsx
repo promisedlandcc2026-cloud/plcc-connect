@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Loader2,
   MessageCircle,
@@ -18,6 +18,7 @@ import { fetchCommunityFeedPage } from '../lib/communityFeedClient';
 import { Button, ButtonLink } from '../components/ui/Button';
 import { MemberPageHeader } from '../components/member/MemberPageHeader';
 import { CommunityPostComposer } from '../components/CommunityPostComposer';
+import { fetchVerse, passageFromParams, type SharedVerse } from '../lib/verseShare';
 import { CommunityPostOwnerActions } from '../components/CommunityPostOwnerActions';
 import { CommunityMentionText } from '../components/CommunityMentionText';
 import { CommunityReactionBar } from '../components/CommunityReactionBar';
@@ -178,8 +179,32 @@ export const CommunityFeedPage: React.FC = () => {
   const [errorCode, setErrorCode] = useState<string | null>(null);
   const [skippedHint, setSkippedHint] = useState(false);
   const [composerOpen, setComposerOpen] = useState(false);
+  // "Post to Tribes" from the church Bible reader: /community?share=verse&t=…&b=…&c=…&v=…
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [shareVerse, setShareVerse] = useState<SharedVerse | null>(null);
+  const [shareError, setShareError] = useState<string | null>(null);
 
   const authUserId = user?.id || null;
+
+  useEffect(() => {
+    if (searchParams.get('share') !== 'verse') return;
+    const passage = passageFromParams(searchParams);
+    const next = new URLSearchParams(searchParams);
+    ['share', 't', 'b', 'c', 'v'].forEach((k) => next.delete(k));
+    setSearchParams(next, { replace: true });
+    if (!passage) {
+      setShareError('That verse link isn’t complete. Please go back to the Bible and try again.');
+      return;
+    }
+    fetchVerse(passage)
+      .then(setShareVerse)
+      .catch((e) => setShareError(e instanceof Error ? e.message : 'Could not load that verse.'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (shareVerse) setComposerOpen(true);
+  }, [shareVerse, authUserId]);
   const requestIdRef = useRef(0);
   const inFlightRef = useRef(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -377,10 +402,21 @@ export const CommunityFeedPage: React.FC = () => {
         </button>
       )}
 
+      {shareError ? (
+        <p role="alert" className="rounded-2xl border border-burgundy/20 bg-burgundy/5 px-4 py-3 text-sm font-medium text-burgundy">
+          {shareError}
+        </p>
+      ) : null}
+
       <CommunityPostComposer
         open={composerOpen}
-        onClose={() => setComposerOpen(false)}
+        onClose={() => {
+          setComposerOpen(false);
+          setShareVerse(null);
+        }}
         onCreated={insertCreatedPost}
+        verse={shareVerse}
+        onRemoveVerse={() => setShareVerse(null)}
       />
 
       {loading && (
