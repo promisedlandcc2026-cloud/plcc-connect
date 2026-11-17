@@ -139,7 +139,7 @@ describe('sanitizeNotification + destinations', () => {
     );
     assert.deepEqual(dest, {
       path: `/community/chat/${POST_ID}`,
-      label: 'Join huddle',
+      label: 'Join Ka Link',
       kind: 'huddle',
       channelId: POST_ID,
     });

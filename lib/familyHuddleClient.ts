@@ -22,13 +22,13 @@ function mapStatus(
     if (bodyCode === 'not_adult') {
       return {
         code: 'not_adult',
-        message: 'Family Huddle is for household adults only in this version.',
+        message: 'Family Ka Link is for household adults only in this version.',
       };
     }
     if (bodyCode === 'unlinked') {
       return {
         code: 'unlinked',
-        message: 'Link your member profile before starting a Family Huddle.',
+        message: 'Link your member profile before starting a Family Ka Link.',
       };
     }
     if (bodyCode === 'conflict') {
@@ -40,7 +40,7 @@ function mapStatus(
     if (bodyCode === 'invite_locked') {
       return {
         code: 'invite_locked',
-        message: 'This Family Huddle is locked to new guests.',
+        message: 'This Family Ka Link is locked to new guests.',
       };
     }
     if (bodyCode === 'invite_exhausted') {
@@ -51,7 +51,7 @@ function mapStatus(
     }
     return {
       code: 'forbidden',
-      message: 'Family Huddle is not available for your account.',
+      message: 'Family Ka Link is not available for your account.',
     };
   }
   if (status === 404) {
@@ -73,17 +73,17 @@ function mapStatus(
     if (bodyCode === 'huddle_unavailable') {
       return {
         code: 'huddle_unavailable',
-        message: 'Family Huddle is not available right now. Please try again later.',
+        message: 'Family Ka Link is not available right now. Please try again later.',
       };
     }
     return {
       code: 'bridge_unconfigured',
-      message: 'Family Huddle is not available right now.',
+      message: 'Family Ka Link is not available right now.',
     };
   }
   return {
     code: 'vault_unavailable',
-    message: 'Family Huddle is temporarily unavailable. Please try again.',
+    message: 'Family Ka Link is temporarily unavailable. Please try again.',
   };
 }
 
@@ -142,7 +142,7 @@ async function authedFetch(path: string, init?: RequestInit): Promise<Response> 
     if (err instanceof FamilyHuddleError) throw err;
     throw new FamilyHuddleError(
       'network',
-      'Family Huddle is temporarily unavailable. Please try again.',
+      'Family Ka Link is temporarily unavailable. Please try again.',
       0
     );
   }
@@ -191,7 +191,7 @@ export async function fetchFamilyHuddleToken(): Promise<FamilyHuddleJoinToken> {
   if (!body.token || !body.url || !body.roomName) {
     throw new FamilyHuddleError(
       'vault_unavailable',
-      'Family Huddle token was incomplete.',
+      'Family Ka Link token was incomplete.',
       502
     );
   }
@@ -294,7 +294,7 @@ export async function redeemFamilyHuddleInvite(
   } catch {
     throw new FamilyHuddleError(
       'network',
-      'Family Huddle is temporarily unavailable. Please try again.',
+      'Family Ka Link is temporarily unavailable. Please try again.',
       0
     );
   }

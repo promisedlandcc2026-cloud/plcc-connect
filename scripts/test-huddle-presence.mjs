@@ -77,7 +77,7 @@ describe('huddlePresence runtime', () => {
   });
 });
 
-describe('huddle chat wire format', () => {
+describe('Ka Link chat wire format', () => {
   it('exports Vault-compatible topic and helpers', () => {
     const src = read('lib/huddleChat.ts');
     assert.ok(src.includes("HUDDLE_CHAT_TOPIC = 'awc.huddle.chat'"));
@@ -122,7 +122,7 @@ describe('mobile Hands | Chat | Attendance', () => {
     assert.equal(src.includes('Share a guest link') && src.includes('<footer') && /footer[\s\S]*Share a guest link/.test(src), false);
   });
 
-  it('Connect and Family huddles follow LiveKit host mute on the local mic', () => {
+  it('Connect and Family Ka Links follow LiveKit host mute on the local mic', () => {
     const presence = read('lib/huddlePresence.ts');
     assert.ok(presence.includes('HUDDLE_HOST_MUTE_NOTICE'));
     assert.ok(presence.includes('huddleMicrophonePublishAllowed'));
@@ -145,7 +145,7 @@ describe('mobile Hands | Chat | Attendance', () => {
   });
 });
 
-describe('huddle host mute helpers', () => {
+describe('Ka Link host mute helpers', () => {
   function huddleMicrophonePublishAllowed(permissions) {
     const sources = permissions?.canPublishSources;
     if (!Array.isArray(sources) || sources.length === 0) return true;

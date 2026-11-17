@@ -96,7 +96,7 @@ describe('keep the screen on', () => {
     assert.ok(existsSync(join(root, 'public/nosleep.webm')));
   });
 
-  it('huddles, Sunday views, notes and the card keep the phone awake', () => {
+  it('Ka Links, Sunday views, notes and the card keep the phone awake', () => {
     for (const f of [
       'components/community/ConnectVoiceHuddle.tsx',
       'components/family/FamilyVoiceHuddle.tsx',
@@ -109,7 +109,7 @@ describe('keep the screen on', () => {
     }
   });
 
-  it('a huddle dropped by sleep or a tab switch rejoins when the member is back', () => {
+  it('a Ka Link dropped by sleep or a tab switch rejoins when the member is back', () => {
     for (const f of ['components/community/ConnectVoiceHuddle.tsx', 'components/family/FamilyVoiceHuddle.tsx']) {
       const src = read(f);
       assert.match(src, /lostConnectionRef\.current = true;/, f);

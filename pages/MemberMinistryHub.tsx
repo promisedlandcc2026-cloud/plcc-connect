@@ -286,7 +286,7 @@ export const MemberMinistryHubPage: React.FC = () => {
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm font-bold text-[#1A1A1A]">Intercessors Prayer Watch</p>
-                  <p className="text-xs text-gray-500">Live Huddle and every prayer request, side by side</p>
+                  <p className="text-xs text-gray-500">Live Ka Link and every prayer request, side by side</p>
                 </div>
               </Link>
             </li>

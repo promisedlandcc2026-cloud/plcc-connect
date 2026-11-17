@@ -462,7 +462,7 @@ const AppShell: React.FC<{ hasSeenSplash: boolean; onSplashComplete: () => void 
         <Route
           path="/family/huddle/join"
           element={
-            <LazyRoute label="Opening Family Huddle…" sectionLabel="Family Huddle">
+            <LazyRoute label="Opening Family Ka Link…" sectionLabel="Family Ka Link">
               <FamilyHuddleJoinPage />
             </LazyRoute>
           }

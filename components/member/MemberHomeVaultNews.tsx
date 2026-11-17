@@ -160,7 +160,7 @@ export const MemberHomeVaultNews: React.FC = () => {
       <div className="rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
         {database === 'unavailable' ? (
           <p className="px-4 py-3 border-b border-gray-100 bg-amber-50/60 text-sm text-amber-950 leading-relaxed">
-            Live Huddles still open for anyone who joined one in the last 12 hours, and switch to the
+            Live Ka Links still open for anyone who joined one in the last 12 hours, and switch to the
             backup line if the main line is busy. We’ll update this as soon as the database is back.
           </p>
         ) : null}

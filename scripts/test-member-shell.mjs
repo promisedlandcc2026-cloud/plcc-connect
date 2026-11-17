@@ -172,7 +172,7 @@ describe('member shell path helpers', () => {
     }
   });
 
-  it('excludes public Family Huddle guest join from member shell nav', () => {
+  it('excludes public Family Ka Link guest join from member shell nav', () => {
     assert.equal(isFamilyPath('/family/huddle/join'), false);
     assert.equal(isMemberNavPath('/family/huddle/join'), false);
     assert.equal(isAuthShellPath('/family/huddle/join'), false);

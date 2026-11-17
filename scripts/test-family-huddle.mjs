@@ -27,8 +27,8 @@ function read(rel) {
   return readFileSync(join(root, rel), 'utf8');
 }
 
-describe('Vault Family Huddle URLs', () => {
-  it('builds resource=family huddle URLs without client householdId', () => {
+describe('Vault Family Ka Link URLs', () => {
+  it('builds resource=family Ka Link URLs without client householdId', () => {
     const status = buildVaultFamilyHuddleUrl('https://vault.example.com/', 'status');
     assert.ok(status.includes(VAULT_FAMILY_HUDDLE_BASE));
     assert.ok(status.includes('huddleType=status'));
@@ -147,7 +147,7 @@ describe('UI + routing', () => {
   it('My Family mounts FamilyVoiceHuddle and live CTAs', () => {
     const page = read('pages/MemberFamily.tsx');
     assert.ok(page.includes('FamilyVoiceHuddle'));
-    assert.ok(page.includes('Start Family Huddle'));
+    assert.ok(page.includes('Start Family Ka Link'));
     assert.ok(page.includes('Share invite link'));
     assert.ok(page.includes('fetchFamilyHuddleStatus'));
     const overlay = read('components/family/FamilyVoiceHuddle.tsx');

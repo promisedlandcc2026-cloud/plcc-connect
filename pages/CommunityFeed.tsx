@@ -350,7 +350,7 @@ export const CommunityFeedPage: React.FC = () => {
               to="/community/chat"
               variant="secondary"
               size="sm"
-              aria-label={anyLive ? 'Chat, live huddle' : 'Chat'}
+              aria-label={anyLive ? 'Chat, live Ka Link' : 'Chat'}
             >
               <span className="relative inline-flex">
                 <MessageCircle size={16} aria-hidden />

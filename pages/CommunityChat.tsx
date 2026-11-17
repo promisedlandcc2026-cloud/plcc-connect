@@ -189,7 +189,7 @@ export const CommunityChatPage: React.FC = () => {
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
               {visibilityLabel(opts?.isDm ? 'dm' : channel.visibility)}
               {live && huddle?.participantCount
-                ? ` · ${huddle.participantCount} in huddle`
+                ? ` · ${huddle.participantCount} in Ka Link`
                 : ''}
               {!live && !opts?.isDm && channel.description
                 ? ` · ${channel.description}`
@@ -242,7 +242,7 @@ export const CommunityChatPage: React.FC = () => {
         title="Chat"
         backTo="/community"
         backLabel="Community"
-        subtitle={`${identity?.name ? `Signed in as ${identity.name}. ` : ''}Message members, open shared channels, and start or join a Live Huddle.`}
+        subtitle={`${identity?.name ? `Signed in as ${identity.name}. ` : ''}Message members, open shared channels, and start or join a Live Ka Link.`}
       />
 
       {loading ? (

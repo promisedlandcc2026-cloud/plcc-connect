@@ -270,7 +270,7 @@ export const CommunityChatRoomPage: React.FC = () => {
             className="inline-flex items-center gap-1.5 text-burgundy text-sm font-bold min-h-[44px] px-2"
           >
             <Radio size={16} aria-hidden />
-            Start huddle
+            Start Ka Link
           </button>
         ) : null}
       </div>
@@ -290,7 +290,7 @@ export const CommunityChatRoomPage: React.FC = () => {
           <span
             className="shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
             role="status"
-            aria-label="Live huddle"
+            aria-label="Live Ka Link"
           />
         ) : null}
       </h1>
@@ -299,8 +299,8 @@ export const CommunityChatRoomPage: React.FC = () => {
         <div className="mb-4 rounded-2xl bg-wine p-4 text-cream shadow-lg">
           <p className="text-sm font-semibold text-cream/85">
             {huddleLive || huddleIntent === 'join'
-              ? 'A Live Huddle is running in this channel.'
-              : 'Start a Live Huddle here. Others in this channel can join from Home.'}
+              ? 'A Live Ka Link is running in this channel.'
+              : 'Start a Live Ka Link here. Others in this channel can join from Home.'}
           </p>
           <div className="mt-3 grid grid-cols-2 gap-2">
             <button
@@ -309,7 +309,7 @@ export const CommunityChatRoomPage: React.FC = () => {
               className="min-h-[48px] rounded-xl bg-leaf text-wine text-sm font-extrabold inline-flex items-center justify-center gap-1.5"
             >
               <Radio size={16} aria-hidden />
-              {huddleLive || huddleIntent === 'join' ? 'Join huddle' : 'Start huddle'}
+              {huddleLive || huddleIntent === 'join' ? 'Join Ka Link' : 'Start Ka Link'}
             </button>
             <button
               type="button"
@@ -336,7 +336,7 @@ export const CommunityChatRoomPage: React.FC = () => {
                   Live now
                 </span>
                 <span className="block text-sm font-bold truncate">
-                  Join huddle
+                  Join Ka Link
                   {huddleCount > 0 ? ` · ${huddleCount} in room` : ''}
                 </span>
               </span>
@@ -426,7 +426,7 @@ export const CommunityChatRoomPage: React.FC = () => {
             className={`relative min-h-[48px] min-w-[48px] rounded-2xl flex items-center justify-center ${
               huddleLive ? 'bg-emerald-600 text-white' : 'bg-gold/25 text-burgundy'
             }`}
-            aria-label={huddleLive ? 'Join live huddle' : 'Start a live huddle'}
+            aria-label={huddleLive ? 'Join live Ka Link' : 'Start a live Ka Link'}
             data-chat-huddle-button="true"
           >
             <Radio size={20} aria-hidden />

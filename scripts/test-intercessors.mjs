@@ -126,7 +126,7 @@ describe('wiring', () => {
     const fns = readdirSync(new URL('../api/', import.meta.url)).filter((f) => f.endsWith('.js'));
     assert.ok(fns.length <= 15);
   });
-  it('Prayer Watch page has the huddle and the requests', () => {
+  it('Prayer Watch page has the Ka Link and the requests', () => {
     const src = readFileSync(new URL('../pages/IntercessorsPrayerWatch.tsx', import.meta.url), 'utf8');
     assert.match(src, /ConnectVoiceHuddle[\s\S]*embedded/);
     assert.match(src, /Praise reports/);

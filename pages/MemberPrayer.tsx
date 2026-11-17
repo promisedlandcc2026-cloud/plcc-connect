@@ -28,7 +28,7 @@ const IntercessorsLink: React.FC = () => {
       </span>
       <span className="flex-1 min-w-0">
         <span className="block text-sm font-bold text-[#1A1A1A]">Intercessors Prayer Watch</span>
-        <span className="block text-xs text-gray-500">{name} · Live Huddle and every prayer request, side by side</span>
+        <span className="block text-xs text-gray-500">{name} · Live Ka Link and every prayer request, side by side</span>
       </span>
       <ChevronRight size={18} className="text-gray-400" aria-hidden />
     </Link>

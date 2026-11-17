@@ -100,10 +100,10 @@ export const MemberFamilyPage: React.FC = () => {
     try {
       const invite = await createFamilyHuddleInvite();
       const url = `${window.location.origin}${invite.path}`;
-      const text = `Join our Family Huddle on Tribes (${inviteExpiryLabel(invite.expiresAt)})`;
+      const text = `Join our Family Ka Link on Tribes (${inviteExpiryLabel(invite.expiresAt)})`;
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'Family Huddle', text, url });
+          await navigator.share({ title: 'Family Ka Link', text, url });
           setShareMsg('Invite shared.');
           return;
         } catch {
@@ -152,7 +152,7 @@ export const MemberFamilyPage: React.FC = () => {
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 space-y-1">
                   <h2 id="family-huddle-heading" className="text-sm font-black text-[#1A1A1A]">
-                    Family Huddle
+                    Family Ka Link
                   </h2>
                   <p className="text-xs text-gray-500 leading-relaxed">
                     Private live video for household adults. Guests can join with a share link.
@@ -174,7 +174,7 @@ export const MemberFamilyPage: React.FC = () => {
 
               {!huddleConfigured ? (
                 <p className="text-sm text-gray-500">
-                  Family Huddle is not configured yet. Check back soon.
+                  Family Ka Link is not configured yet. Check back soon.
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -185,7 +185,7 @@ export const MemberFamilyPage: React.FC = () => {
                       className={buttonClass({ fullWidth: true })}
                     >
                       <Users size={16} aria-hidden />
-                      Join Family Huddle
+                      Join Family Ka Link
                     </button>
                   ) : (
                     <button
@@ -194,7 +194,7 @@ export const MemberFamilyPage: React.FC = () => {
                       className={buttonClass({ fullWidth: true })}
                     >
                       <Radio size={16} aria-hidden />
-                      Start Family Huddle
+                      Start Family Ka Link
                     </button>
                   )}
                   <button

@@ -352,7 +352,7 @@ function connectApiDevBridge() {
             JSON.stringify({
               ok: false,
               code: 'vault_unavailable',
-              message: 'Family Huddle is temporarily unavailable. Please try again.',
+              message: 'Family Ka Link is temporarily unavailable. Please try again.',
             })
           );
         }

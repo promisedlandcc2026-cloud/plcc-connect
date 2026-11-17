@@ -24,7 +24,7 @@ before(async () => {
   m = await import(`data:text/javascript;base64,${Buffer.from(out.outputFiles[0].text).toString('base64')}`);
 });
 
-describe('huddle music helpers', () => {
+describe('Ka Link music helpers', () => {
   it('uses the same track name as the Vault so both apps see the music', () => {
     assert.equal(m.HUDDLE_MUSIC_TRACK_NAME, 'awc-huddle-music');
     const vaultPath = join(root, '..', 'awc-vault', 'api', '_utils', 'huddleMusic.ts');
@@ -72,7 +72,7 @@ describe('huddle music helpers', () => {
   });
 });
 
-describe('huddle UI wiring', () => {
+describe('Ka Link UI wiring', () => {
   const ui = read('components/community/ConnectVoiceHuddle.tsx');
 
   it('ships the music file', () => {

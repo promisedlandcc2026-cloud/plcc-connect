@@ -125,7 +125,7 @@ const HuddlePanel: React.FC<{
   return (
     <div className="rounded-3xl bg-wine text-white p-5 sm:p-6 flex flex-col gap-4 lg:min-h-[320px]">
       <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-black uppercase tracking-[0.18em] text-leaf">Live Huddle</p>
+        <p className="text-xs font-black uppercase tracking-[0.18em] text-leaf">Live Ka Link</p>
         {live ? (
           <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold">
             <span className="w-2 h-2 rounded-full bg-[#4ADE80] animate-pulse" aria-hidden /> Live · {count} praying
@@ -471,7 +471,7 @@ export const IntercessorsPrayerWatchPage: React.FC = () => {
         <div className="mt-5 grid grid-cols-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] gap-5 items-start">
           {/* Left: Live Huddle (sticks to the top on phones once the call is on) */}
           <section
-            aria-label="Live Huddle"
+            aria-label="Live Ka Link"
             className={`print:hidden ${joined ? 'sticky top-[env(safe-area-inset-top,0px)] z-20' : ''} lg:sticky lg:top-4`}
           >
             <HuddlePanel roomId={access.roomId} roomName={roomName} meetingToday={meetingToday} joined={joined} setJoined={setJoined} />

@@ -16,7 +16,7 @@ const TYPE_LABELS = {
   community_mention: 'Community',
   community_reply: 'Community',
   community_dm: 'Message',
-  community_huddle_started: 'Huddle',
+  community_huddle_started: 'Ka Link',
   community_feed_comment: 'Community',
   community_feed_mention_post: 'Community',
   community_feed_mention_comment: 'Community',
@@ -252,7 +252,7 @@ export function resolveNotificationDestination(type, sourceId, rawLink) {
     if (channelId) {
       return {
         path: `/community/chat/${channelId}`,
-        label: 'Join huddle',
+        label: 'Join Ka Link',
         kind: 'huddle',
         channelId,
       };

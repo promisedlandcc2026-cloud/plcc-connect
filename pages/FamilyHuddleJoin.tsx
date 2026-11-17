@@ -61,7 +61,7 @@ export const FamilyHuddleJoinPage: React.FC = () => {
     return (
       <main className="min-h-[100dvh] flex flex-col items-center justify-center px-5 bg-[#faf7f5]">
         <p className="text-sm text-gray-600 text-center">
-          You left the Family Huddle. You can close this tab.
+          You left the Family Ka Link. You can close this tab.
         </p>
       </main>
     );
@@ -87,10 +87,10 @@ export const FamilyHuddleJoinPage: React.FC = () => {
         <p className="text-xs font-black uppercase tracking-widest text-burgundy/70 mb-2">
           Tribes
         </p>
-        <h1 className="text-2xl font-black text-[#1A1A1A] mb-2">Family Huddle</h1>
+        <h1 className="text-2xl font-black text-[#1A1A1A] mb-2">Family Ka Link</h1>
         <p className="text-sm text-gray-600 leading-relaxed mb-6">
           You were invited by a family on Tribes. Enter a display name to join
-          their private live huddle. This does not create a church account or add you
+          their private live Ka Link. This does not create a church account or add you
           to their household.
         </p>
 
@@ -121,7 +121,7 @@ export const FamilyHuddleJoinPage: React.FC = () => {
               className="w-full min-h-[48px] rounded-2xl bg-burgundy text-white text-sm font-bold disabled:opacity-50 inline-flex items-center justify-center gap-2"
             >
               {busy ? <Loader2 size={16} className="animate-spin" aria-hidden /> : null}
-              {busy ? 'Joining…' : 'Join Family Huddle'}
+              {busy ? 'Joining…' : 'Join Family Ka Link'}
             </button>
           </form>
         )}

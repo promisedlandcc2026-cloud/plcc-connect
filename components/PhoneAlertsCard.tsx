@@ -18,7 +18,7 @@ import {
 const TOPICS: { key: AlertTopic; label: string; hint: string; locked?: boolean }[] = [
   { key: 'church', label: 'Church alerts', hint: "We're live, events, Canaan News", locked: true },
   { key: 'prayer', label: 'Prayer requests', hint: 'When someone shares a prayer request' },
-  { key: 'community', label: 'My community', hint: 'Mentions, replies, huddles, PLCC Bucks' },
+  { key: 'community', label: 'My community', hint: 'Mentions, replies, Ka Links, PLCC Bucks' },
   { key: 'daily', label: 'Morning devotional', hint: 'Today’s devotional at 7 AM' },
 ];
 

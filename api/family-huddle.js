@@ -135,7 +135,7 @@ function mapUpstreamError(res, status, body) {
     return json(res, 403, {
       ok: false,
       code: code || 'forbidden',
-      message: message || 'Family Huddle is not available for your account.',
+      message: message || 'Family Ka Link is not available for your account.',
     });
   }
   if (status === 404) {
@@ -170,13 +170,13 @@ function mapUpstreamError(res, status, body) {
     return json(res, 503, {
       ok: false,
       code: code || 'huddle_unavailable',
-      message: message || 'Family Huddle is not available right now.',
+      message: message || 'Family Ka Link is not available right now.',
     });
   }
   return json(res, 502, {
     ok: false,
     code: 'vault_unavailable',
-    message: 'Family Huddle is temporarily unavailable. Please try again.',
+    message: 'Family Ka Link is temporarily unavailable. Please try again.',
   });
 }
 
@@ -204,7 +204,7 @@ export default async function handler(req, res) {
       return json(res, 400, {
         ok: false,
         code: 'invalid_query',
-        message: 'That Family Huddle request was not valid.',
+        message: 'That Family Ka Link request was not valid.',
       });
     }
   }
@@ -242,7 +242,7 @@ export default async function handler(req, res) {
     return json(res, 503, {
       ok: false,
       code: 'bridge_unconfigured',
-      message: 'Family Huddle is not available right now.',
+      message: 'Family Ka Link is not available right now.',
     });
   }
 
@@ -301,7 +301,7 @@ export default async function handler(req, res) {
         return json(res, 502, {
           ok: false,
           code: 'invalid_upstream',
-          message: 'Family Huddle status was unexpected.',
+          message: 'Family Ka Link status was unexpected.',
         });
       }
       return json(res, 200, {
@@ -347,7 +347,7 @@ export default async function handler(req, res) {
         return json(res, 502, {
           ok: false,
           code: 'invalid_upstream',
-          message: 'Family Huddle token was unexpected.',
+          message: 'Family Ka Link token was unexpected.',
         });
       }
       return json(res, 200, { ok: true, ...parsed.token });
@@ -387,7 +387,7 @@ export default async function handler(req, res) {
         return json(res, 502, {
           ok: false,
           code: 'invalid_upstream',
-          message: 'Could not confirm Family Huddle end.',
+          message: 'Could not confirm Family Ka Link end.',
         });
       }
       return json(res, 200, { ok: true, ended: parsed.ended });
@@ -616,7 +616,7 @@ export default async function handler(req, res) {
     return json(res, 400, {
       ok: false,
       code: 'invalid_query',
-      message: 'That Family Huddle request was not valid.',
+      message: 'That Family Ka Link request was not valid.',
     });
   } catch (err) {
     const aborted = err?.name === 'AbortError';
@@ -624,7 +624,7 @@ export default async function handler(req, res) {
     return json(res, 502, {
       ok: false,
       code: 'vault_unavailable',
-      message: 'Family Huddle is temporarily unavailable. Please try again.',
+      message: 'Family Ka Link is temporarily unavailable. Please try again.',
     });
   } finally {
     clearTimeout(timer);

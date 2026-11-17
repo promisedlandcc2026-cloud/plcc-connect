@@ -82,7 +82,7 @@ export const LiveHuddles: React.FC = () => {
           ) : (
             <Mic size={16} className="text-leaf" aria-hidden />
           )}
-          Live Huddles
+          Live Ka Links
         </h2>
         <button
           type="button"
@@ -134,13 +134,13 @@ export const LiveHuddles: React.FC = () => {
           ) : null}
         </ul>
       ) : (
-        <p className="mt-1.5 text-sm text-cream/80">No one is in a huddle right now. Start one and others can join from here.</p>
+        <p className="mt-1.5 text-sm text-cream/80">No one is in a Ka Link right now. Start one and others can join from here.</p>
       )}
 
       <ModalShell
         isOpen={pickerOpen}
         onClose={() => setPickerOpen(false)}
-        title="Start a Live Huddle"
+        title="Start a Live Ka Link"
         subtitle="Pick where to start it"
         icon={<Mic size={22} className="text-gold" aria-hidden />}
       >
@@ -176,7 +176,7 @@ export const LiveHuddles: React.FC = () => {
             >
               <span className="min-w-0 flex-1">
                 <span className="block text-[15px] font-bold">My Family</span>
-                <span className="block text-xs text-ink-soft">A private huddle with your household</span>
+                <span className="block text-xs text-ink-soft">A private Ka Link with your household</span>
               </span>
               <ChevronRight size={18} className="shrink-0 text-ink-soft" aria-hidden />
             </Link>

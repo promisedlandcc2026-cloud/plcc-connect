@@ -230,8 +230,8 @@ describe('visitor Home (Sanctuary)', () => {
   });
 });
 
-describe('Home Live Huddles', () => {
-  it('lists live channel huddles busiest first and builds one-tap room links', async () => {
+describe('Home Live Ka Links', () => {
+  it('lists live channel Ka Links busiest first and builds one-tap room links', async () => {
     const h = await load('lib/liveHuddles.ts');
     const rows = h.liveHuddleRows(
       [{ id: 'a', name: 'Prayer' }, { id: 'b', name: 'Youth' }, { id: 'c', name: 'Men' }],
@@ -243,7 +243,7 @@ describe('Home Live Huddles', () => {
     assert.equal(h.parseHuddleIntent('?huddle=x'), null);
   });
 
-  it('Home shows Live Huddles; the room asks for a tap before the mic starts', () => {
+  it('Home shows Live Ka Links; the room asks for a tap before the mic starts', () => {
     assert.match(read('components/member/MemberHomeHeader.tsx'), /<LiveHuddles \/>/);
     const lh = read('components/sanctuary/LiveHuddles.tsx');
     assert.match(lh, /fetchHuddleStatuses/);

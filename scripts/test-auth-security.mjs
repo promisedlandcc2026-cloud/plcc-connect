@@ -102,7 +102,7 @@ describe('session recovery + wake lock', () => {
     assert.ok(read('lib/authAccessToken.ts').includes('getValidAccessToken'));
   });
 
-  it('uses screen wake lock in both huddle components', () => {
+  it('uses screen wake lock in both Ka Link components', () => {
     const hook = read('lib/useScreenWakeLock.ts');
     assert.ok(hook.includes('wakeLock'));
     assert.ok(read('components/community/ConnectVoiceHuddle.tsx').includes('useScreenWakeLock'));

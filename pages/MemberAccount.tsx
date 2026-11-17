@@ -164,8 +164,8 @@ export const MemberAccount: React.FC = () => {
             </p>
             <p className="text-sm text-gray-700 leading-relaxed">
               You can use Community feed, comments, reactions, Chat (including direct
-              messages), and start or join Live Huddles from Connect when you have
-              access. Church leaders create group channels and run huddle host tools.
+              messages), and start or join Live Ka Links from Connect when you have
+              access. Church leaders create group channels and run Ka Link host tools.
             </p>
             <Link
               to="/community"

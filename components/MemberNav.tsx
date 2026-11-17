@@ -143,7 +143,7 @@ export const MemberNav: React.FC = () => {
               aria-current={active ? 'page' : undefined}
               aria-label={
                 showHuddle
-                  ? `${item.label}, live huddle`
+                  ? `${item.label}, live Ka Link`
                   : showBadge
                     ? `${item.label}, ${unreadBadge} unread`
                     : item.label
