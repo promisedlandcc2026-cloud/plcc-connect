@@ -1,27 +1,27 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Loader2,
-  MessageCircle,
-  PenSquare,
-  Pin,
-  RefreshCcw,
-} from 'lucide-react';
+import { Loader2, Pencil, Pin, RefreshCcw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useHuddleLive } from '../context/HuddleLiveContext';
-import { HuddleLiveDot } from '../components/huddle/HuddleLiveDot';
 import {
   CommunityFeedError,
   type CommunityFeedPost,
 } from '../lib/communityFeedTypes';
 import { fetchCommunityFeedPage } from '../lib/communityFeedClient';
-import { Button, ButtonLink } from '../components/ui/Button';
-import { MemberPageHeader } from '../components/member/MemberPageHeader';
+import { Button } from '../components/ui/Button';
+import { TribesHeader } from '../components/tribes/TribesHeader';
+import { TribesHero } from '../components/tribes/TribesHero';
+import { ReportPostMenu, TribesPostActions } from '../components/tribes/TribesPostActions';
+import {
+  FEED_VIEW_PARAM,
+  feedViewFromParams,
+  filterFeedPosts,
+  isScripturePost,
+  type FeedView,
+} from '../lib/scripturePost';
 import { CommunityPostComposer } from '../components/CommunityPostComposer';
 import { fetchVerse, passageFromParams, type SharedVerse } from '../lib/verseShare';
 import { CommunityPostOwnerActions } from '../components/CommunityPostOwnerActions';
 import { CommunityMentionText } from '../components/CommunityMentionText';
-import { CommunityReactionBar } from '../components/CommunityReactionBar';
 import { useCommunityReactions } from '../context/CommunityReactionsContext';
 import { useCommunityPostsSync } from '../context/CommunityPostsSyncContext';
 
@@ -73,57 +73,60 @@ const PostCard: React.FC<{
   onDeleted: (postId: string) => void;
 }> = ({ post, onUpdated, onDeleted }) => {
   const navigate = useNavigate();
-  const { getCommentCount } = useCommunityReactions();
   const [imageFailed, setImageFailed] = useState(false);
-  const commentCount = getCommentCount(post.id, post.commentCount);
+  const scripture = isScripturePost(post);
 
-  const openPost = () => {
+  const openPost = (hash = '') => {
     const selection = typeof window !== 'undefined' ? window.getSelection() : null;
-    if (selection && selection.toString().trim()) return;
-    navigate(`/community/post/${post.id}`);
+    if (!hash && selection && selection.toString().trim()) return;
+    navigate(`/community/post/${post.id}${hash}`);
   };
 
   return (
     <div
       role="link"
       tabIndex={0}
-      onClick={openPost}
+      onClick={() => openPost()}
       onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           openPost();
         }
       }}
-      className="bg-white rounded-3xl border border-gray-100 shadow-sm p-4 space-y-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/40"
-      aria-label={`Open post by ${post.author.name}`}
+      className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] px-3.5 pt-3.5 pb-1 space-y-3 cursor-pointer shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40"
+      aria-label={`Open ${scripture ? 'Scripture post' : 'post'} by ${post.author.name}`}
     >
+      {post.pinned && (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3E2B3] px-2.5 py-1 text-xs font-bold text-[#12231c]">
+          <Pin size={12} aria-hidden className="fill-current" />
+          Pinned
+        </span>
+      )}
       <header className="flex items-start gap-3">
         <AuthorAvatar name={post.author.name} avatarUrl={post.author.avatarUrl} />
         <div className="min-w-0 flex-1 text-left">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h2 className="text-sm font-bold text-[#1A1A1A] truncate">{post.author.name}</h2>
-            {post.pinned && (
-              <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-gold-ink">
-                <Pin size={10} aria-hidden />
-                Pinned
-              </span>
-            )}
-          </div>
-          <p className="text-xs text-gray-500">
-            {post.categoryLabel}
+          <h2 className="text-[16px] font-bold text-[#12231c] truncate">{post.author.name}</h2>
+          <p className="text-[13px] text-[#4B5563]">
+            {scripture ? 'Scripture' : post.categoryLabel}
             {post.createdAt ? ` · ${formatRelativeTime(post.createdAt)}` : ''}
             {post.edited ? ' · Edited' : ''}
           </p>
         </div>
         <CommunityPostOwnerActions post={post} onUpdated={onUpdated} onDeleted={onDeleted} />
+        <ReportPostMenu post={post} />
       </header>
 
       {post.content ? (
-        <CommunityMentionText content={post.content} />
+        <CommunityMentionText
+          content={post.content}
+          scripture="feed"
+          className="text-[15px] text-[#1A1A1A] leading-relaxed whitespace-pre-wrap break-words text-left"
+        />
       ) : null}
 
       {post.imageUrl && !imageFailed ? (
-        <div className="rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
+        <div className="-mx-1 rounded-xl overflow-hidden border border-[#E8DCC2] bg-[#F3EBD8]">
           <img
             src={post.imageUrl}
             alt={post.imageAlt || 'Community photo'}
@@ -134,19 +137,37 @@ const PostCard: React.FC<{
         </div>
       ) : null}
 
-      {(commentCount > 0) && (
-        <footer className="flex items-center gap-4 pt-1 text-xs font-semibold text-gray-500">
-          <span className="inline-flex items-center gap-1" aria-label={`${commentCount} comments`}>
-            <MessageCircle size={12} aria-hidden />
-            {commentCount}
-          </span>
-        </footer>
-      )}
-
-      <CommunityReactionBar postId={post.id} reactions={post.reactions} compact />
+      <TribesPostActions post={post} onComment={() => openPost('#comment')} />
     </div>
   );
 };
+
+/** All posts | Scripture — the two feed views. */
+const FeedFilter: React.FC<{ view: FeedView; onChange: (v: FeedView) => void }> = ({ view, onChange }) => (
+  <div className="flex rounded-xl border border-[#1d372c]/70 bg-[#FDF9EF] p-0.5" role="group" aria-label="Show posts">
+    {(
+      [
+        ['all', 'All posts'],
+        ['scripture', 'Scripture'],
+      ] as const
+    ).map(([value, label]) => {
+      const active = view === value;
+      return (
+        <button
+          key={value}
+          type="button"
+          aria-pressed={active}
+          onClick={() => onChange(value)}
+          className={`flex-1 min-h-[44px] rounded-[10px] text-[15px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A35A] ${
+            active ? 'bg-[#1d372c] text-[#F6EFDD] shadow-sm' : 'text-[#12231c] hover:bg-[#1d372c]/5'
+          }`}
+        >
+          {label}
+        </button>
+      );
+    })}
+  </div>
+);
 
 const FeedPostList: React.FC<{
   posts: CommunityFeedPost[];
@@ -165,8 +186,7 @@ const FeedPostList: React.FC<{
  * Not a moderation surface.
  */
 export const CommunityFeedPage: React.FC = () => {
-  const { identity, memberAccessState, isAuthenticated, user } = useAuth();
-  const { anyLive } = useHuddleLive();
+  const { memberAccessState, isAuthenticated, user } = useAuth();
   const { seedFromPosts, removePostState } = useCommunityReactions();
   const { getUpdatedPost, isDeleted, applyUpdatedPost, markDeleted } = useCommunityPostsSync();
   const navigate = useNavigate();
@@ -183,6 +203,22 @@ export const CommunityFeedPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [shareVerse, setShareVerse] = useState<SharedVerse | null>(null);
   const [shareError, setShareError] = useState<string | null>(null);
+  // All posts | Scripture, kept in the URL (?view=scripture) so Back and refresh keep it.
+  const view = feedViewFromParams(searchParams);
+  const setView = useCallback(
+    (next: FeedView) => {
+      setSearchParams(
+        (prev) => {
+          const p = new URLSearchParams(prev);
+          if (next === 'scripture') p.set(FEED_VIEW_PARAM, 'scripture');
+          else p.delete(FEED_VIEW_PARAM);
+          return p;
+        },
+        { replace: true }
+      );
+    },
+    [setSearchParams]
+  );
 
   const authUserId = user?.id || null;
 
@@ -339,68 +375,42 @@ export const CommunityFeedPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reload only when auth identity changes
   }, [authUserId, isAuthenticated, memberAccessState]);
 
-  return (
-    <main className="flex-1 px-5 pt-8 pb-28">
-      <MemberPageHeader
-        title="Community"
-        subtitle="Share updates, celebrate, and pray with your church family."
-        action={
-          <div className="flex items-center gap-2">
-            <ButtonLink
-              to="/community/chat"
-              variant="secondary"
-              size="sm"
-              aria-label={anyLive ? 'Chat, live Ka Link' : 'Chat'}
-            >
-              <span className="relative inline-flex">
-                <MessageCircle size={16} aria-hidden />
-                {anyLive ? (
-                  <span className="absolute -right-1 -top-1">
-                    <HuddleLiveDot size="sm" label="" />
-                  </span>
-                ) : null}
-              </span>
-              Chat
-            </ButtonLink>
-            <Button
-              variant="subtle"
-              size="sm"
-              onClick={() => void loadPage('refresh')}
-              disabled={loading || refreshing || memberAccessState !== 'approved_member'}
-              aria-label="Refresh Community feed"
-            >
-              <RefreshCcw size={16} className={refreshing ? 'animate-spin' : ''} aria-hidden />
-            </Button>
-          </div>
-        }
-      />
+  const visiblePosts = filterFeedPosts(
+    posts.filter((p) => !isDeleted(p.id)).map((p) => getUpdatedPost(p.id) ?? p),
+    view
+  );
 
+  return (
+    <main className="tribes-page flex-1 px-5 pb-28">
+      <TribesHeader />
+      <TribesHero />
 
       {memberAccessState === 'approved_member' && (
         <button
           type="button"
           onClick={() => setComposerOpen(true)}
-          className="w-full mb-5 flex items-center gap-3 rounded-3xl border border-gray-100 bg-white shadow-sm px-4 py-3 text-left min-h-[56px] focus:outline-none focus-visible:ring-2 focus-visible:ring-burgundy/40"
-          aria-label="Create a Community post"
+          className="tribes-gold-btn mt-5 mb-4 flex w-full min-h-[54px] items-center justify-center gap-3 rounded-2xl border border-[#C9A35A] text-[18px] font-bold text-[#12231c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/50"
+          aria-label="Create a Tribes post"
         >
-          {identity?.avatarUrl ? (
-            <img
-              src={identity.avatarUrl}
-              alt=""
-              className="w-10 h-10 rounded-full object-cover border border-gray-100"
-            />
-          ) : (
-            <div
-              className="w-10 h-10 rounded-full bg-burgundy/10 text-burgundy flex items-center justify-center text-sm font-bold"
-              aria-hidden
-            >
-              {(identity?.name || 'M').trim().charAt(0).toUpperCase()}
-            </div>
-          )}
-          <span className="flex-1 text-sm text-gray-500">Share with the PLCC Community…</span>
-          <PenSquare size={18} className="text-burgundy shrink-0" aria-hidden />
+          <Pencil size={22} aria-hidden />
+          Create post
         </button>
       )}
+
+      <div className="mb-4 flex items-center gap-2">
+        <div className="flex-1">
+          <FeedFilter view={view} onChange={setView} />
+        </div>
+        <button
+          type="button"
+          onClick={() => void loadPage('refresh')}
+          disabled={loading || refreshing || memberAccessState !== 'approved_member'}
+          aria-label="Refresh Tribes feed"
+          className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-[#1d372c] hover:bg-[#1d372c]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40 disabled:opacity-50"
+        >
+          <RefreshCcw size={18} className={refreshing ? 'animate-spin' : ''} aria-hidden />
+        </button>
+      </div>
 
       {shareError ? (
         <p role="alert" className="rounded-2xl border border-burgundy/20 bg-burgundy/5 px-4 py-3 text-sm font-medium text-burgundy">
@@ -435,16 +445,15 @@ export const CommunityFeedPage: React.FC = () => {
             </Button>
           )}
           <Link to="/" className="block text-sm font-bold text-burgundy underline min-h-[44px]">
-            Back to Connect
+            Back to Home
           </Link>
         </div>
       )}
 
       {!loading && !error && posts.length === 0 && (
-        <div className="bg-white border border-gray-100 rounded-3xl p-8 text-center space-y-3">
-          <p className="text-sm text-gray-600 leading-relaxed">
-            No Community posts to show yet. When posts are shared in PLCC Community, they will appear
-            here.
+        <div className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] p-8 text-center space-y-3">
+          <p className="text-sm text-[#4B5563] leading-relaxed">
+            No posts to show yet. When the PLCC family shares in Tribes, posts will appear here.
           </p>
           <Button type="button" variant="secondary" onClick={() => void loadPage('refresh')}>
             Refresh
@@ -459,10 +468,17 @@ export const CommunityFeedPage: React.FC = () => {
               Some items could not be shown and were skipped.
             </p>
           )}
+          {view === 'scripture' && visiblePosts.length === 0 ? (
+            <div className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] p-6 text-center" role="status">
+              <p className="text-sm text-[#4B5563] leading-relaxed">
+                {hasMore
+                  ? 'No Scripture posts in the latest posts. Load more to look further back.'
+                  : 'No Scripture posts yet. Share a verse from the Bible with “Post to Tribes”.'}
+              </p>
+            </div>
+          ) : null}
           <FeedPostList
-            posts={posts
-              .filter((p) => !isDeleted(p.id))
-              .map((p) => getUpdatedPost(p.id) ?? p)}
+            posts={visiblePosts}
             onUpdated={handlePostUpdated}
             onDeleted={handlePostDeleted}
           />

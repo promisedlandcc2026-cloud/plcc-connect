@@ -1,0 +1,66 @@
+import React, { useState } from 'react';
+import { ExternalLink } from 'lucide-react';
+import type { SharedVerse } from '../../lib/verseShare';
+import { GoldRuleMark } from './TribesHero';
+
+/**
+ * Framed Scripture card for Tribes posts: ivory card, fine gold border,
+ * forest-green type. Reference and wording come from the church Bible reader
+ * (carried in the post); long passages fold.
+ */
+export const ScriptureCard: React.FC<{ verse: SharedVerse; size?: 'feed' | 'full' }> = ({ verse, size = 'full' }) => {
+  const [open, setOpen] = useState(false);
+  const lines = size === 'feed' ? 5 : 9;
+  const long = verse.text.length > lines * 38;
+  const clamp = long && !open;
+  return (
+    <figure className="tribes-verse-frame mx-1.5 my-3 px-5 pb-3 pt-5 text-center text-[#12301f]">
+      <GoldRuleMark tone="dark" size={size === 'feed' ? 24 : 28} />
+      <figcaption className="mt-3">
+        <span
+          className={`block font-display font-bold leading-tight ${size === 'feed' ? 'text-[26px]' : 'text-[32px] sm:text-[36px]'}`}
+        >
+          {verse.ref}
+        </span>
+        <span className="mt-1.5 block text-xs font-semibold uppercase tracking-[0.18em] text-[#7A5C0F]">{verse.translation}</span>
+      </figcaption>
+      <span aria-hidden className="mx-auto mt-3.5 block h-px w-16 bg-[#C9A35A]/70" />
+      <blockquote
+        className={`mt-3 font-display italic leading-snug ${size === 'feed' ? 'text-[19px]' : 'text-[22px] sm:text-[23px]'} text-balance`}
+        style={clamp ? { display: '-webkit-box', WebkitLineClamp: lines, WebkitBoxOrient: 'vertical', overflow: 'hidden' } : undefined}
+      >
+        {verse.text}
+      </blockquote>
+      <div className="mt-3 flex flex-wrap items-center justify-center gap-x-5">
+        {long ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen((v) => !v);
+            }}
+            aria-expanded={open}
+            className="min-h-[44px] text-[14px] font-bold text-[#7A5C0F] underline-offset-2 hover:underline"
+          >
+            {open ? 'Show less' : 'Show all'}
+          </button>
+        ) : null}
+        <a
+          href={verse.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="inline-flex min-h-[44px] items-center gap-1.5 text-[14px] font-semibold text-[#1d372c] underline decoration-[#C9A35A] decoration-1 underline-offset-4"
+        >
+          Open in the Bible <ExternalLink size={14} aria-hidden />
+          <span className="sr-only">(opens in a new tab)</span>
+        </a>
+      </div>
+      <div className="mt-1 flex items-center justify-center gap-2.5" aria-hidden>
+        <span className="h-px w-10 bg-[#C9A35A]/50" />
+        <span className="h-1 w-1 rotate-45 bg-[#C9A35A]" />
+        <span className="h-px w-10 bg-[#C9A35A]/50" />
+      </div>
+    </figure>
+  );
+};
