@@ -43,6 +43,8 @@ type Props = {
   postId?: string;
   reactions: CommunityFeedReaction[];
   compact?: boolean;
+  /** Show only these reactions (Tribes shows Like in its own action row). */
+  only?: CommunityReactionKey[];
 };
 
 /**
@@ -55,6 +57,7 @@ export const CommunityReactionBar: React.FC<Props> = ({
   postId,
   reactions: fallback,
   compact = false,
+  only,
 }) => {
   const resolvedType: CommunityReactionTargetType = targetType ?? 'post';
   const resolvedId = targetId || postId || '';
@@ -63,7 +66,7 @@ export const CommunityReactionBar: React.FC<Props> = ({
   const approved = memberAccessState === 'approved_member';
   const reactions = normalizeReactions(
     resolvedId ? getReactions(resolvedType, resolvedId, fallback) : fallback
-  );
+  ).filter((r) => !only || only.includes(r.key as CommunityReactionKey));
   const pending = resolvedId ? isPending(resolvedType, resolvedId) : false;
   const error = resolvedId ? errorFor(resolvedType, resolvedId) : null;
 

@@ -23,6 +23,11 @@ export async function awcChatShareUrl(kind: 'event' | 'serve', id: string): Prom
   return awcChatSignedInUrl(`/share?${new URLSearchParams({ kind, id }).toString()}`);
 }
 
+/** "Share to Ka Link" for a Scripture post: Ka Link's verse share screen, signed in. */
+export async function kaLinkVerseShareUrl(sharePath: string): Promise<string> {
+  return awcChatSignedInUrl(sharePath);
+}
+
 /** Any Ka Link path, opened with the one sign-on handoff when we can. */
 export async function awcChatSignedInUrl(next: string): Promise<string> {
   const plain = `${AWC_CHAT_ORIGIN}${next}`;

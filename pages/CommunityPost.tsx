@@ -1,14 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import {
-  ArrowLeft,
-  Bell,
-  Loader2,
-  MessageCircle,
-  Pin,
-  RefreshCcw,
-  Users,
-} from 'lucide-react';
+import { Loader2, Pin, RefreshCcw, Users } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import {
   CommunityFeedError,
@@ -19,7 +11,9 @@ import {
   isValidCommunityPostId,
 } from '../lib/communityPostClient';
 import { Button } from '../components/ui/Button';
-import { CommunityReactionBar } from '../components/CommunityReactionBar';
+import { TribesHeader, TribesSubBar } from '../components/tribes/TribesHeader';
+import { ReportPostMenu, ReportPostRow, TribesPostActions } from '../components/tribes/TribesPostActions';
+import { isScripturePost } from '../lib/scripturePost';
 import { CommunityCommentsSection } from '../components/CommunityCommentsSection';
 import { CommunityPostOwnerActions } from '../components/CommunityPostOwnerActions';
 import { CommunityMentionText } from '../components/CommunityMentionText';
@@ -85,7 +79,7 @@ export const CommunityPostPage: React.FC = () => {
       ? focusCommentRaw
       : null;
   const { isAuthenticated, memberAccessState, user } = useAuth();
-  const { seedFromPosts, getCommentCount, removePostState } = useCommunityReactions();
+  const { seedFromPosts, removePostState } = useCommunityReactions();
   const { getUpdatedPost, isDeleted, applyUpdatedPost, markDeleted } = useCommunityPostsSync();
   const fromNotifications = Boolean((location.state as LocationState)?.fromNotifications);
 
@@ -222,35 +216,33 @@ export const CommunityPostPage: React.FC = () => {
     errorCode === 'rate_limited' ||
     errorCode === 'malformed_response';
 
-  return (
-    <main className="flex-1 px-5 pt-10 pb-28">
-      <div className="flex flex-wrap items-center justify-between gap-2 mb-6">
-        <div className="flex flex-wrap items-center gap-3">
-          {fromNotifications ? (
-            <Link
-              to="/notifications"
-              className="inline-flex items-center gap-2 text-burgundy text-sm font-bold min-h-[44px]"
-            >
-              <Bell size={16} aria-hidden />
-              Notifications
-            </Link>
-          ) : null}
-          <Link
-            to="/community"
-            className="inline-flex items-center gap-2 text-burgundy text-sm font-bold min-h-[44px]"
-          >
-            <ArrowLeft size={18} aria-hidden />
-            Community
-          </Link>
-        </div>
-      </div>
+  const isScripture = displayPost ? isScripturePost(displayPost) : false;
 
-      <header className="text-left mb-6">
-        <p className="text-xs font-black uppercase tracking-widest text-gold-ink mb-1">
-          PLCC Community
-        </p>
-        <h1 className="text-2xl font-bold text-[#1A1A1A]">Post</h1>
-      </header>
+  const focusCommentComposer = useCallback(() => {
+    const el = document.getElementById('community-comment-composer') as HTMLTextAreaElement | null;
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.focus({ preventScroll: true });
+  }, []);
+
+  // "Comment" on a feed card opens /community/post/:id#comment.
+  const wantsComment = location.hash === '#comment';
+  const postReady = Boolean(displayPost && !loading && !error);
+  useEffect(() => {
+    if (!wantsComment || !postReady) return;
+    const t = window.setTimeout(focusCommentComposer, 150);
+    return () => window.clearTimeout(t);
+  }, [focusCommentComposer, postReady, wantsComment]);
+
+  return (
+    <main className="tribes-page flex-1 px-5 pb-28">
+      <TribesHeader />
+      <TribesSubBar
+        title={isScripture ? 'Scripture' : 'Post'}
+        backTo={fromNotifications ? '/notifications' : '/community'}
+        backLabel={fromNotifications ? 'Notifications' : 'Tribes'}
+      />
+      <div className="h-4" />
 
       {loading && (
         <div className="flex items-center justify-center gap-2 py-16 text-gray-500" role="status">
@@ -280,7 +272,7 @@ export const CommunityPostPage: React.FC = () => {
               to="/community"
               className="inline-flex items-center justify-center min-h-[48px] rounded-2xl border border-gray-200 text-sm font-bold text-burgundy"
             >
-              Back to Community
+              Back to Tribes
             </Link>
             {fromNotifications && (
               <Link
@@ -295,71 +287,61 @@ export const CommunityPostPage: React.FC = () => {
       )}
 
       {!loading && displayPost && !error && !isDeleted(displayPost.id) && (
-        <article className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 space-y-4">
-          <header className="flex items-start gap-3">
-            <AuthorAvatar name={displayPost.author.name} avatarUrl={displayPost.author.avatarUrl} />
-            <div className="min-w-0 flex-1 text-left">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h2 className="text-base font-bold text-[#1A1A1A] truncate">
-                  {displayPost.author.name}
-                </h2>
-                {displayPost.pinned && (
-                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-widest text-gold-ink">
-                    <Pin size={10} aria-hidden />
-                    Pinned
-                  </span>
-                )}
-              </div>
-              <p className="text-xs text-gray-500">
-                {displayPost.categoryLabel}
-                {displayPost.createdAt ? ` · ${formatRelativeTime(displayPost.createdAt)}` : ''}
-                {displayPost.edited ? ' · Edited' : ''}
-              </p>
-            </div>
-            <CommunityPostOwnerActions
-              post={displayPost}
-              onUpdated={handlePostUpdated}
-              onDeleted={handlePostDeleted}
-            />
-          </header>
-
-          {displayPost.content ? (
-            <CommunityMentionText content={displayPost.content} />
-          ) : null}
-
-          {displayPost.imageUrl && !imageFailed ? (
-            <div className="rounded-2xl overflow-hidden border border-gray-100 bg-gray-50">
-              <img
-                src={displayPost.imageUrl}
-                alt={displayPost.imageAlt || 'Community photo'}
-                className="w-full max-h-[520px] object-cover"
-                onError={() => setImageFailed(true)}
-              />
-            </div>
-          ) : null}
-
-          {getCommentCount(displayPost.id, displayPost.commentCount) > 0 && (
-            <div className="flex items-center gap-4 pt-1 text-xs font-semibold text-gray-500">
-              <span
-                className="inline-flex items-center gap-1"
-                aria-label={`${getCommentCount(displayPost.id, displayPost.commentCount)} comments`}
-              >
-                <MessageCircle size={12} aria-hidden />
-                {getCommentCount(displayPost.id, displayPost.commentCount)}
+        <div className="space-y-4">
+          <article className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] p-4 pb-2 space-y-3 shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)]">
+            {displayPost.pinned && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3E2B3] px-2.5 py-1 text-xs font-bold text-[#12231c]">
+                <Pin size={12} aria-hidden className="fill-current" />
+                Pinned
               </span>
-            </div>
-          )}
+            )}
+            <header className="flex items-start gap-3">
+              <AuthorAvatar name={displayPost.author.name} avatarUrl={displayPost.author.avatarUrl} />
+              <div className="min-w-0 flex-1 text-left">
+                <h2 className="text-[17px] font-bold text-[#12231c] truncate">{displayPost.author.name}</h2>
+                <p className="text-[14px] text-[#4B5563]">
+                  {isScripture ? 'Scripture' : displayPost.categoryLabel}
+                  {displayPost.createdAt ? ` · ${formatRelativeTime(displayPost.createdAt)}` : ''}
+                  {displayPost.edited ? ' · Edited' : ''}
+                </p>
+              </div>
+              <CommunityPostOwnerActions
+                post={displayPost}
+                onUpdated={handlePostUpdated}
+                onDeleted={handlePostDeleted}
+              />
+              <ReportPostMenu post={displayPost} />
+            </header>
 
-          <CommunityReactionBar
-            postId={displayPost.id}
-            reactions={displayPost.reactions}
-          />
+            {displayPost.content ? (
+              <CommunityMentionText
+                content={displayPost.content}
+                scripture="full"
+                className="text-[16px] text-[#1A1A1A] leading-relaxed whitespace-pre-wrap break-words text-left"
+              />
+            ) : null}
+
+            {displayPost.imageUrl && !imageFailed ? (
+              <div className="-mx-1 rounded-xl overflow-hidden border border-[#E8DCC2] bg-[#F3EBD8]">
+                <img
+                  src={displayPost.imageUrl}
+                  alt={displayPost.imageAlt || 'Community photo'}
+                  className="w-full max-h-[520px] object-cover"
+                  onError={() => setImageFailed(true)}
+                />
+              </div>
+            ) : null}
+
+            <TribesPostActions post={displayPost} onComment={focusCommentComposer} />
+          </article>
+
+          <ReportPostRow post={displayPost} />
 
           <CommunityCommentsSection
             postId={displayPost.id}
             focusCommentId={focusCommentId}
           />
-        </article>
+        </div>
       )}
     </main>
   );
