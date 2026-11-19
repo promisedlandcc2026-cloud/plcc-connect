@@ -95,21 +95,10 @@ const ITEMS: MemberNavItem[] = [
 ];
 
 /**
- * How much room a tab takes. The current tab widens; "Community" (the long
- * name) always gets a little extra so it never shows as "Commu…".
- */
-function tabGrow(label: string, active: boolean): string {
-  const long = label.length > 7;
-  if (active) return long ? 'grow-[1.6]' : 'grow-[1.3]';
-  return long ? 'grow-[1.4]' : 'grow';
-}
-
-/**
- * Member bottom bar — Home · Community · Events · Prayer · Me — as the
- * Sanctuary floating glass dock: every tab shows its icon and name; the tab
- * you're on widens into a gold-leaf pill that slides over when you switch.
- * Plain CSS transitions (flex-grow), no animation library; reduced-motion
- * users get an instant switch.
+ * Member bottom bar — Home · Community · Events · Prayer · Me — PLCC Tribes style:
+ * a light ivory bar along the bottom of the app column, forest-green icons with
+ * their names, and a gold underline under the tab you're on. Hides while you
+ * scroll down and comes back when you scroll up or tap into it (same as before).
  */
 export const MemberNav: React.FC = () => {
   const location = useLocation();
@@ -122,12 +111,12 @@ export const MemberNav: React.FC = () => {
   return (
     <div
       onFocusCapture={showDock}
-      className={`pointer-events-none fixed bottom-[max(12px,env(safe-area-inset-bottom))] left-1/2 z-[110] w-full max-w-[500px] -translate-x-1/2 px-3 transition-transform duration-300 ease-out motion-reduce:transition-none ${
-        dockHidden ? 'translate-y-[calc(100%+max(12px,env(safe-area-inset-bottom))+8px)]' : 'translate-y-0'
+      className={`pointer-events-none fixed bottom-0 left-1/2 z-[110] w-full max-w-[500px] -translate-x-1/2 transition-transform duration-300 ease-out motion-reduce:transition-none ${
+        dockHidden ? 'translate-y-full' : 'translate-y-0'
       }`}
     >
       <nav
-        className="awc-dock pointer-events-auto flex h-[68px] items-center rounded-[34px] px-1.5"
+        className="awc-dock pointer-events-auto flex items-stretch px-1 pb-[env(safe-area-inset-bottom)]"
         aria-label="Member navigation"
       >
         {ITEMS.map((item) => {
@@ -152,19 +141,19 @@ export const MemberNav: React.FC = () => {
               onFocus={() => item.onPrefetch?.()}
               onMouseEnter={() => item.onPrefetch?.()}
               onTouchStart={() => item.onPrefetch?.()}
-              className={`awc-dock-tab relative flex active:scale-[0.97] h-14 min-w-0 basis-0 flex-col items-center justify-center gap-1 rounded-[28px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf ${
-                active ? 'bg-leaf text-wine' : 'text-cream/85 hover:text-cream active:bg-white/10'
-              } ${tabGrow(item.label, active)}`}
+              className={`awc-dock-tab relative flex min-h-[64px] min-w-0 basis-0 ${item.label.length > 7 ? 'grow-[1.3]' : 'grow'} flex-col items-center justify-center gap-1 pt-1.5 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C9A35A] active:bg-[#1d372c]/[0.05] ${
+                active ? 'text-[#12301f]' : 'text-[#5B6658] hover:text-[#12301f]'
+              }`}
             >
               <span className="relative inline-flex shrink-0 items-center justify-center">
                 {item.isMe && avatarUrl ? (
                   <img
                     src={avatarUrl}
                     alt=""
-                    className={`h-[22px] w-[22px] rounded-full object-cover ${active ? 'ring-2 ring-wine' : 'ring-1 ring-cream/50'}`}
+                    className={`h-[24px] w-[24px] rounded-full object-cover ${active ? 'ring-2 ring-[#C9A35A]' : 'ring-1 ring-[#D9CDB4]'}`}
                   />
                 ) : (
-                  <Icon size={22} strokeWidth={active ? 2.3 : 1.9} aria-hidden />
+                  <Icon size={23} strokeWidth={active ? 2.2 : 1.8} aria-hidden />
                 )}
                 {showHuddle ? (
                   <span className="absolute -right-1 -top-0.5">
@@ -172,15 +161,19 @@ export const MemberNav: React.FC = () => {
                   </span>
                 ) : null}
                 {showBadge ? (
-                  <span className="absolute -right-3 -top-1.5 min-w-[20px] h-5 px-1 rounded-full bg-burgundy text-white text-xs font-extrabold leading-5 text-center ring-2 ring-wine-night">
+                  <span className="absolute -right-3 -top-1.5 min-w-[20px] h-5 px-1 rounded-full bg-[#C9A35A] text-[#12231c] text-xs font-extrabold leading-5 text-center ring-2 ring-[#FBF7EE]">
                     {unreadBadge}
                   </span>
                 ) : null}
               </span>
               {/* Every tab keeps its name under the icon — easier for members who read the words. */}
-              <span aria-hidden className="max-w-full truncate px-0.5 text-xs font-bold leading-none tracking-[-0.02em]">
+              <span aria-hidden className={`max-w-full truncate text-[12px] leading-none tracking-[-0.01em] ${active ? 'font-bold' : 'font-semibold'}`}>
                 {item.label}
               </span>
+              <span
+                aria-hidden
+                className={`awc-dock-mark absolute bottom-1 h-[3px] rounded-full bg-[#C9A35A] ${active ? 'w-8 opacity-100' : 'w-0 opacity-0'}`}
+              />
             </Link>
           );
         })}

@@ -276,8 +276,8 @@ export const PrayerWall: React.FC = () => {
                 )}
 
                 {/* Subtle Side Gradients for Scroll */}
-                <div className="absolute top-0 right-0 bottom-4 w-12 bg-gradient-to-l from-[#F8F5F2] to-transparent pointer-events-none z-10 hidden sm:block"></div>
-                <div className="absolute top-0 left-0 bottom-4 w-12 bg-gradient-to-r from-[#F8F5F2] to-transparent pointer-events-none z-10 hidden sm:block"></div>
+                <div className="absolute top-0 right-0 bottom-4 w-12 bg-gradient-to-l from-[#F7F1E5] to-transparent pointer-events-none z-10 hidden sm:block"></div>
+                <div className="absolute top-0 left-0 bottom-4 w-12 bg-gradient-to-r from-[#F7F1E5] to-transparent pointer-events-none z-10 hidden sm:block"></div>
             </div>
 
             {/* Detail Modal */}

@@ -22,7 +22,9 @@ import { ModalShell } from '../ui/ModalShell';
 
 const POLL_MS = 30_000;
 
-export const LiveHuddles: React.FC = () => {
+/** tone: 'dark' on the evening shell (default), 'light' on PLCC Tribes' ivory Home. */
+export const LiveHuddles: React.FC<{ tone?: 'dark' | 'light' }> = ({ tone = 'dark' }) => {
+  const light = tone === 'light';
   const [channels, setChannels] = useState<CommunityChatChannel[] | null>(null);
   const [status, setStatus] = useState<Record<string, HuddleChannelStatus>>({});
   const [family, setFamily] = useState<{ live: boolean; count: number } | null>(null);
@@ -73,14 +75,14 @@ export const LiveHuddles: React.FC = () => {
   return (
     <section
       aria-labelledby="live-huddles-title"
-      className="rounded-[22px] border border-[#F2D98A]/20 bg-white/[0.06] p-4 text-cream"
+      className={light ? 'rounded-[20px] border border-[#E3D6BA] bg-white p-4 text-[#12231c] shadow-[0_1px_2px_rgba(18,35,28,0.04),0_6px_18px_rgba(18,35,28,0.06)]' : 'rounded-[22px] border border-[#F2D98A]/20 bg-white/[0.06] p-4 text-cream'}
     >
       <div className="flex items-center justify-between gap-3">
         <h2 id="live-huddles-title" className="flex items-center gap-2 text-[15px] font-bold">
           {anyLive ? (
             <span className="awc-live-dot awc-live-dot--green h-[9px] w-[9px] rounded-full bg-green-500" aria-hidden />
           ) : (
-            <Mic size={16} className="text-leaf" aria-hidden />
+            <Mic size={16} className={light ? 'text-gold-ink' : 'text-leaf'} aria-hidden />
           )}
           Live Ka Links
         </h2>
@@ -88,7 +90,7 @@ export const LiveHuddles: React.FC = () => {
           type="button"
           onClick={() => setPickerOpen(true)}
           onTouchStart={prefetchCommunityChatChunks}
-          className="min-h-[40px] rounded-full border border-[#F2D98A]/40 px-3.5 text-[13px] font-bold text-leaf"
+          className={light ? 'min-h-[40px] rounded-full border border-[#C9A35A] px-3.5 text-[13px] font-bold text-[#12301f] hover:bg-[#C9A35A]/10' : 'min-h-[40px] rounded-full border border-[#F2D98A]/40 px-3.5 text-[13px] font-bold text-leaf'}
         >
           Start one
         </button>
@@ -102,7 +104,7 @@ export const LiveHuddles: React.FC = () => {
                 to={huddleRoomPath(r.id, 'join')}
                 state={{ channelName: r.name }}
                 onTouchStart={prefetchCommunityChatChunks}
-                className="flex min-h-[56px] items-center gap-3 rounded-2xl bg-cream px-3.5 py-2.5 text-ink"
+                className={`flex min-h-[56px] items-center gap-3 rounded-2xl px-3.5 py-2.5 text-ink ${light ? 'border border-[#E8DCC2] bg-[#FBF7EE]' : 'bg-cream'}`}
               >
                 <Radio size={18} className="shrink-0 text-green-700" aria-hidden />
                 <span className="min-w-0 flex-1">
@@ -119,7 +121,7 @@ export const LiveHuddles: React.FC = () => {
             <li>
               <Link
                 to="/family"
-                className="flex min-h-[56px] items-center gap-3 rounded-2xl bg-cream px-3.5 py-2.5 text-ink"
+                className={`flex min-h-[56px] items-center gap-3 rounded-2xl px-3.5 py-2.5 text-ink ${light ? 'border border-[#E8DCC2] bg-[#FBF7EE]' : 'bg-cream'}`}
               >
                 <Users size={18} className="shrink-0 text-green-700" aria-hidden />
                 <span className="min-w-0 flex-1">
@@ -134,7 +136,7 @@ export const LiveHuddles: React.FC = () => {
           ) : null}
         </ul>
       ) : (
-        <p className="mt-1.5 text-sm text-cream/80">No one is in a Ka Link right now. Start one and others can join from here.</p>
+        <p className={`mt-1.5 text-sm ${light ? 'text-ink-muted' : 'text-cream/80'}`}>No one is in a Ka Link right now. Start one and others can join from here.</p>
       )}
 
       <ModalShell

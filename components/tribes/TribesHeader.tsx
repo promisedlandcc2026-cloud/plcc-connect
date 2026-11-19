@@ -5,6 +5,7 @@ import { useNotifications } from '../../context/NotificationsContext';
 import { useHuddleLive } from '../../context/HuddleLiveContext';
 import { HuddleLiveDot } from '../huddle/HuddleLiveDot';
 import { prefetchNotificationsChunk } from '../../lib/prefetchMemberChunks';
+import { TribesMark } from './TribesMark';
 
 const ICON_BTN =
   'relative inline-flex h-11 w-11 items-center justify-center rounded-full text-[#F6EFDD] hover:bg-white/10 active:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4C36A]';
@@ -24,9 +25,9 @@ export const TribesHeader: React.FC<{ showChat?: boolean }> = ({ showChat = true
         className="flex min-h-[44px] min-w-0 flex-1 items-center gap-2 min-[360px]:gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4C36A]"
         aria-label="PLCC Tribes home"
       >
-        <img src="/awc_connect_logo.png" alt="" width={40} height={40} className="h-9 w-9 min-[360px]:h-10 min-[360px]:w-10 shrink-0 rounded-full" />
-        <span aria-hidden className="h-7 w-px shrink-0 bg-[#E4C36A]/50" />
-        <span className="truncate font-display text-[21px] min-[360px]:text-[24px] font-bold leading-none text-[#F6EFDD]">PLCC Tribes</span>
+        <TribesMark className="h-9 w-auto shrink-0 text-[#E4C36A] min-[360px]:h-10" />
+        <span aria-hidden className="h-7 w-px shrink-0 bg-[#E4C36A]/45" />
+        <span className="truncate font-display text-[21px] min-[360px]:text-[23px] font-semibold leading-none text-[#F6EFDD]">PLCC Tribes</span>
       </Link>
       {showChat ? (
         <Link to="/community/chat" className={ICON_BTN} aria-label={anyLive ? 'Ka Link, live now' : 'Ka Link'}>

@@ -46,7 +46,10 @@ const ctaClass =
   'flex min-h-[52px] w-full items-center justify-center gap-2 rounded-[18px] bg-leaf text-base font-extrabold text-wine';
 
 /** `visitor`: no Canaan News (members only); prayer CTA scrolls to the public wall. */
-export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false }) => {
+/** tone: 'dark' on the evening shell (default), 'light' on PLCC Tribes' ivory Home. */
+export const TodayStories: React.FC<{ visitor?: boolean; tone?: 'dark' | 'light' }> = ({ visitor = false, tone = 'dark' }) => {
+  const labelTone = tone === 'light' ? 'text-[#12231c]' : 'text-cream';
+  const discTone = tone === 'light' ? 'bg-[#12301f]' : 'bg-wine';
   const navigate = useNavigate();
   const location = useLocation();
   const [seen, setSeen] = useState<Record<string, string>>(readSeen);
@@ -221,11 +224,11 @@ export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false 
         onTouchStart={prefetchBibleChunk}
         onFocus={prefetchBibleChunk}
         aria-label="Bible"
-        className="flex min-w-[64px] flex-col items-center gap-1.5 text-cream"
+        className={`flex min-w-[64px] flex-col items-center gap-1.5 ${labelTone}`}
       >
         {/* Always gold: it is a shortcut, not a story with a seen/unseen state. */}
         <span className="awc-story-ring flex h-16 w-16 items-center justify-center rounded-full p-[3px]" data-unseen="true">
-          <span className="flex h-full w-full items-center justify-center rounded-full bg-wine text-[#F2D98A]">
+          <span className={`flex h-full w-full items-center justify-center rounded-full ${discTone} text-[#F2D98A]`}>
             <BookMarked size={24} strokeWidth={1.9} aria-hidden />
           </span>
         </span>
@@ -236,7 +239,7 @@ export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false 
 
   return (
     <section aria-labelledby="today-at-awc-title">
-      <h2 id="today-at-awc-title" className="mx-6 mb-2.5 text-[15px] font-bold text-cream/90">
+      <h2 id="today-at-awc-title" className={`mx-6 mb-2.5 text-[15px] font-bold ${tone === 'light' ? 'text-[#12231c]' : 'text-cream/90'}`}>
         Today at PLCC
       </h2>
       <ul className="no-scrollbar flex gap-3.5 overflow-x-auto px-5 pb-1">
@@ -250,10 +253,10 @@ export const TodayStories: React.FC<{ visitor?: boolean }> = ({ visitor = false 
                 type="button"
                 onClick={() => openStory(s)}
                 aria-label={`${s.label}${unseen ? ', new' : ''}`}
-                className="flex min-w-[64px] flex-col items-center gap-1.5 text-cream"
+                className={`flex min-w-[64px] flex-col items-center gap-1.5 ${labelTone}`}
               >
                 <span className="awc-story-ring flex h-16 w-16 items-center justify-center rounded-full p-[3px]" data-unseen={unseen ? 'true' : 'false'}>
-                  <span className="flex h-full w-full items-center justify-center rounded-full bg-wine text-[#F2D98A]">
+                  <span className={`flex h-full w-full items-center justify-center rounded-full ${discTone} text-[#F2D98A]`}>
                     <Icon size={24} strokeWidth={1.9} aria-hidden />
                   </span>
                 </span>

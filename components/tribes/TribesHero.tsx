@@ -1,4 +1,5 @@
 import React from 'react';
+import { TribesMark } from './TribesMark';
 
 /** Thin gold rule with the official mark in the middle — shared by the hero and the Scripture card. */
 export const GoldRuleMark: React.FC<{ size?: number; tone?: 'dark' | 'light'; className?: string }> = ({
@@ -6,11 +7,12 @@ export const GoldRuleMark: React.FC<{ size?: number; tone?: 'dark' | 'light'; cl
   tone = 'light',
   className = '',
 }) => {
-  const line = tone === 'light' ? 'bg-[#E4C36A]/70' : 'bg-[#C9A35A]/70';
+  const line = tone === 'light' ? 'bg-[#E4C36A]/60' : 'bg-[#C9A35A]/60';
+  const ink = tone === 'light' ? 'text-[#E4C36A]' : 'text-[#B8893A]';
   return (
     <div className={`flex items-center justify-center gap-3 ${className}`} aria-hidden>
       <span className={`h-px w-14 ${line}`} />
-      <img src="/awc_connect_logo.png" alt="" width={size} height={size} className="rounded-full" style={{ width: size, height: size }} />
+      <span style={{ height: size }} className="inline-flex"><TribesMark className={`h-full w-auto ${ink}`} /></span>
       <span className={`h-px w-14 ${line}`} />
     </div>
   );
@@ -29,7 +31,7 @@ export const TribesHero: React.FC = () => (
       <br />
       One purpose.
     </h1>
-    <GoldRuleMark className="mt-4" size={28} />
+    <GoldRuleMark className="mt-4" size={30} />
     <p className="sr-only">PLCC Tribes community feed</p>
   </section>
 );

@@ -1,6 +1,6 @@
 /**
  * Design kit — page header for member screens.
- * Back link, optional eyebrow, serif page title (the one place Playfair is used
+ * Back link, optional eyebrow, serif page title (the one place Fraunces is used
  * in the UI), optional subtitle and an optional action on the right.
  */
 import React from 'react';
@@ -29,7 +29,7 @@ export const MemberPageHeader: React.FC<MemberPageHeaderProps> = ({
     <div className="flex items-center justify-between gap-3 -ml-2">
       <Link
         to={backTo}
-        className="inline-flex items-center gap-1 rounded-xl pl-1 pr-3 text-burgundy text-[15px] font-semibold min-h-[44px] active:bg-burgundy/5"
+        className="inline-flex items-center gap-1 rounded-xl pl-1 pr-3 text-[#1d372c] text-[15px] font-semibold min-h-[44px] active:bg-burgundy/5"
       >
         <ChevronLeft size={22} aria-hidden />
         {backLabel}
@@ -39,9 +39,11 @@ export const MemberPageHeader: React.FC<MemberPageHeaderProps> = ({
     {eyebrow ? (
       <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-gold-ink">{eyebrow}</p>
     ) : null}
-    <h1 className={`${eyebrow ? 'mt-1' : 'mt-3'} font-display text-[30px] leading-tight font-bold text-ink`}>
+    <h1 className={`${eyebrow ? 'mt-1' : 'mt-3'} font-display text-[30px] leading-tight font-semibold text-[#12231c]`}>
       {title}
     </h1>
+    {/* PLCC Tribes: a short gold rule under every page title. */}
+    <span aria-hidden className="mt-2.5 block h-[3px] w-10 rounded-full bg-[#C9A35A]" />
     {subtitle ? <p className="mt-2 text-[15px] text-ink-muted leading-relaxed">{subtitle}</p> : null}
   </header>
 );
