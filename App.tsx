@@ -1,4 +1,6 @@
 import React, { lazy } from 'react';
+// Same as Ka Link: one broken screen shows a Reload card (and is logged) instead of a blank page.
+import { AppCrashBoundary } from './components/routing/AppCrashBoundary';
 import { BrowserRouter, Navigate, Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { NotificationsProvider } from './context/NotificationsContext';
@@ -556,6 +558,7 @@ const App: React.FC = () => {
   );
 
   return (
+    <AppCrashBoundary>
     <BrowserRouter>
       <AuthProvider>
         <SeasonThemeProvider>
@@ -571,6 +574,7 @@ const App: React.FC = () => {
         </SeasonThemeProvider>
       </AuthProvider>
     </BrowserRouter>
+    </AppCrashBoundary>
   );
 };
 

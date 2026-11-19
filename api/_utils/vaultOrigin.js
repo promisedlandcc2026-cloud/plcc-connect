@@ -145,6 +145,12 @@ export function buildVaultUsersPatchUrl(origin) {
  * @param {string} origin
  * @returns {string}
  */
+/** Canaan's sign-in problems log (#17): Tribes reports app crashes here (app: 'tribes'). */
+export function buildVaultSignInFailuresUrl(origin) {
+  const base = String(origin || '').replace(/\/+$/, '');
+  return `${base}/api/vault?resource=sign-in-failures`;
+}
+
 export function buildVaultAuthPhoneUrl(origin) {
   const base = String(origin || '').replace(/\/+$/, '');
   return `${base}${VAULT_AUTH_PHONE_PATH}`;

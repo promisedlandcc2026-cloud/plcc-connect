@@ -34,6 +34,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  AudioPresets,
   LocalAudioTrack,
   Room,
   RoomEvent,
@@ -98,6 +99,7 @@ const DailyBackupHuddle = lazy(() =>
 import {
   appendHuddleChatMessage,
   buildHuddleChatWirePayload,
+  type HuddleChatReplyRef,
   createHuddleChatId,
   decodeIncomingHuddleChat,
   encodeHuddleChatPayload,
@@ -109,6 +111,8 @@ import {
   HUDDLE_HOST_MUTE_NOTICE,
   huddleMicrophonePublishAllowed,
   mergeHandMetadata,
+  nextHandNo,
+  parseHandNo,
   parseHandRaised,
   sortTilesRaisedFirst,
   syncRosterFromTiles,
@@ -187,7 +191,21 @@ type Tile = {
   speaking: boolean;
   /** Room moderator (from the LiveKit token's plcc.role attribute). */
   moderator: boolean;
+  /** Fixed hand number for this Ka Link (kept after the hand is lowered). */
+  handNo: number | null;
+  /** Ka Link team role from Canaan's signed token (admin, leader, standing Bible reader). */
+  team: 'admin' | 'leader' | 'reader' | null;
 };
+
+function participantTeam(p: Participant): 'admin' | 'leader' | 'reader' | null {
+  const t = p.attributes?.['plcc.team'];
+  return t === 'admin' || t === 'leader' || t === 'reader' ? t : null;
+}
+
+/** Video is for the Ka Link team's admins and leaders (Pr. Grace) and moderators. */
+function teamMayUseVideo(team: 'admin' | 'leader' | 'reader' | null | undefined): boolean {
+  return team === 'admin' || team === 'leader';
+}
 
 type Props = {
   channelId: string;
@@ -377,6 +395,8 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   const [musicVolume, setMusicVolume] = useState(HUDDLE_MUSIC_DEFAULT_VOLUME);
   // Ephemeral emoji reactions (same wire format as PLCC Canaan — not chat, nothing is saved).
   const [reactionPickerOpen, setReactionPickerOpen] = useState(false);
+  /** Where the Reactions button is, so the picker floats above the (sideways-scrolling on phones) tools row. */
+  const [reactionAnchor, setReactionAnchor] = useState<{ left: number; bottom: number } | null>(null);
   const [activeReactions, setActiveReactions] = useState<HuddleReactionEvent[]>([]);
   const [reactionBusy, setReactionBusy] = useState(false);
   const [reactionError, setReactionError] = useState<string | null>(null);
@@ -552,6 +572,8 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
         micOn: Boolean(micPub?.track && !micPub.isMuted),
         camOn: Boolean(camPub?.track && !camPub.isMuted),
         handRaised: parseHandRaised(p.metadata),
+        handNo: parseHandNo(p.metadata),
+        team: participantTeam(p),
         speaking: speakers.has(p.identity),
         moderator: p.attributes?.['plcc.role'] === 'moderator' || (isLocal && canModerateRef.current),
       });
@@ -789,7 +811,24 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       setTitle(tokenPayload.channelName || channelName || 'Live Ka Link');
       setCanModerate(Boolean(tokenPayload.canModerate));
 
-      const room = new Room({ adaptiveStream: true, dynacast: true });
+      const room = new Room({
+        adaptiveStream: true,
+        dynacast: true,
+        publishDefaults: {
+          // Same as Ka Link (Nov 19): DTX (silence skipping) cut soft voices and clicked at
+          // the start of speech; the speech preset keeps data use low; RED covers lost packets.
+          audioPreset: AudioPresets.speech,
+          dtx: false,
+          red: true,
+        },
+        audioCaptureDefaults: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          voiceIsolation: true,
+          channelCount: 1,
+        },
+      });
       roomRef.current = room;
 
       const onChange = () => refreshTiles(room);
@@ -991,12 +1030,16 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       }
       setMicEnabled(false);
       micEnabledRef.current = false;
-      if (camEnabled) {
+      // Video only for moderators and the Ka Link team (Pr. Grace); members join audio-only.
+      const mayUseCamera = Boolean(tokenPayload.canModerate) || teamMayUseVideo(participantTeam(room.localParticipant));
+      if (camEnabled && mayUseCamera) {
         try {
           await room.localParticipant.setCameraEnabled(true);
         } catch {
           setError('Camera could not be enabled. You can still join with audio.');
         }
+      } else if (camEnabled) {
+        setCamEnabled(false);
       }
 
       for (const p of room.remoteParticipants.values()) {
@@ -1358,7 +1401,12 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     const local: LocalParticipant = room.localParticipant;
     const next = !handRaised;
     try {
-      await local.setMetadata(mergeHandMetadata(local.metadata, next));
+      // First raise: take the next number in the room; after that keep the same number.
+      const handNo = next
+        ? parseHandNo(local.metadata) ??
+          nextHandNo([local.metadata, ...Array.from(room.remoteParticipants.values(), (p: Participant) => p.metadata)])
+        : null;
+      await local.setMetadata(mergeHandMetadata(local.metadata, next, handNo));
       setHandRaised(next);
       refreshTiles(room);
     } catch {
@@ -1447,13 +1495,14 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     [conn, ingestReaction, lastReactionSentAt, reactionBusy]
   );
 
-  const sendChat = useCallback(async (text: string) => {
+  const sendChat = useCallback(async (text: string, reply?: HuddleChatReplyRef | null) => {
     const room = roomRef.current;
     if (!room) return;
     const local = room.localParticipant;
     const wire = buildHuddleChatWirePayload({
       id: createHuddleChatId(),
       text,
+      reply,
     });
     if (!wire) return;
     setChatSending(true);
@@ -1494,7 +1543,9 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     () =>
       tiles
         .filter((t) => t.handRaised)
-        .map((t) => ({ identity: t.identity, name: t.name, isLocal: t.isLocal })),
+        // Fixed hand numbers decide the line; people without one keep their place after.
+        .sort((a, b) => (a.handNo ?? 1e9) - (b.handNo ?? 1e9))
+        .map((t, i) => ({ identity: t.identity, name: t.name, isLocal: t.isLocal, number: t.handNo ?? i + 1 })),
     [tiles]
   );
   const inCount = roster.filter((e) => e.status === 'in').length;
@@ -1518,6 +1569,8 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   // dark layout below.
   if (!embedded) {
     const localTile = tiles.find((t) => t.isLocal);
+    // Video is for Pr. Grace, the Ka Link team and moderators (Canaan enforces it too).
+    const canUseCamera = canModerate || teamMayUseVideo(localTile?.team);
     const speakingNow = tiles.filter((t) => t.speaking && t.micOn).map((t) => (t.isLocal ? 'You' : t.name));
     const anyVideo = tiles.some((t) => t.camOn);
     const connected = conn === 'connected';
@@ -1954,7 +2007,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                             {chatUnread > 0 ? <span className="pr-badge">{chatUnread}</span> : null}
                           </button>
                         ) : null}
-                        {!audioOnly ? (
+                        {!audioOnly && (canUseCamera || camEnabled) ? (
                           <button
                             type="button"
                             onClick={() => void toggleCam()}
@@ -1997,8 +2050,13 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                           <div className="relative">
                             <button
                               type="button"
-                              onClick={() => {
+                              onClick={(e) => {
                                 setReactionError(null);
+                                const r = e.currentTarget.getBoundingClientRect();
+                                setReactionAnchor({
+                                  left: Math.min(Math.max(8, r.left + r.width / 2 - 104), window.innerWidth - 216),
+                                  bottom: window.innerHeight - r.top + 8,
+                                });
                                 setReactionPickerOpen((open) => !open);
                               }}
                               disabled={reactionBusy}
@@ -2015,7 +2073,9 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                               <div
                                 role="menu"
                                 aria-label="Ka Link reactions"
-                                className="absolute bottom-[calc(100%+0.5rem)] left-1/2 z-50 w-52 -translate-x-1/2 rounded-2xl border border-[#eadfca] bg-white p-2 shadow-xl"
+                                className="fixed z-[460] w-52 rounded-2xl border border-[#eadfca] bg-white p-2 shadow-xl"
+                                style={reactionAnchor ? { left: reactionAnchor.left, bottom: reactionAnchor.bottom } : { left: '50%', bottom: '8rem', transform: 'translateX(-50%)' }}
+                                data-testid="huddle-reaction-picker"
                               >
                                 <p className="px-2 pb-1.5 text-xs font-black uppercase tracking-[0.2em] text-[#7a5a1c]">Reactions</p>
                                 <div className="grid grid-cols-1 gap-1">
@@ -2489,7 +2549,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
             >
               {micEnabled ? <Mic size={22} /> : <MicOff size={22} />}
             </button>
-            {!audioOnly && (
+            {!audioOnly && (canModerate || camEnabled || tiles.some((t) => t.isLocal && teamMayUseVideo(t.team))) && (
             <button
               type="button"
               onClick={() => void toggleCam()}
@@ -2541,8 +2601,13 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
               <div className="relative">
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={(e) => {
                     setReactionError(null);
+                    const r = e.currentTarget.getBoundingClientRect();
+                    setReactionAnchor({
+                      left: Math.min(Math.max(8, r.left + r.width / 2 - 104), window.innerWidth - 216),
+                      bottom: window.innerHeight - r.top + 8,
+                    });
                     setReactionPickerOpen((open) => !open);
                   }}
                   disabled={reactionBusy}
@@ -2560,7 +2625,9 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                   <div
                     role="menu"
                     aria-label="Ka Link reactions"
-                    className="absolute bottom-[calc(100%+0.5rem)] left-1/2 z-50 w-52 -translate-x-1/2 rounded-2xl border border-white/15 bg-[#0c110f] p-2 shadow-xl"
+                    className="fixed z-[460] w-52 rounded-2xl border border-white/15 bg-[#0c110f] p-2 shadow-xl"
+                                style={reactionAnchor ? { left: reactionAnchor.left, bottom: reactionAnchor.bottom } : { left: '50%', bottom: '8rem', transform: 'translateX(-50%)' }}
+                                data-testid="huddle-reaction-picker-alt"
                   >
                     <p className="px-2 pb-1.5 text-xs font-black uppercase tracking-[0.2em] text-gold">
                       Reactions
