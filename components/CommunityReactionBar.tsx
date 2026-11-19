@@ -45,6 +45,8 @@ type Props = {
   compact?: boolean;
   /** Show only these reactions (Tribes shows Like in its own action row). */
   only?: CommunityReactionKey[];
+  /** Tribes look: small quiet chips, counts only when someone has reacted. */
+  quiet?: boolean;
 };
 
 /**
@@ -58,6 +60,7 @@ export const CommunityReactionBar: React.FC<Props> = ({
   reactions: fallback,
   compact = false,
   only,
+  quiet = false,
 }) => {
   const resolvedType: CommunityReactionTargetType = targetType ?? 'post';
   const resolvedId = targetId || postId || '';
@@ -87,7 +90,7 @@ export const CommunityReactionBar: React.FC<Props> = ({
       onClick={(e) => e.stopPropagation()}
       onKeyDown={(e) => e.stopPropagation()}
     >
-      <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Reactions">
+      <div className={`flex items-center gap-1.5 ${quiet ? "flex-nowrap" : "flex-wrap"}`} role="group" aria-label="Reactions">
         {reactions.map((r) => {
           const key = r.key as CommunityReactionKey;
           const selected = Boolean(r.reactedByMe);
@@ -104,14 +107,22 @@ export const CommunityReactionBar: React.FC<Props> = ({
                   ? `${label}, selected, ${r.count}`
                   : `${label}, ${r.count}`
               }
-              className={`inline-flex items-center gap-1 min-h-[40px] min-w-[40px] px-2.5 rounded-2xl border text-sm font-semibold transition-colors ${
-                selected
-                  ? 'bg-burgundy/10 border-burgundy text-burgundy ring-1 ring-burgundy/30'
-                  : 'bg-gray-50 border-gray-100 text-gray-600 hover:border-burgundy/30'
-              } ${pending || !approved ? 'opacity-60 cursor-not-allowed' : ''}`}
+              className={
+                quiet
+                  ? `inline-flex items-center justify-center gap-1 min-h-[40px] min-w-[44px] px-2.5 rounded-full border text-sm font-semibold transition-colors ${
+                      selected
+                        ? 'bg-[#1d372c]/[0.07] border-[#1d372c]/40 text-[#12231c]'
+                        : 'bg-transparent border-[#E8DCC2] text-[#4B5563] hover:bg-[#1d372c]/[0.04]'
+                    } ${pending || !approved ? 'opacity-60 cursor-not-allowed' : ''}`
+                  : `inline-flex items-center gap-1 min-h-[40px] min-w-[40px] px-2.5 rounded-2xl border text-sm font-semibold transition-colors ${
+                      selected
+                        ? 'bg-burgundy/10 border-burgundy text-burgundy ring-1 ring-burgundy/30'
+                        : 'bg-gray-50 border-gray-100 text-gray-600 hover:border-burgundy/30'
+                    } ${pending || !approved ? 'opacity-60 cursor-not-allowed' : ''}`
+              }
             >
-              <span aria-hidden>{r.emoji || EMOJI[key]}</span>
-              <span className="text-xs font-bold tabular-nums">{r.count}</span>
+              <span aria-hidden className={quiet ? 'text-[15px] leading-none' : undefined}>{r.emoji || EMOJI[key]}</span>
+              {!quiet || r.count > 0 ? <span className="text-xs font-bold tabular-nums">{r.count}</span> : null}
               <span className="sr-only">{label}</span>
             </button>
           );

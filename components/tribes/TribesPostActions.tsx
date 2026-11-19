@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { ChevronRight, Flag, Loader2, MessageCircle, MoreHorizontal, Share2, ThumbsUp } from 'lucide-react';
+import { ChevronRight, Flag, Loader2, MessageCircle, MoreHorizontal, Share, ThumbsUp } from 'lucide-react';
 import type { CommunityFeedPost, CommunityReactionKey } from '../../lib/communityFeedTypes';
 import { useCommunityReactions } from '../../context/CommunityReactionsContext';
 import { useAuth } from '../../context/AuthContext';
@@ -12,7 +12,7 @@ const LIKE: CommunityReactionKey = 'like';
 const OTHER_REACTIONS: CommunityReactionKey[] = ['love', 'pray', 'praise'];
 
 const ACTION =
-  'inline-flex min-h-[48px] grow basis-0 items-center justify-center gap-2 rounded-xl px-2 text-[15px] font-semibold text-[#1d372c] hover:bg-[#1d372c]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40 disabled:opacity-60';
+  'inline-flex min-h-[44px] grow basis-0 items-center justify-center gap-1.5 rounded-xl px-1.5 text-[15px] font-semibold text-[#1d372c] hover:bg-[#1d372c]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40 disabled:opacity-60';
 
 /** Opens the shared Report dialog for a Tribes post (same flow as the rest of PLCC). */
 export function reportPost(post: CommunityFeedPost) {
@@ -51,15 +51,22 @@ export const TribesPostActions: React.FC<{
 
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
 
+  const summary = [likeCount > 0 ? `${likeCount} ${likeCount === 1 ? 'like' : 'likes'}` : '', commentCount > 0 ? `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}` : '']
+    .filter(Boolean)
+    .join(' · ');
+
   return (
-    <div onClick={stop} onKeyDown={stop} className="space-y-2">
-      <CommunityReactionBar postId={post.id} reactions={post.reactions} compact only={OTHER_REACTIONS} />
-      <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-t border-[#E8DCC2] pt-1 pb-1">
+    <div onClick={stop} onKeyDown={stop}>
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 pb-2">
+        <CommunityReactionBar postId={post.id} reactions={post.reactions} compact quiet only={OTHER_REACTIONS} />
+        {summary ? <p className="ml-auto shrink-0 text-[13px] text-[#4B5563] tabular-nums">{summary}</p> : null}
+      </div>
+      <div className="flex flex-wrap items-center gap-y-2 border-t border-[#E8DCC2] py-1.5">
         <button
           type="button"
-          className={`${ACTION} min-w-[96px] ${liked ? 'text-[#12301f]' : ''}`}
+          className={`${ACTION} min-w-[64px] ${liked ? 'text-[#12301f]' : ''}`}
           aria-pressed={liked}
-          aria-label={`Like, ${likeCount}`}
+          aria-label={liked ? `Like, selected, ${likeCount}` : `Like, ${likeCount}`}
           disabled={!approved || pending}
           onClick={async (e) => {
             e.preventDefault();
@@ -71,48 +78,51 @@ export const TribesPostActions: React.FC<{
             }
           }}
         >
-          <ThumbsUp size={20} aria-hidden fill={liked ? 'currentColor' : 'none'} strokeWidth={liked ? 2 : 1.8} />
-          <span>Like</span>
-          {likeCount > 0 ? <span className="tabular-nums text-[13px] text-[#4B5563]">{likeCount}</span> : null}
+          <ThumbsUp size={19} aria-hidden fill={liked ? 'currentColor' : 'none'} strokeWidth={liked ? 2 : 1.8} />
+          <span className={liked ? 'font-bold' : undefined}>Like</span>
         </button>
+        <span aria-hidden className="h-6 w-px bg-[#E8DCC2]" />
         <button
           type="button"
-          className={`${ACTION} min-w-[124px]`}
+          className={`${ACTION} min-w-[104px]`}
+          aria-label={commentCount > 0 ? `Comment, ${commentCount} comments` : 'Comment'}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             onComment();
           }}
         >
-          <MessageCircle size={20} aria-hidden strokeWidth={1.8} />
+          <MessageCircle size={19} aria-hidden strokeWidth={1.8} />
           <span>Comment</span>
-          {commentCount > 0 ? <span className="tabular-nums text-[13px] text-[#4B5563]">{commentCount}</span> : null}
         </button>
         {sharePath && approved ? (
-          <div className="flex min-w-[172px] grow basis-[172px]">
-            <button
-              type="button"
-              disabled={sharing}
-              onClick={async (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setSharing(true);
-                try {
-                  window.location.assign(await kaLinkVerseShareUrl(sharePath));
-                } finally {
-                  window.setTimeout(() => setSharing(false), 8000);
-                }
-              }}
-              className="tribes-gold-btn inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#C9A35A] px-2 text-[14px] font-bold text-[#12231c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/50 disabled:opacity-70"
-            >
-              {sharing ? <Loader2 size={18} className="animate-spin" aria-hidden /> : <Share2 size={18} aria-hidden />}
-              <span className="whitespace-nowrap">Share to Ka Link</span>
-            </button>
-          </div>
+          <>
+            <span aria-hidden className="h-6 w-px bg-[#E8DCC2]" />
+            <div className="flex min-w-[150px] grow basis-[150px] pl-2">
+              <button
+                type="button"
+                disabled={sharing}
+                onClick={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSharing(true);
+                  try {
+                    window.location.assign(await kaLinkVerseShareUrl(sharePath));
+                  } finally {
+                    window.setTimeout(() => setSharing(false), 8000);
+                  }
+                }}
+                className="tribes-gold-btn inline-flex min-h-[44px] w-full items-center justify-center gap-1.5 rounded-xl border border-[#C9A35A] px-2.5 text-[13.5px] font-bold text-[#12231c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/50 disabled:opacity-70"
+              >
+                {sharing ? <Loader2 size={17} className="animate-spin" aria-hidden /> : <Share size={17} strokeWidth={2.1} aria-hidden />}
+                <span className="whitespace-nowrap">Share to Ka Link</span>
+              </button>
+            </div>
+          </>
         ) : null}
       </div>
       {error ? (
-        <p className="text-left text-xs text-red-700" role="status">
+        <p className="pb-1 text-left text-xs text-red-700" role="status">
           {error}
         </p>
       ) : null}

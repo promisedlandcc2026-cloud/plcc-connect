@@ -423,14 +423,14 @@ html[data-season='dry'] {
 }
 .tribes-bar {
   background: linear-gradient(180deg, #17392b 0%, #12301f 100%);
-  box-shadow: inset 0 -1px 0 rgba(228, 195, 106, 0.25);
+  box-shadow: inset 0 -1px 0 rgba(228, 195, 106, 0.45);
 }
 .tribes-weave {
   background-color: #163a2a;
   background-image:
-    radial-gradient(ellipse 70% 80% at 50% 50%, rgba(18, 48, 33, 0.92) 0%, rgba(18, 48, 33, 0.55) 55%, rgba(18, 48, 33, 0) 100%),
-    repeating-linear-gradient(45deg, rgba(228, 195, 106, 0.16) 0 2px, transparent 2px 9px, rgba(228, 195, 106, 0.08) 9px 11px, transparent 11px 22px),
-    repeating-linear-gradient(-45deg, rgba(228, 195, 106, 0.16) 0 2px, transparent 2px 9px, rgba(228, 195, 106, 0.08) 9px 11px, transparent 11px 22px);
+    radial-gradient(ellipse 75% 85% at 50% 50%, rgba(18, 48, 33, 0.94) 0%, rgba(18, 48, 33, 0.6) 60%, rgba(18, 48, 33, 0.15) 100%),
+    repeating-linear-gradient(45deg, rgba(228, 195, 106, 0.11) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(-45deg, rgba(228, 195, 106, 0.11) 0 1px, transparent 1px 18px);
 }
 .tribes-gold-btn {
   background: linear-gradient(180deg, #ecd08a 0%, #d8b466 55%, #c9a35a 100%);
@@ -441,29 +441,8 @@ html[data-season='dry'] {
 }
 .tribes-verse-frame {
   position: relative;
-  background: #fdf9ef;
-  border: 1px solid #c9a35a;
-  border-radius: 6px;
-  box-shadow: 0 0 0 4px #fdf9ef, 0 0 0 5px rgba(201, 163, 90, 0.55);
-}
-.tribes-verse-frame::before,
-.tribes-verse-frame::after {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  border: 1px solid #c9a35a;
-  pointer-events: none;
-}
-.tribes-verse-frame::before {
-  top: 5px;
-  left: 5px;
-  border-right: 0;
-  border-bottom: 0;
-}
-.tribes-verse-frame::after {
-  bottom: 5px;
-  right: 5px;
-  border-left: 0;
-  border-top: 0;
+  background: #fffcf4;
+  border: 1px solid rgba(201, 163, 90, 0.9);
+  border-radius: 10px;
+  box-shadow: 0 0 0 4px #fffcf4, 0 0 0 5px rgba(201, 163, 90, 0.45);
 }

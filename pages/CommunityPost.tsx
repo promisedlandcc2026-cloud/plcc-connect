@@ -288,7 +288,7 @@ export const CommunityPostPage: React.FC = () => {
 
       {!loading && displayPost && !error && !isDeleted(displayPost.id) && (
         <div className="space-y-4">
-          <article className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] p-4 pb-2 space-y-3 shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)]">
+          <article className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] px-3.5 pt-3.5 pb-1 space-y-3 shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)]">
             {displayPost.pinned && (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F3E2B3] px-2.5 py-1 text-xs font-bold text-[#12231c]">
                 <Pin size={12} aria-hidden className="fill-current" />

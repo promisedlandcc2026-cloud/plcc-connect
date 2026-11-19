@@ -18,10 +18,10 @@ export const GoldRuleMark: React.FC<{ size?: number; tone?: 'dark' | 'light'; cl
 
 /** Woven-pattern welcome band: "One family. Many nations. One purpose." */
 export const TribesHero: React.FC = () => (
-  <section className="tribes-weave -mx-5 px-6 pb-6 pt-7 text-center" aria-labelledby="tribes-hero-title">
+  <section className="tribes-weave -mx-5 px-6 pb-5 pt-6 text-center" aria-labelledby="tribes-hero-title">
     <h1
       id="tribes-hero-title"
-      className="font-display text-[30px] font-bold leading-[1.12] text-[#F6E7B8] xs:text-[32px] sm:text-[36px]"
+      className="font-display text-[28px] font-bold leading-[1.15] tracking-[-0.01em] text-[#F6E7B8] min-[360px]:text-[31px]"
     >
       One family.
       <br />
@@ -29,7 +29,7 @@ export const TribesHero: React.FC = () => (
       <br />
       One purpose.
     </h1>
-    <GoldRuleMark className="mt-4" size={34} />
+    <GoldRuleMark className="mt-4" size={28} />
     <p className="sr-only">PLCC Tribes community feed</p>
   </section>
 );

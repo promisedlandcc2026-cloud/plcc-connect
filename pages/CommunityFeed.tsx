@@ -94,7 +94,7 @@ const PostCard: React.FC<{
           openPost();
         }
       }}
-      className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] p-4 pb-2 space-y-3 cursor-pointer shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40"
+      className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] px-3.5 pt-3.5 pb-1 space-y-3 cursor-pointer shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40"
       aria-label={`Open ${scripture ? 'Scripture post' : 'post'} by ${post.author.name}`}
     >
       {post.pinned && (
@@ -389,7 +389,7 @@ export const CommunityFeedPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setComposerOpen(true)}
-          className="tribes-gold-btn mt-4 mb-4 flex w-full min-h-[56px] items-center justify-center gap-3 rounded-2xl border border-[#C9A35A] text-[18px] font-bold text-[#12231c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/50"
+          className="tribes-gold-btn mt-5 mb-4 flex w-full min-h-[54px] items-center justify-center gap-3 rounded-2xl border border-[#C9A35A] text-[18px] font-bold text-[#12231c] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/50"
           aria-label="Create a Tribes post"
         >
           <Pencil size={22} aria-hidden />
