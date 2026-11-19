@@ -44,12 +44,19 @@ export const MemberHome: React.FC = () => {
   const [live, setLive] = useState(false);
 
   return (
-  <div className="awc-home-shell" data-mode={live ? 'live' : 'weekday'}>
+  // Weekdays: PLCC Tribes ivory Home. Sunday while service is live: the evening shell.
+  <div className={live ? 'awc-home-shell' : 'tribes-home'} data-mode={live ? 'live' : 'weekday'}>
     <SeasonHeroLayer />
     <MemberHomeHeader onLiveChange={setLive} />
 
-    <main className="relative mt-7 bg-cream text-ink rounded-t-[30px] px-5 pt-5 space-y-9 pb-[calc(8.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.22)]">
-      <div className="mx-auto h-1 w-10 rounded-full bg-[#D8CCBF]" aria-hidden />
+    <main
+      className={
+        live
+          ? 'relative mt-7 bg-cream text-ink rounded-t-[30px] px-5 pt-5 space-y-9 pb-[calc(8.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.22)]'
+          : 'relative text-ink px-5 pt-9 space-y-9 pb-[calc(7rem+env(safe-area-inset-bottom))]'
+      }
+    >
+      {live ? <div className="mx-auto h-1 w-10 rounded-full bg-[#D8CCBF]" aria-hidden /> : null}
       {/* Nudges + time-sensitive cards (each hides itself when it has nothing to say). */}
       <PWAPrompt />
       <PhoneAlertsCard variant="nudge" />

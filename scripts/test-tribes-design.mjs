@@ -73,6 +73,25 @@ describe('Scripture posts', async () => {
   });
 });
 
+describe('PLCC Tribes look (v2)', () => {
+  it('woven hero artwork is small enough for mobile data', async () => {
+    const { statSync } = await import('node:fs');
+    assert.ok(statSync(join(root, 'public/brand/tribes-hero.webp')).size < 90_000);
+    assert.match(read('index.css'), /\.tribes-hero \{[\s\S]*url\('\/brand\/tribes-hero\.webp'\)/);
+  });
+  it('weekday Home: forest bar with the mark, woven greeting, light content; Sunday live keeps the evening shell', () => {
+    const h = read('components/member/MemberHomeHeader.tsx');
+    assert.match(h, /tribes-bar[\s\S]*<TribesMark[\s\S]*PLCC Tribes/);
+    assert.match(h, /tribes-hero[\s\S]*<StainedGlassGreeting/);
+    assert.match(h, /<TodayStories tone="light" \/>[\s\S]*<LiveHuddles tone="light" \/>/);
+    assert.match(h, /if \(live\) \{[\s\S]*<SundayLiveHome/);
+    assert.match(read('components/member/MemberHome.tsx'), /live \? 'awc-home-shell' : 'tribes-home'/);
+  });
+  it('page titles get the gold rule', () => {
+    assert.match(read('components/member/MemberPageHeader.tsx'), /h-\[3px\] w-10 rounded-full bg-\[#C9A35A\]/);
+  });
+});
+
 describe('Tribes screens use the existing flows', () => {
   const feed = read('pages/CommunityFeed.tsx');
   const post = read('pages/CommunityPost.tsx');
@@ -89,9 +108,10 @@ describe('Tribes screens use the existing flows', () => {
     assert.match(feed, /fetchCommunityFeedPage/);
   });
 
-  it('header keeps notifications and uses the official mark (no generated artwork)', () => {
+  it('header keeps notifications and uses the PLCC sun-and-road mark', () => {
     assert.match(header, /to="\/notifications"/);
-    assert.match(header, /awc_connect_logo\.png/);
+    assert.match(header, /<TribesMark/);
+    assert.match(read('components/tribes/TribesMark.tsx'), /fill="currentColor"/);
     assert.equal(/unsplash|generated|mockup/i.test(feed + post + header), false);
   });
 

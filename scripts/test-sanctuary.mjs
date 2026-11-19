@@ -209,11 +209,11 @@ describe('motion and type', () => {
 });
 
 describe('visitor Home (Sanctuary)', () => {
-  it('visitor hero uses the stained glass, a Plan-a-visit ticket and stories without Canaan News', () => {
+  it('visitor hero (PLCC Tribes): woven welcome, a Plan-a-visit ticket and stories without Canaan News', () => {
     const hero = read('components/home/HomeHero.tsx');
-    assert.match(hero, /<StainedGlass \/>/);
+    assert.match(hero, /tribes-bar[\s\S]*<TribesMark[\s\S]*tribes-hero/);
     assert.match(hero, /<NextUpTicket next=\{next\} liveUrl=\{liveUrl\} visitor \/>/);
-    assert.match(hero, /<TodayStories visitor \/>/);
+    assert.match(hero, /<TodayStories visitor tone="light" \/>/);
     assert.match(hero, /as="p"/, 'keeps the single sr-only h1');
     const ticket = read('components/sanctuary/NextUpTicket.tsx');
     assert.match(ticket, /Plan a visit/);

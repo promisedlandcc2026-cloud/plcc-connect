@@ -24,7 +24,8 @@ export default {
                     light: '#E8D8B2',
                     cream: '#f6f1e6',
                 },
-                eggshell: '#F8F5F2',
+                /** PLCC ivory page background (warmer than AWC Connect's eggshell). */
+                eggshell: '#F7F1E5',
                 /** Sanctuary: evening grounds and gold-leaf light (see index.css). */
                 wine: {
                     night: '#0e1512',
@@ -32,7 +33,7 @@ export default {
                     deep: '#0b0f0d',
                 },
                 leaf: '#E4C36A',
-                cream: '#F8F5F2',
+                cream: '#F7F1E5',
                 /** gray-500 darkened so secondary text passes WCAG AA on white and eggshell. */
                 gray: {
                     500: '#636A77',
@@ -47,9 +48,9 @@ export default {
                 'gold-ink': '#7A5C0F',
             },
             fontFamily: {
-                sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
-                serif: ['Playfair Display', 'serif'],
-                display: ['Playfair Display', 'serif'],
+                sans: ['Figtree', 'system-ui', 'sans-serif'],
+                serif: ['Fraunces', 'Georgia', 'serif'],
+                display: ['Fraunces', 'Georgia', 'serif'],
             },
             boxShadow: {
                 card: '0 1px 2px rgba(26, 26, 26, 0.04), 0 4px 16px rgba(26, 26, 26, 0.05)',

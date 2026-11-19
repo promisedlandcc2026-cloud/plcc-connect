@@ -5,13 +5,13 @@
 :root {
   --awc-burgundy: #1d372c;
   --awc-gold: #C9A35A;
-  --awc-eggshell: #F8F5F2;
+  --awc-eggshell: #F7F1E5;
   /* Sanctuary redesign — evening grounds, gold-leaf light, cream pages. */
   --awc-wine-night: #0e1512;
   --awc-wine: #0d1914;
   --awc-leaf: #E4C36A;
   --awc-leaf-soft: #F2D98A;
-  --awc-cream: #F8F5F2;
+  --awc-cream: #F7F1E5;
 }
 
 body {
@@ -21,16 +21,17 @@ body {
 }
 
 /*
- * Design kit (Sanctuary): UI text and headings use Plus Jakarta Sans; the
- * Playfair serif is reserved for page titles and hero moments via
+ * Design kit (Sanctuary): UI text and headings use Figtree; the
+ * Fraunces serif is reserved for page titles and hero moments via
  * `font-display`. Minimum UI text is 12px.
  */
 h1, h2, h3 {
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Figtree', system-ui, sans-serif;
 }
 
 .font-display {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Fraunces', Georgia, serif;
+  font-optical-sizing: auto;
 }
 
 .no-scrollbar::-webkit-scrollbar {
@@ -359,22 +360,26 @@ html[data-season='dry'] {
   z-index: 1;
 }
 
-/* Floating glass dock. */
+/* PLCC Tribes bottom bar (class names kept from the old dock). */
 .awc-dock-tab {
-  transition: flex-grow 360ms cubic-bezier(0.22, 1, 0.36, 1), background-color 200ms ease, color 200ms ease, padding 360ms cubic-bezier(0.22, 1, 0.36, 1), transform 120ms ease;
+  transition: color 200ms ease, background-color 200ms ease;
+}
+.awc-dock-mark {
+  transition: width 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease;
 }
 @media (prefers-reduced-motion: reduce) {
-  .awc-dock-tab {
+  .awc-dock-tab,
+  .awc-dock-mark {
     transition: none;
   }
 }
 
 .awc-dock {
-  background: rgba(8, 15, 12, 0.88);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
-  backdrop-filter: blur(18px) saturate(140%);
-  border: 1px solid rgba(242, 217, 138, 0.22);
-  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
+  background: rgba(251, 247, 238, 0.96);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
+  border-top: 1px solid #e3d6ba;
+  box-shadow: 0 -6px 20px rgba(18, 35, 28, 0.08);
 }
 
 /* Welcome page "Slide to begin" */
@@ -425,13 +430,17 @@ html[data-season='dry'] {
   background: linear-gradient(180deg, #17392b 0%, #12301f 100%);
   box-shadow: inset 0 -1px 0 rgba(228, 195, 106, 0.45);
 }
-.tribes-weave {
-  background-color: #163a2a;
+.tribes-weave,
+.tribes-hero {
+  background-color: #123a26;
   background-image:
-    radial-gradient(ellipse 75% 85% at 50% 50%, rgba(18, 48, 33, 0.94) 0%, rgba(18, 48, 33, 0.6) 60%, rgba(18, 48, 33, 0.15) 100%),
-    repeating-linear-gradient(45deg, rgba(228, 195, 106, 0.11) 0 1px, transparent 1px 18px),
-    repeating-linear-gradient(-45deg, rgba(228, 195, 106, 0.11) 0 1px, transparent 1px 18px);
+    radial-gradient(ellipse 62% 78% at 50% 50%, rgba(10, 36, 22, 0.88) 0%, rgba(10, 36, 22, 0.55) 58%, rgba(10, 36, 22, 0.12) 100%),
+    url('/brand/tribes-hero.webp');
+  background-size: cover, cover;
+  background-position: center, center;
+  box-shadow: inset 0 -1px 0 rgba(228, 195, 106, 0.35);
 }
+
 .tribes-gold-btn {
   background: linear-gradient(180deg, #ecd08a 0%, #d8b466 55%, #c9a35a 100%);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset, 0 6px 16px rgba(122, 92, 15, 0.22);
@@ -445,4 +454,31 @@ html[data-season='dry'] {
   border: 1px solid rgba(201, 163, 90, 0.9);
   border-radius: 10px;
   box-shadow: 0 0 0 4px #fffcf4, 0 0 0 5px rgba(201, 163, 90, 0.45);
+}
+
+/* PLCC Tribes Home (weekdays): ivory page under the forest bar and woven greeting. */
+.tribes-home {
+  position: relative;
+  min-height: 100vh;
+  background: #f6f0e2;
+}
+/* Seasonal falling effect (when staff turn it on) drifts over the woven greeting only;
+   the colour wash is left out so the PLCC artwork keeps its colours. */
+.tribes-home > .season-wash {
+  display: none;
+}
+.tribes-home > .season-particles {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 420px;
+  z-index: 2;
+  pointer-events: none;
+}
+.tribes-home .awc-ticket {
+  filter: drop-shadow(0 1px 1px rgba(18, 35, 28, 0.06)) drop-shadow(0 10px 22px rgba(18, 35, 28, 0.1));
+}
+.tribes-home .awc-ticket__top,
+.tribes-home .awc-ticket__bottom {
+  background: #ffffff;
 }

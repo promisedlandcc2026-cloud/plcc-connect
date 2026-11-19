@@ -15,7 +15,7 @@ export const ScriptureCard: React.FC<{ verse: SharedVerse; size?: 'feed' | 'full
   const clamp = long && !open;
   return (
     <figure className="tribes-verse-frame mx-1.5 my-3 px-5 pb-3 pt-5 text-center text-[#12301f]">
-      <GoldRuleMark tone="dark" size={size === 'feed' ? 24 : 28} />
+      <GoldRuleMark tone="dark" size={size === 'feed' ? 28 : 34} />
       <figcaption className="mt-3">
         <span
           className={`block font-display font-bold leading-tight ${size === 'feed' ? 'text-[26px]' : 'text-[32px] sm:text-[36px]'}`}

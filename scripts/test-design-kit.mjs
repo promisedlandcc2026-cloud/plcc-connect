@@ -40,16 +40,17 @@ describe('readable text', () => {
     assert.deepEqual(offenders, []);
   });
 
-  it('Sanctuary type is actually loaded (Jakarta UI weights, Playfair with italics)', () => {
+  it('PLCC Tribes type is actually loaded (Figtree UI weights, Fraunces with italics)', () => {
     const html = read('index.html');
-    assert.match(html, /Plus\+Jakarta\+Sans:wght@400;500;600;700;800/);
-    assert.match(html, /Playfair\+Display:ital,wght@0,600;0,700;1,600;1,700/);
-    assert.match(read('tailwind.config.js'), /sans: \['Plus Jakarta Sans'/);
+    assert.match(html, /Figtree:wght@400;500;600;700;800/);
+    assert.match(html, /Fraunces:ital,opsz,wght@0,9\.\.144,600;0,9\.\.144,700;1,9\.\.144,600/);
+    assert.match(read('tailwind.config.js'), /sans: \['Figtree'/);
+    assert.match(read('tailwind.config.js'), /display: \['Fraunces'/);
   });
 
   it('serif is reserved for page titles via font-display', () => {
     const css = read('index.css');
-    assert.match(css, /h1, h2, h3 \{\s*font-family: 'Plus Jakarta Sans'/);
+    assert.match(css, /h1, h2, h3 \{\s*font-family: 'Figtree'/);
     assert.match(css, /\.font-display/);
     assert.match(read('components/member/MemberPageHeader.tsx'), /font-display/);
     assert.match(read('tailwind.config.js'), /'gold-ink': '#7A5C0F'/);
@@ -79,12 +80,12 @@ describe('kit components', () => {
     }
   });
 
-  it('member bottom bar is the floating glass dock: sentence case, gold-leaf active pill', () => {
+  it('member bottom bar is the PLCC Tribes ivory bar: sentence case, gold underline on the current tab', () => {
     const nav = read('components/MemberNav.tsx');
     assert.match(nav, /awc-dock/);
-    assert.match(nav, /active \? 'bg-leaf text-wine'/);
-    // Sliding pill: the current tab widens; every tab keeps its name under the icon.
-    assert.match(nav, /function tabGrow/);
+    assert.match(nav, /awc-dock-mark[\s\S]*bg-\[#C9A35A\][\s\S]*active \? 'w-8 opacity-100'/);
+    // Every tab keeps its name under the icon; "Community" gets a little more room.
+    assert.match(nav, /item\.label\.length > 7 \? 'grow-\[1\.3\]'/);
     assert.match(nav, /\{item\.label\}\s*<\/span>/);
     assert.equal(nav.includes('max-w-0'), false, 'names are never hidden');
     assert.match(read('index.css'), /prefers-reduced-motion: reduce\)[\s\S]*\.awc-dock-tab/);

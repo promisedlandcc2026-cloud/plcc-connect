@@ -20,9 +20,9 @@ const MemberHome = lazy(() =>
   import('./member/MemberHome').then((m) => ({ default: m.MemberHome }))
 );
 
-/** Public / visitor / pending Home — Sanctuary wine shell + the existing feed on a cream sheet. */
+/** Public / visitor / pending Home — PLCC Tribes: forest bar, woven welcome, ivory feed. */
 export const PublicHome: React.FC = () => (
-  <div className="awc-home-shell">
+  <div className="tribes-home">
     <SeasonHeroLayer />
     <HomeHero variant="public" />
     <PWAPrompt />
@@ -31,9 +31,11 @@ export const PublicHome: React.FC = () => (
       <HomeHubGrid variant="public" />
     </div>
 
-    <main className="relative mt-7 bg-cream text-ink rounded-t-[30px] px-5 pt-5 space-y-12 pb-[calc(8.5rem+env(safe-area-inset-bottom))] shadow-[0_-8px_32px_rgba(0,0,0,0.22)]">
-      <div className="mx-auto h-1 w-10 rounded-full bg-[#D8CCBF]" aria-hidden />
-      <h2 className="!mt-3 font-display text-[22px] font-bold text-ink">🗓️ This week at PLCC</h2>
+    <main className="relative text-ink px-5 pt-8 space-y-12 pb-[calc(7rem+env(safe-area-inset-bottom))]">
+      <div>
+        <h2 className="font-display text-[26px] font-semibold text-[#12231c]">This week at PLCC</h2>
+        <span aria-hidden className="mt-2.5 block h-[3px] w-10 rounded-full bg-[#C9A35A]" />
+      </div>
       <HolidayRsvpCard />
       <VisitorWelcomeStrip />
 
