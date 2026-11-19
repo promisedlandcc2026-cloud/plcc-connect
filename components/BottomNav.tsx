@@ -1,7 +1,7 @@
 /**
- * Visitor bottom bar — the Sanctuary floating glass dock (same look as the
- * member dock): Home · Watch · Events · Prayer · Visit, full labels, and a
- * gold-leaf pill on the section you last jumped to.
+ * Visitor bottom bar — PLCC Tribes ivory bar (same look as the member bar):
+ * Home · Watch · Events · Prayer · Visit, full labels, and a gold underline on
+ * the section you last jumped to.
  */
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -57,13 +57,13 @@ export const BottomNav: React.FC = () => {
   return (
     <div
       onFocusCapture={showDock}
-      className={`pointer-events-none fixed bottom-[max(12px,env(safe-area-inset-bottom))] left-1/2 z-[110] w-full max-w-[500px] -translate-x-1/2 px-3 transition-transform duration-300 ease-out motion-reduce:transition-none ${
-        dockHidden ? 'translate-y-[calc(100%+max(12px,env(safe-area-inset-bottom))+8px)]' : 'translate-y-0'
+      className={`pointer-events-none fixed bottom-0 left-1/2 z-[110] w-full max-w-[500px] -translate-x-1/2 transition-transform duration-300 ease-out motion-reduce:transition-none ${
+        dockHidden ? 'translate-y-full' : 'translate-y-0'
       }`}
     >
       <nav
         aria-label="Main"
-        className="awc-dock pointer-events-auto grid h-[68px] grid-cols-5 items-center rounded-[34px] px-1"
+        className="awc-dock pointer-events-auto grid grid-cols-5 items-stretch px-1 pb-[env(safe-area-inset-bottom)]"
       >
         {ITEMS.map((item) => {
           const Icon = item.icon;
@@ -74,12 +74,13 @@ export const BottomNav: React.FC = () => {
               type="button"
               onClick={() => go(item.id)}
               aria-current={active ? 'true' : undefined}
-              className={`flex h-14 min-w-0 flex-col items-center justify-center gap-[3px] rounded-[28px] transition-colors motion-reduce:transition-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-leaf ${
-                active ? 'bg-leaf text-wine' : 'text-cream/85 hover:text-cream'
+              className={`awc-dock-tab relative flex min-h-[64px] min-w-0 flex-col items-center justify-center gap-1 pt-1.5 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C9A35A] active:bg-[#1d372c]/[0.05] ${
+                active ? 'text-[#12301f]' : 'text-[#5B6658] hover:text-[#12301f]'
               }`}
             >
-              <Icon size={22} strokeWidth={active ? 2.2 : 1.9} aria-hidden />
-              <span className="max-w-full truncate text-xs font-bold leading-none tracking-[-0.01em]">{item.label}</span>
+              <Icon size={23} strokeWidth={active ? 2.2 : 1.8} aria-hidden />
+              <span className={`max-w-full truncate text-[12px] leading-none tracking-[-0.01em] ${active ? 'font-bold' : 'font-semibold'}`}>{item.label}</span>
+              <span aria-hidden className={`awc-dock-mark absolute bottom-1 h-[3px] rounded-full bg-[#C9A35A] ${active ? 'w-8 opacity-100' : 'w-0 opacity-0'}`} />
             </button>
           );
         })}

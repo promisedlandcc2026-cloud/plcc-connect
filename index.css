@@ -458,8 +458,22 @@ html[data-season='dry'] {
 
 /* PLCC Tribes Home (weekdays): ivory page under the forest bar and woven greeting. */
 .tribes-home {
+  position: relative;
   min-height: 100vh;
   background: #f6f0e2;
+}
+/* Seasonal falling effect (when staff turn it on) drifts over the woven greeting only;
+   the colour wash is left out so the PLCC artwork keeps its colours. */
+.tribes-home > .season-wash {
+  display: none;
+}
+.tribes-home > .season-particles {
+  position: absolute;
+  inset: 0 0 auto 0;
+  width: 100%;
+  height: 420px;
+  z-index: 2;
+  pointer-events: none;
 }
 .tribes-home .awc-ticket {
   filter: drop-shadow(0 1px 1px rgba(18, 35, 28, 0.06)) drop-shadow(0 10px 22px rgba(18, 35, 28, 0.1));

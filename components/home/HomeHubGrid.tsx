@@ -112,7 +112,7 @@ function scrollToSection(sectionId: string) {
 }
 
 const tileClassName =
-  'flex items-center gap-3 rounded-[18px] bg-white/[0.06] border border-[#F2D98A]/20 px-3.5 min-h-[56px] text-left text-cream active:scale-[0.97] transition-transform motion-reduce:transition-none hover:bg-white/10';
+  'flex items-center gap-3 rounded-[18px] bg-white border border-[#E3D6BA] px-3.5 min-h-[56px] text-left text-[#12231c] shadow-[0_1px_2px_rgba(18,35,28,0.04)] active:scale-[0.97] transition-transform motion-reduce:transition-none hover:border-[#C9A35A]';
 
 /** PLCC Ark: its own site at /ark (same sign-in), opened with a full page load. */
 const ArkTile: React.FC = () => (
@@ -140,7 +140,7 @@ export const HomeHubGrid: React.FC<HomeHubGridProps> = ({ variant = 'public' }) 
 
   return (
     <section id="actions" className="scroll-mt-24" aria-labelledby="home-shortcuts-title">
-      <h2 id="home-shortcuts-title" className="mb-2.5 px-1 text-[15px] font-bold text-cream/90">
+      <h2 id="home-shortcuts-title" className="mb-2.5 px-1 text-[15px] font-bold text-[#12231c]">
         🧭 Explore PLCC
       </h2>
       <div className="grid grid-cols-2 gap-2.5">

@@ -1,6 +1,7 @@
 /**
  * Home top for visitors (Sanctuary) + the shared bell / account / sign-in actions.
  */
+import { TribesMark } from '../tribes/TribesMark';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, UserRound } from 'lucide-react';
@@ -11,7 +12,7 @@ import { fetchMemberHomeEvents } from '../../lib/memberHomeData';
 import { pickNextUp, type NextUp } from '../../lib/nextUp';
 import { isYouTubeLiveUrl, resolveLatestVideoUrl } from '../../lib/youtube';
 import { useNow } from '../../lib/useNow';
-import { StainedGlass, StainedGlassGreeting } from '../sanctuary/StainedGlassGreeting';
+import { StainedGlassGreeting } from '../sanctuary/StainedGlassGreeting';
 import { NextUpTicket } from '../sanctuary/NextUpTicket';
 import { TodayStories } from '../sanctuary/TodayStories';
 import type { ChurchEvent } from '../../types';
@@ -115,24 +116,39 @@ export const HomeHero: React.FC<HomeHeroProps> = ({ variant = 'public' }) => {
   const next: NextUp | null = useMemo(() => (events ? pickNextUp(events, now) : null), [events, now]);
 
   return (
-    <header className="relative px-5 pt-3 pb-1 space-y-6">
+    <header>
       <h1 className="sr-only">Tribes — Promised Land Christian Center</h1>
-      <StainedGlass />
-      <div className="relative flex items-center justify-between gap-3">
-        <AWCLogo size={52} className="block rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.25)]" />
+      <div className="tribes-bar flex items-center gap-2 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5 min-[360px]:gap-3">
+          <TribesMark className="h-9 w-auto shrink-0 text-[#E4C36A] min-[360px]:h-10" />
+          <span aria-hidden className="h-7 w-px shrink-0 bg-[#E4C36A]/45" />
+          <span className="truncate font-display text-[21px] font-semibold leading-none text-[#F6EFDD] min-[360px]:text-[23px]">
+            PLCC Tribes
+          </span>
+        </div>
         <HomeHeroActions showBell={showBell} />
       </div>
 
-      <div className="relative space-y-6">
-        <StainedGlassGreeting
-          as="p"
-          greeting={`${daypartGreeting(now)}, friend`}
-          tagline="Changing Hearts. Transforming Lives."
-          now={now}
-        />
+      <section className="tribes-hero px-5 pb-7 pt-8 text-center" aria-label="Welcome">
+        <div className="mx-auto max-w-[380px] [&_p.font-display]:text-[34px] min-[360px]:[&_p.font-display]:text-[38px]">
+          <StainedGlassGreeting
+            as="p"
+            greeting={`${daypartGreeting(now)}, friend`}
+            tagline="Changing Hearts. Transforming Lives."
+            now={now}
+          />
+        </div>
+        <div className="mt-5 flex items-center justify-center gap-3" aria-hidden>
+          <span className="h-px w-14 bg-[#E4C36A]/60" />
+          <TribesMark className="h-7 w-auto text-[#E4C36A]" />
+          <span className="h-px w-14 bg-[#E4C36A]/60" />
+        </div>
+      </section>
+
+      <div className="space-y-6 px-5 pt-5">
         <NextUpTicket next={next} liveUrl={liveUrl} visitor />
         <div className="-mx-5">
-          <TodayStories visitor />
+          <TodayStories visitor tone="light" />
         </div>
       </div>
     </header>

@@ -46,7 +46,7 @@ export const MemberHome: React.FC = () => {
   return (
   // Weekdays: PLCC Tribes ivory Home. Sunday while service is live: the evening shell.
   <div className={live ? 'awc-home-shell' : 'tribes-home'} data-mode={live ? 'live' : 'weekday'}>
-    {live ? <SeasonHeroLayer /> : null}
+    <SeasonHeroLayer />
     <MemberHomeHeader onLiveChange={setLive} />
 
     <main
