@@ -123,6 +123,7 @@ const MemberDependentCardPage = lazy(() =>
   import('./pages/MemberDependentCard').then((m) => ({ default: m.MemberDependentCardPage }))
 );
 const IssuesPage = lazy(() => import('./pages/IssuesPage').then((m) => ({ default: m.IssuesPage })));
+const KaLinkMusicPage = lazy(() => import('./pages/KaLinkMusicPage').then((m) => ({ default: m.KaLinkMusicPage })));
 const MemberKidsViewPage = lazy(() => import('./pages/MemberKidsView'));
 const MemberKidsPlansPage = lazy(() =>
   import('./pages/MemberKidsPlans').then((m) => ({ default: m.MemberKidsPlansPage }))
@@ -378,6 +379,16 @@ const AppShell: React.FC<{ hasSeenSplash: boolean; onSplashComplete: () => void 
             <MemberGate>
               <LazyRoute label="Opening today’s devotional…" sectionLabel="Daily">
                 <MemberDailyPage />
+              </LazyRoute>
+            </MemberGate>
+          }
+        />
+        <Route
+          path="/music"
+          element={
+            <MemberGate>
+              <LazyRoute label="Loading music…" sectionLabel="Music">
+                <KaLinkMusicPage />
               </LazyRoute>
             </MemberGate>
           }

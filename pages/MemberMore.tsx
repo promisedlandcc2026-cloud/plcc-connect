@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { canViewIssues } from '../lib/issueReport';
+import { canUploadMusicCached } from '../lib/kaLinkMusic';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ListGroup, ListRow } from '../components/ui/ListRow';
 import { GiveModule } from '../components/GiveModule';
@@ -30,6 +31,7 @@ import {
   Wallet,
   Flag,
   ShieldAlert,
+  Music,
   type LucideIcon,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -130,6 +132,7 @@ const MORE_EMOJI: Record<string, string> = {
   'Report a problem': '🛠️',
   'Report harassment or a scam': '🛡️',
   Issues: '🩺',
+  'Ka Link Music': '🎵',
 };
 
 const GROUP_LABEL: Record<MoreGroup, string> = {
@@ -155,9 +158,12 @@ export const MemberMePage: React.FC = () => {
   const showVault = canOpenVaultStaffLink(identity?.role);
   // Issues (who had problems, why, the fix): church leaders only — Canaan decides.
   const [leaderIssues, setLeaderIssues] = useState(false);
+  // Music team + managers: upload songs the church bought (Nov 19).
+  const [musicTeam, setMusicTeam] = useState(false);
   useEffect(() => {
     let alive = true;
     void canViewIssues().then((ok) => alive && setLeaderIssues(ok));
+    void canUploadMusicCached().then((ok) => alive && setMusicTeam(ok));
     return () => {
       alive = false;
     };
@@ -380,6 +386,17 @@ export const MemberMePage: React.FC = () => {
       label: 'Add to home screen',
       description: 'Put Tribes on your phone like an app',
       icon: Smartphone,
+    });
+  }
+
+  if (musicTeam) {
+    items.push({
+      group: 'account',
+      kind: 'route',
+      to: '/music',
+      label: 'Ka Link Music',
+      description: 'Upload songs you bought for Ka Link',
+      icon: Music,
     });
   }
 

@@ -1,3 +1,4 @@
+import { parseMusicCommand, sanitizeMusicAnswer } from '../_utils/musicBridge.js';
 import { createHash } from 'node:crypto';
 import { parseBearerAuthorization } from '../_utils/memberIdentity.js';
 import {
@@ -66,6 +67,7 @@ import {
 const UPSTREAM_TIMEOUT_MS = 15000;
 const TOKEN_UPSTREAM_TIMEOUT_MS = 20000;
 const ALLOWED_RESOURCES = new Set([
+  'huddle-songs',
   'member-conduct',
   'issue-report',
   'issues',
@@ -386,6 +388,35 @@ async function handleBridge(req, res) {
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    if (resource === 'huddle-songs') {
+      // #12 song library: play links for this room's moderators; the music team (Nov 19)
+      // and managers also list, upload (bought music only) and delete. Canaan decides who may.
+      if (req.method !== 'POST') {
+        res.setHeader('Allow', 'POST');
+        return json(res, 405, { ok: false, code: 'method_not_allowed', message: 'Only POST is supported.' });
+      }
+      const parsedBody = parseJsonBody(req);
+      const command = parseMusicCommand(parsedBody.ok ? parsedBody.body : null);
+      if (!command) return json(res, 400, { ok: false, code: 'invalid_body', message: 'That request was not valid.' });
+      const upstream = await fetch(buildVaultCommunityChatIssuesUrl(originResult.origin, 'ka-link-songs'), {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json', Authorization: `Bearer ${auth.token}` },
+        body: JSON.stringify(command),
+        signal: controller.signal,
+        redirect: 'error',
+      });
+      const body = await upstream.json().catch(() => null);
+      if (!upstream.ok) {
+        if ([400, 403, 503].includes(upstream.status) && typeof body?.error === 'string') {
+          return json(res, upstream.status, { ok: false, code: upstream.status === 503 ? 'not_set_up' : 'songs_refused', message: body.error.slice(0, 200) });
+        }
+        return mapUpstreamError(res, upstream.status);
+      }
+      const answer = sanitizeMusicAnswer(command.action, body);
+      if (!answer) return json(res, 502, { ok: false, code: 'invalid_upstream', message: 'Could not start the upload. Please try again.' });
+      return json(res, 200, { ok: true, ...answer });
+    }
+
     if (resource === 'member-conduct') {
       // Warn, then block, an unruly member (moderators / leaders). Canaan checks who may.
       const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
