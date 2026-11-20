@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { ArrowLeft, Loader2, Radio, Send } from 'lucide-react';
+import { ArrowLeft, Loader2, Radio, Send, ShieldBan } from 'lucide-react';
+import { ConductSheet } from '../components/conduct/ConductSheet';
+import { canModerateConduct, isConductTargetId, type ConductTarget } from '../lib/memberConduct';
 import { useAuth } from '../context/AuthContext';
 import {
   CommunityChatError,
@@ -56,7 +58,18 @@ export const CommunityChatRoomPage: React.FC = () => {
   const [huddleOpen, setHuddleOpen] = useState(false);
   const [huddleMode, setHuddleMode] = useState<'join' | 'start'>('join');
   const bottomRef = useRef<HTMLDivElement>(null);
+  /** Moderators: warn, then block, an unruly member (Nov 19). Canaan decides who may. */
+  const [mayWarn, setMayWarn] = useState(false);
+  const [conductTarget, setConductTarget] = useState<ConductTarget | null>(null);
   const validChannel = UUID_RE.test(channelId);
+  useEffect(() => {
+    if (!validChannel) return;
+    let alive = true;
+    void canModerateConduct(channelId).then((ok) => alive && setMayWarn(ok));
+    return () => {
+      alive = false;
+    };
+  }, [channelId, validChannel]);
   /** Arrived from Home "Live Huddles": show a one-tap card (the tap is what lets the mic start). */
   const [huddleIntent, setHuddleIntent] = useState(() => parseHuddleIntent(location.search));
   /** True when this room is the Intercessor Channel and the member can open the Prayer Watch. */
@@ -384,6 +397,17 @@ export const CommunityChatRoomPage: React.FC = () => {
                   }`}
                 >
                   {msg.author.name} · {formatTime(msg.createdAt)}
+                  {mayWarn && !mine && !isDm && isConductTargetId(msg.author.id) ? (
+                    <button
+                      type="button"
+                      onClick={() => setConductTarget({ userId: msg.author.id, name: msg.author.name || 'This member', place: 'chat', channelId })}
+                      className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-xs font-bold normal-case tracking-normal text-amber-800 align-middle"
+                      aria-label={`Warn or block ${msg.author.name}`}
+                      data-testid="message-warn-block"
+                    >
+                      <ShieldBan size={12} aria-hidden /> Warn
+                    </button>
+                  ) : null}
                 </p>
                 {msg.parent && !msg.parent.isDeleted && msg.parent.content ? (
                   <p
@@ -461,6 +485,7 @@ export const CommunityChatRoomPage: React.FC = () => {
         </button>
       </form>
 
+      {conductTarget ? <ConductSheet target={conductTarget} onClose={() => setConductTarget(null)} /> : null}
       {huddleOpen ? (
         <ConnectVoiceHuddle
           channelId={channelId}

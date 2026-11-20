@@ -1,4 +1,6 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ConductNoticeModal, ConductSheet } from '../conduct/ConductSheet';
+import { HUDDLE_CONDUCT_TOPIC, isConductTargetId, parseConductNotice, type ConductNotice, type ConductTarget } from '../../lib/memberConduct';
 import {
   onPageClosing,
   reportHuddleActivity,
@@ -7,6 +9,7 @@ import {
   type IssueExtra,
 } from '../../lib/issueReport';
 import {
+  ShieldBan,
   BookHeart,
   RefreshCw,
   Captions,
@@ -395,6 +398,9 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   const [chatSending, setChatSending] = useState(false);
   const [title, setTitle] = useState(channelName || 'Live Ka Link');
   const [canModerate, setCanModerate] = useState(false);
+  /** Warn / Block sheet (moderators) and the notice a warned/blocked member sees (Nov 19). */
+  const [conductTarget, setConductTarget] = useState<ConductTarget | null>(null);
+  const [conductNotice, setConductNotice] = useState<ConductNotice | null>(null);
   const [ending, setEnding] = useState(false);
   const [shareDone, setShareDone] = useState<string | null>(null);
   /** Full-screen prayer room: listen-only mode, sheets and participant search. */
@@ -967,6 +973,12 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
           onChange();
         })
         .on(RoomEvent.DataReceived, (payload, participant, _kind, topic) => {
+          // A moderator's warning / block comes from Canaan (no participant).
+          if (topic === HUDDLE_CONDUCT_TOPIC) {
+            const notice = parseConductNotice(payload);
+            if (notice && mountedRef.current && roomRef.current === room) setConductNotice(notice);
+            return;
+          }
           if (!mountedRef.current || !participant) return;
           if (topic === HUDDLE_CAPTION_TOPIC) {
             const wire = decodeCaptionWire(payload);
@@ -1748,6 +1760,28 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   );
   const inCount = roster.filter((e) => e.status === 'in').length;
 
+  // Warn / Block sheet (moderators) and the warning a member must acknowledge — every layout.
+  const conductOverlays = (
+    <>
+      {conductTarget ? <ConductSheet target={conductTarget} onClose={() => setConductTarget(null)} /> : null}
+      {conductNotice ? (
+        <ConductNoticeModal kind={conductNotice.t} reason={conductNotice.reason} onClose={() => setConductNotice(null)} />
+      ) : null}
+    </>
+  );
+  const warnButton = (tile: { identity: string; name: string; isLocal: boolean; moderator: boolean }, className: string) =>
+    canModerate && !tile.isLocal && !tile.moderator && isConductTargetId(tile.identity) ? (
+      <button
+        type="button"
+        onClick={() => setConductTarget({ userId: tile.identity, name: tile.name, place: 'call', channelId })}
+        className={className}
+        aria-label={`Warn or block ${tile.name}`}
+        data-testid="huddle-warn-block"
+      >
+        <ShieldBan size={16} aria-hidden />
+      </button>
+    ) : null;
+
   if (dailyCreds) {
     return (
       <Suspense
@@ -1819,6 +1853,8 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     // Minimized: a small floating bar; the chat underneath stays usable and the call keeps going.
     if (minimized) {
       return (
+        <>
+        {conductOverlays}
         <div className="pr-mini" role="region" aria-label="Live Ka Link (minimized)">
           <button type="button" onClick={() => setMinimized(false)} className="pr-mini-main" aria-label="Open the prayer room">
             <span className={`pr-mini-dot ${connected ? 'is-live' : ''}`} aria-hidden />
@@ -1858,11 +1894,13 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
             <LogOut size={18} aria-hidden />
           </button>
         </div>
+        </>
       );
     }
 
     return (
       <div className={`${shellClass} pr-shell overflow-hidden`} role="dialog" aria-modal aria-label="Live Ka Link">
+        {conductOverlays}
         {connected && activeReactions.length > 0 ? (
           <div
             className="pointer-events-none absolute right-3 bottom-24 z-40 flex max-w-[min(14rem,46%)] flex-col-reverse items-end gap-1.5"
@@ -2374,6 +2412,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                             <span className="pr-role is-mod"><Crown size={12} aria-hidden /> Mod</span>
                           ) : null}
                           {tile.micOn ? <Mic size={17} className="pr-mic-on" aria-label="Microphone on" /> : <MicOff size={17} className="pr-mic-off" aria-label="Muted" />}
+                          {warnButton(tile, 'ml-1 min-h-[40px] min-w-[40px] rounded-full bg-white/10 text-amber-300 flex items-center justify-center')}
                         </li>
                       ))}
                       {!peopleList.length ? <li className="py-4 text-center text-sm text-white/60">No one matches that name.</li> : null}
@@ -2429,6 +2468,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       aria-modal={embedded ? undefined : true}
       aria-label="Live Ka Link"
     >
+      {conductOverlays}
       {conn === 'connected' && activeReactions.length > 0 ? (
         <div
           className="pointer-events-none absolute right-3 bottom-44 z-40 flex max-w-[min(14rem,46%)] flex-col-reverse items-end gap-1.5"
@@ -2629,6 +2669,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                         </span>
                       </div>
                     )}
+                    {warnButton(tile, 'absolute top-2 left-2 z-20 min-h-[36px] min-w-[36px] rounded-full bg-black/60 text-amber-300 flex items-center justify-center')}
                     {tile.handRaised ? (
                       <div
                         className="absolute top-2 right-2 z-20 min-h-[36px] min-w-[36px] rounded-full bg-gold text-burgundy shadow-lg flex items-center justify-center"

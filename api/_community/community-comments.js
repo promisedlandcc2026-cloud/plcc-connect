@@ -290,6 +290,13 @@ export default async function handler(req, res) {
       redirect: 'error',
     });
 
+    if (upstream.status === 403) {
+      // Blocked after a warning (member conduct): say why.
+      const denied = await upstream.clone().json().catch(() => null);
+      if (denied?.code === 'member_blocked' && typeof denied?.error === 'string') {
+        return json(res, 403, { ok: false, code: 'member_blocked', message: denied.error.slice(0, 200) });
+      }
+    }
     if (!upstream.ok) return mapUpstreamError(res, upstream.status);
 
     let body;

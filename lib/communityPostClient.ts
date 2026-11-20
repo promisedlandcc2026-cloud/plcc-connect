@@ -236,7 +236,8 @@ export async function createCommunityPost(
     if (res.status === 403) {
       throw new CommunityFeedError(
         'forbidden',
-        'Community is not available for this account yet.',
+        // Blocked after a warning: Canaan's message says why and who to talk to.
+        codeFromBody === 'member_blocked' ? msg : 'Community is not available for this account yet.',
         403
       );
     }

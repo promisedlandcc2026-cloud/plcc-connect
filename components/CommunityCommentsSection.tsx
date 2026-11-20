@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Loader2, Pencil, Trash2 } from 'lucide-react';
+import { Loader2, Pencil, ShieldBan, Trash2 } from 'lucide-react';
+import { ConductSheet } from './conduct/ConductSheet';
+import { canModerateConductCached, isConductTargetId, type ConductTarget } from '../lib/memberConduct';
 import {
   createCommunityComment,
   deleteCommunityComment,
@@ -60,6 +62,16 @@ type Props = {
 };
 
 export const CommunityCommentsSection: React.FC<Props> = ({ postId, focusCommentId }) => {
+  /** Moderators: warn, then block, an unruly commenter (Nov 19). */
+  const [mayWarn, setMayWarn] = useState(false);
+  const [conductTarget, setConductTarget] = useState<ConductTarget | null>(null);
+  useEffect(() => {
+    let alive = true;
+    void canModerateConductCached().then((ok) => alive && setMayWarn(ok));
+    return () => {
+      alive = false;
+    };
+  }, []);
   const {
     adjustCommentCount,
     seedFromComments,
@@ -239,6 +251,7 @@ export const CommunityCommentsSection: React.FC<Props> = ({ postId, focusComment
 
   return (
     <section className="mt-6 space-y-4" aria-label="Comments">
+      {conductTarget ? <ConductSheet target={conductTarget} onClose={() => setConductTarget(null)} /> : null}
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-lg font-bold text-[#1A1A1A]">Comments</h2>
         <button
@@ -294,6 +307,17 @@ export const CommunityCommentsSection: React.FC<Props> = ({ postId, focusComment
                       {formatRelativeTime(c.createdAt)}
                       {c.edited ? ' · Edited' : ''}
                     </p>
+                    {mayWarn && !c.canEdit && isConductTargetId(c.author.id) ? (
+                      <button
+                        type="button"
+                        onClick={() => setConductTarget({ userId: c.author.id, name: c.author.name, place: 'post', postId })}
+                        className="ml-auto inline-flex min-h-[36px] items-center gap-1 rounded-full bg-amber-50 px-3 text-xs font-bold text-amber-800"
+                        aria-label={`Warn or block ${c.author.name}`}
+                        data-testid="comment-warn-block"
+                      >
+                        <ShieldBan size={14} aria-hidden /> Warn
+                      </button>
+                    ) : null}
                   </div>
 
                   {editingId === c.id ? (

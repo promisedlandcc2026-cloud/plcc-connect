@@ -1,5 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { ChevronRight, Flag, Loader2, MessageCircle, MoreHorizontal, Share, ThumbsUp } from 'lucide-react';
+import { ChevronRight, Flag, Loader2, MessageCircle, MoreHorizontal, Share, ShieldBan, ThumbsUp } from 'lucide-react';
+import { ConductSheet } from '../conduct/ConductSheet';
+import { canModerateConductCached, isConductTargetId } from '../../lib/memberConduct';
 import type { CommunityFeedPost, CommunityReactionKey } from '../../lib/communityFeedTypes';
 import { useCommunityReactions } from '../../context/CommunityReactionsContext';
 import { useAuth } from '../../context/AuthContext';
@@ -130,10 +132,43 @@ export const TribesPostActions: React.FC<{
   );
 };
 
+/** Moderators / leaders: may warn or block this post's author? (Canaan decides.) */
+function useMayWarnAuthor(post: CommunityFeedPost): boolean {
+  const [may, setMay] = useState(false);
+  const eligible = !post.authoredByMe && isConductTargetId(post.author.id);
+  useEffect(() => {
+    if (!eligible) return;
+    let alive = true;
+    void canModerateConductCached().then((ok) => alive && setMay(ok));
+    return () => {
+      alive = false;
+    };
+  }, [eligible]);
+  return eligible && may;
+}
+
 /** Full-width "Report post" row (single-post view), for posts that aren't yours. */
 export const ReportPostRow: React.FC<{ post: CommunityFeedPost }> = ({ post }) => {
+  const mayWarn = useMayWarnAuthor(post);
+  const [warnOpen, setWarnOpen] = useState(false);
   if (post.authoredByMe) return null;
   return (
+    <>
+    {mayWarn ? (
+      <button
+        type="button"
+        onClick={() => setWarnOpen(true)}
+        className="mb-2 flex min-h-[56px] w-full items-center gap-3 rounded-2xl border border-amber-300 bg-amber-50 px-4 text-left text-[16px] font-semibold text-amber-900 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/40"
+        data-testid="post-warn-block"
+      >
+        <ShieldBan size={20} aria-hidden />
+        <span className="flex-1">Warn or block {post.author.name}</span>
+        <ChevronRight size={20} aria-hidden />
+      </button>
+    ) : null}
+    {warnOpen ? (
+      <ConductSheet target={{ userId: post.author.id, name: post.author.name, place: 'post', postId: post.id }} onClose={() => setWarnOpen(false)} />
+    ) : null}
     <button
       type="button"
       onClick={() => reportPost(post)}
@@ -143,12 +178,15 @@ export const ReportPostRow: React.FC<{ post: CommunityFeedPost }> = ({ post }) =
       <span className="flex-1">Report post</span>
       <ChevronRight size={20} aria-hidden />
     </button>
+    </>
   );
 };
 
 /** ⋯ menu on someone else's post in the feed — Report post. (Your own posts keep Edit / Delete.) */
 export const ReportPostMenu: React.FC<{ post: CommunityFeedPost }> = ({ post }) => {
   const [open, setOpen] = useState(false);
+  const mayWarn = useMayWarnAuthor(post);
+  const [warnOpen, setWarnOpen] = useState(false);
   const menuId = useId();
   const ref = useRef<HTMLDivElement>(null);
 
@@ -204,7 +242,25 @@ export const ReportPostMenu: React.FC<{ post: CommunityFeedPost }> = ({ post }) 
             <Flag size={18} aria-hidden />
             Report post
           </button>
+          {mayWarn ? (
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                setWarnOpen(true);
+              }}
+              className="flex min-h-[48px] w-full items-center gap-3 px-4 text-left text-[15px] font-semibold text-amber-900 hover:bg-amber-50 focus:bg-amber-50 focus:outline-none"
+              data-testid="post-menu-warn-block"
+            >
+              <ShieldBan size={18} aria-hidden />
+              Warn or block author
+            </button>
+          ) : null}
         </div>
+      ) : null}
+      {warnOpen ? (
+        <ConductSheet target={{ userId: post.author.id, name: post.author.name, place: 'post', postId: post.id }} onClose={() => setWarnOpen(false)} />
       ) : null}
     </div>
   );
