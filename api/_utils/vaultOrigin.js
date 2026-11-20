@@ -512,3 +512,14 @@ export function buildVaultIntercessorsUrl(origin, q = {}) {
   if (q.to) url += `&to=${encodeURIComponent(q.to)}`;
   return url;
 }
+
+/**
+ * Issues (Account → Issues): report a problem / read the log on Canaan.
+ * @param {string} origin
+ * @param {'issue-report' | 'issues'} sub
+ */
+export function buildVaultCommunityChatIssuesUrl(origin, sub) {
+  if (sub !== 'issue-report' && sub !== 'issues') throw new Error('unknown issues route');
+  const base = String(origin || '').replace(/\/+$/, '');
+  return `${base}${VAULT_COMMUNITY_CHAT_BASE}&subResource=${sub}`;
+}

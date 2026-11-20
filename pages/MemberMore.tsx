@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { canViewIssues } from '../lib/issueReport';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ListGroup, ListRow } from '../components/ui/ListRow';
 import { GiveModule } from '../components/GiveModule';
@@ -128,6 +129,7 @@ const MORE_EMOJI: Record<string, string> = {
   'Open PLCC Canaan': '🔐',
   'Report a problem': '🛠️',
   'Report harassment or a scam': '🛡️',
+  Issues: '🩺',
 };
 
 const GROUP_LABEL: Record<MoreGroup, string> = {
@@ -151,6 +153,15 @@ export const MemberMePage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const showVault = canOpenVaultStaffLink(identity?.role);
+  // Issues (who had problems, why, the fix): church leaders only — Canaan decides.
+  const [leaderIssues, setLeaderIssues] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    void canViewIssues().then((ok) => alive && setLeaderIssues(ok));
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const items: MoreLink[] = [
     {
@@ -369,6 +380,17 @@ export const MemberMePage: React.FC = () => {
       label: 'Add to home screen',
       description: 'Put Tribes on your phone like an app',
       icon: Smartphone,
+    });
+  }
+
+  if (leaderIssues) {
+    items.push({
+      group: 'account',
+      kind: 'route',
+      to: '/issues',
+      label: 'Issues',
+      description: 'Who had problems in Tribes or Ka Link, why, and the fix',
+      icon: ShieldAlert,
     });
   }
 

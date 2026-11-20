@@ -122,6 +122,7 @@ const FamilyHuddleJoinPage = lazy(() =>
 const MemberDependentCardPage = lazy(() =>
   import('./pages/MemberDependentCard').then((m) => ({ default: m.MemberDependentCardPage }))
 );
+const IssuesPage = lazy(() => import('./pages/IssuesPage').then((m) => ({ default: m.IssuesPage })));
 const MemberKidsViewPage = lazy(() => import('./pages/MemberKidsView'));
 const MemberKidsPlansPage = lazy(() =>
   import('./pages/MemberKidsPlans').then((m) => ({ default: m.MemberKidsPlansPage }))
@@ -377,6 +378,16 @@ const AppShell: React.FC<{ hasSeenSplash: boolean; onSplashComplete: () => void 
             <MemberGate>
               <LazyRoute label="Opening today’s devotional…" sectionLabel="Daily">
                 <MemberDailyPage />
+              </LazyRoute>
+            </MemberGate>
+          }
+        />
+        <Route
+          path="/issues"
+          element={
+            <MemberGate>
+              <LazyRoute label="Loading issues…" sectionLabel="Issues">
+                <IssuesPage />
               </LazyRoute>
             </MemberGate>
           }

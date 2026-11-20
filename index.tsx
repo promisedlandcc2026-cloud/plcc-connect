@@ -1,4 +1,5 @@
 
+import { installCrashReporter } from './lib/issueReport';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -19,6 +20,9 @@ if (import.meta.env.PROD) window.addEventListener('load', () => void registerAle
 window.addEventListener('vite:preloadError', (event) => {
   if (reloadOnceForNewVersion()) event.preventDefault();
 });
+
+// Issues (Me → Issues): uncaught crashes are reported for church leaders.
+installCrashReporter();
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
