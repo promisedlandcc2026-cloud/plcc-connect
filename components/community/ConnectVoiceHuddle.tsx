@@ -1,4 +1,7 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ModeratorRoomBar, PersonActionsSheet } from '../huddle/HuddleModeratorTools';
+import { EMPTY_HUDDLE_STAGE, parseHuddleStageView, type HuddleStageView } from '../../lib/huddleStage';
+import { HuddleModerateError, moderateHuddle, type HuddleModerateAction } from '../../lib/huddleModerate';
 import { setCallActive } from '../../lib/staleBuild';
 import { ConductNoticeModal, ConductSheet } from '../conduct/ConductSheet';
 import { HUDDLE_CONDUCT_TOPIC, isConductTargetId, parseConductNotice, type ConductNotice, type ConductTarget } from '../../lib/memberConduct';
@@ -402,6 +405,11 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   const [chatSending, setChatSending] = useState(false);
   const [title, setTitle] = useState(channelName || 'Live Ka Link');
   const [canModerate, setCanModerate] = useState(false);
+  /** Moderator tools (same as Ka Link, Nov 20): mics start locked; mods unlock or let people speak. */
+  const [stage, setStage] = useState<HuddleStageView>(EMPTY_HUDDLE_STAGE);
+  const [modBusy, setModBusy] = useState(false);
+  const [modError, setModError] = useState<string | null>(null);
+  const [modTargetId, setModTargetId] = useState<string | null>(null);
   /** Warn / Block sheet (moderators) and the notice a warned/blocked member sees (Nov 19). */
   const [conductTarget, setConductTarget] = useState<ConductTarget | null>(null);
   const [conductNotice, setConductNotice] = useState<ConductNotice | null>(null);
@@ -412,7 +420,6 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   /** Set when this room is at its 50-seat cap: offer PLCC Sanctum's overflow room. */
   const [roomFull, setRoomFull] = useState<{ checking: boolean; overflow: SanctumOverflow | null } | null>(null);
   const [sheet, setSheet] = useState<'prayer' | 'guidelines' | null>(null);
-  const [peopleSearchOpen, setPeopleSearchOpen] = useState(false);
   const [peopleQuery, setPeopleQuery] = useState('');
   /** This device is playing the waiting music into the room. */
   const [musicPlaying, setMusicPlaying] = useState(false);
@@ -976,6 +983,11 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
           }
           onChange();
         })
+        // Moderators locked/unlocked mics or changed Bible readers (written by Canaan).
+        .on(RoomEvent.RoomMetadataChanged, (metadata: string) => {
+          if (roomRef.current !== room || !mountedRef.current) return;
+          setStage(parseHuddleStageView(metadata));
+        })
         .on(RoomEvent.DataReceived, (payload, participant, _kind, topic) => {
           // A moderator's warning / block comes from Canaan (no participant).
           if (topic === HUDDLE_CONDUCT_TOPIC) {
@@ -1156,6 +1168,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       }
       setMicEnabled(false);
       micEnabledRef.current = false;
+      setStage(parseHuddleStageView(room.metadata));
       // PLCC: Ka Links start with mics locked — tell members how to speak.
       if (!huddleMicrophonePublishAllowed(room.localParticipant.permissions)) setHostMuteNotice(TRIBES_MIC_LOCKED_NOTICE);
       // Video only for moderators and the Ka Link team (Pr. Grace); members join audio-only.
@@ -1723,6 +1736,35 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     [conn, ingestReaction, lastReactionSentAt, reactionBusy]
   );
 
+  /** Moderator action; refreshes the lock state from Canaan's answer. */
+  const moderate = useCallback(
+    async (action: HuddleModerateAction, targetIdentity?: string): Promise<boolean> => {
+      setModBusy(true);
+      setModError(null);
+      try {
+        const result = await moderateHuddle(channelId, action, targetIdentity);
+        if (action !== 'mute' && action !== 'unmute' && action !== 'lower-hand') {
+          setStage({ micLock: result.micLock, readerIds: result.readerIds });
+        }
+        return true;
+      } catch (err) {
+        const message = err instanceof Error && err.message ? err.message : 'That did not work. Please try again.';
+        setModError(message);
+        reportIssue({
+          area: 'huddle',
+          code: `huddle_mod_${action}_failed`.slice(0, 64),
+          status: err instanceof HuddleModerateError ? err.status : null,
+          message: message.slice(0, 300),
+          channelId,
+        });
+        return false;
+      } finally {
+        setModBusy(false);
+      }
+    },
+    [channelId]
+  );
+
   const sendChat = useCallback(async (text: string, reply?: HuddleChatReplyRef | null) => {
     const room = roomRef.current;
     if (!room) return;
@@ -1782,6 +1824,36 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
   const conductOverlays = (
     <>
       {conductTarget ? <ConductSheet target={conductTarget} onClose={() => setConductTarget(null)} /> : null}
+      {modTargetId && canModerate
+        ? (() => {
+            const t = tiles.find((x) => x.identity === modTargetId);
+            if (!t) return null;
+            return (
+              <PersonActionsSheet
+                target={{
+                  identity: t.identity,
+                  name: t.name,
+                  micOn: t.micOn,
+                  handRaised: t.handRaised,
+                  moderator: t.moderator || t.team === 'admin' || t.team === 'leader',
+                  reader: t.team === 'reader' || stage.readerIds.includes(t.identity),
+                }}
+                micLock={stage.micLock}
+                busy={modBusy}
+                error={modError}
+                onClose={() => setModTargetId(null)}
+                onAction={async (action) => {
+                  if (action === 'conduct') {
+                    setConductTarget({ userId: t.identity, name: t.name, place: 'call', channelId });
+                    setModTargetId(null);
+                    return;
+                  }
+                  if (await moderate(action, t.identity)) setModTargetId(null);
+                }}
+              />
+            );
+          })()
+        : null}
       {conductNotice ? (
         <ConductNoticeModal kind={conductNotice.t} reason={conductNotice.reason} onClose={() => setConductNotice(null)} />
       ) : null}
@@ -2411,6 +2483,16 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                       <Search size={16} aria-hidden className="opacity-60" />
                       <input value={peopleQuery} onChange={(e) => setPeopleQuery(e.target.value)} placeholder="Search participants…" aria-label="Search participants" />
                     </label>
+                    {canModerate ? (
+                      <ModeratorRoomBar
+                        micLock={stage.micLock}
+                        handsCount={raisedEntries.length}
+                        busy={modBusy}
+                        onToggleLock={() => void moderate(stage.micLock ? 'mic-unlock' : 'mic-lock')}
+                        onLowerAll={() => void moderate('lower-all-hands')}
+                      />
+                    ) : null}
+                    {canModerate && modError && !modTargetId ? <p className="pr-notice" role="alert">{modError}</p> : null}
                     {!prayerWatch && raisedEntries.length > 0 ? (
                       <button type="button" onClick={() => setActiveTab('hands')} className="pr-hands-btn">
                         <Hand size={15} aria-hidden /> {raisedEntries.length} hand{raisedEntries.length === 1 ? '' : 's'} raised — view
@@ -2420,10 +2502,25 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                       {peopleList.map((tile) => (
                         <li key={tile.identity} className="pr-person">
                           <span className={`pr-avatar ${tile.speaking && tile.micOn ? 'is-speaking' : ''}`}>{initials(tile.name)}</span>
-                          <span className="pr-person-name">
-                            {tile.name}
-                            {tile.isLocal ? ' (you)' : ''}
-                          </span>
+                          {canModerate && !tile.isLocal ? (
+                            <button
+                              type="button"
+                              className="pr-person-name text-left"
+                              onClick={() => {
+                                setModError(null);
+                                setModTargetId(tile.identity);
+                              }}
+                              aria-label={`Moderator options for ${tile.name}`}
+                              data-testid="huddle-person-open"
+                            >
+                              {tile.name}
+                            </button>
+                          ) : (
+                            <span className="pr-person-name">
+                              {tile.name}
+                              {tile.isLocal ? ' (you)' : ''}
+                            </span>
+                          )}
                           {tile.handRaised ? <Hand size={16} className="pr-hand" aria-label="Hand raised" /> : null}
                           {tile.speaking && tile.micOn ? (
                             <span className="pr-role is-speaking">Praying</span>
@@ -2651,6 +2748,18 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
 
         {conn === 'connected' ? (
           <div className="space-y-3">
+            {canModerate ? (
+              <div className="max-w-5xl mx-auto">
+                <ModeratorRoomBar
+                  micLock={stage.micLock}
+                  handsCount={raisedEntries.length}
+                  busy={modBusy}
+                  onToggleLock={() => void moderate(stage.micLock ? 'mic-unlock' : 'mic-lock')}
+                  onLowerAll={() => void moderate('lower-all-hands')}
+                />
+                {modError && !modTargetId ? <p className="text-xs text-red-300 mt-1" role="alert">{modError}</p> : null}
+              </div>
+            ) : null}
             {raisedNames.length > 0 && !prayerWatch ? (
               <div
                 className="sticky top-0 z-20 rounded-2xl bg-gold/15 border border-gold/40 px-3 py-2.5 backdrop-blur-md"

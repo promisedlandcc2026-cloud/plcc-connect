@@ -5,7 +5,6 @@ import { TribesMark } from '../tribes/TribesMark';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Bell, UserRound } from 'lucide-react';
-import { AWCLogo } from '../ui/AWCLogo';
 import { useAuth } from '../../context/AuthContext';
 import { daypartGreeting } from '../../lib/memberGreeting';
 import { fetchMemberHomeEvents } from '../../lib/memberHomeData';

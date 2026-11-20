@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Heart, Share2, Shield, Loader2, Sparkles, RefreshCcw, X, PenLine } from 'lucide-react';
+import { MessageSquare, Heart, Shield, Loader2, Sparkles, RefreshCcw, X, PenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { supabasePublic } from '../lib/supabasePublic';
 import { isPublicPrayerRow } from '../lib/memberHomeData';

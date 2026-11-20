@@ -25,6 +25,7 @@ import {
   parseHuddleLineCommand,
   parseVaultDailyTokenResponse,
   parseVaultHuddleLineResponse,
+  parseHuddleModerateCommand,
 } from '../_utils/communityChatSanitize.js';
 import {
   buildVaultCommunityChatChannelsUrl,
@@ -67,6 +68,7 @@ import {
 const UPSTREAM_TIMEOUT_MS = 15000;
 const TOKEN_UPSTREAM_TIMEOUT_MS = 20000;
 const ALLOWED_RESOURCES = new Set([
+  'huddle-moderate',
   'huddle-songs',
   'member-conduct',
   'issue-report',
@@ -415,6 +417,50 @@ async function handleBridge(req, res) {
       const answer = sanitizeMusicAnswer(command.action, body);
       if (!answer) return json(res, 502, { ok: false, code: 'invalid_upstream', message: 'Could not start the upload. Please try again.' });
       return json(res, 200, { ok: true, ...answer });
+    }
+
+    if (resource === 'huddle-moderate') {
+      // Phase 2 moderator tools. Canaan checks the caller really is a Ka Link moderator.
+      if (req.method !== 'POST') {
+        res.setHeader('Allow', 'POST');
+        return json(res, 405, { ok: false, code: 'method_not_allowed', message: 'Only POST is supported.' });
+      }
+      const parsedBody = parseJsonBody(req);
+      const command = parseHuddleModerateCommand(parsedBody.ok ? parsedBody.body : null);
+      if (!command) {
+        return json(res, 400, { ok: false, code: 'invalid_body', message: 'That request was not valid.' });
+      }
+      const upstream = await fetch(buildVaultCommunityChatIssuesUrl(originResult.origin, command.subResource), {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${auth.token}`,
+        },
+        body: JSON.stringify(command.forward),
+        signal: controller.signal,
+        redirect: 'error',
+      });
+      const body = await upstream.json().catch(() => null);
+      if (!upstream.ok) {
+        // Canaan's moderator errors are written for people ("That person is not in the Ka Link").
+        if ([400, 403, 404, 503].includes(upstream.status) && typeof body?.error === 'string') {
+          return json(res, upstream.status, {
+            ok: false,
+            code: upstream.status === 403 ? 'forbidden' : 'moderate_failed',
+            message: body.error.replace(/[\u0000-\u001f]/g, ' ').slice(0, 160),
+          });
+        }
+        return mapUpstreamError(res, upstream.status, 'Only Ka Link moderators can do that.');
+      }
+      return json(res, 200, {
+        ok: true,
+        action: command.action,
+        micLock: body?.micLock === true,
+        readerIds: Array.isArray(body?.readerIds)
+          ? body.readerIds.filter((id) => typeof id === 'string' && id.length <= 128).slice(0, 12)
+          : [],
+      });
     }
 
     if (resource === 'member-conduct') {
