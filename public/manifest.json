@@ -1,40 +1,40 @@
 {
-    "short_name": "Tribes",
-    "name": "Tribes — Promised Land Christian Center",
-    "icons": [
-        {
-            "src": "/favicon.png",
-            "sizes": "64x64 32x32 24x24 16x16",
-            "type": "image/png"
-        },
-        {
-            "src": "/icon-192.png",
-            "type": "image/png",
-            "sizes": "192x192",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-512.png",
-            "type": "image/png",
-            "sizes": "512x512",
-            "purpose": "any"
-        },
-        {
-            "src": "/icon-512.png",
-            "type": "image/png",
-            "sizes": "512x512",
-            "purpose": "maskable"
-        }
-    ],
-    "start_url": ".",
-    "display": "standalone",
-    "theme_color": "#0e1512",
-    "background_color": "#0e1512",
-    "id": "/",
-    "related_applications": [
-        {
-            "platform": "webapp",
-            "url": "https://plcc-connect.vercel.app/manifest.json"
-        }
-    ]
+  "short_name": "Tribes",
+  "name": "Tribes — Promised Land Christian Center",
+  "icons": [
+    {
+      "src": "/favicon.png?v=3",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-192.png?v=3",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png?v=3",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png?v=3",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0e1512",
+  "background_color": "#0e1512",
+  "id": "/",
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "https://plcc-connect.vercel.app/manifest.json"
+    }
+  ]
 }
