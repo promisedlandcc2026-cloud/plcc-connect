@@ -28,7 +28,7 @@ export async function moderateHuddle(
   channelId: string,
   action: HuddleModerateAction,
   targetIdentity?: string
-): Promise<{ micLock: boolean; readerIds: string[] }> {
+): Promise<{ micLock: boolean; readerIds: string[]; asked: boolean }> {
   const token = (await supabase.auth.getSession()).data.session?.access_token;
   if (!token) throw new HuddleModerateError('Please sign in again.', 401);
   const res = await fetch('/api/community-chat?resource=huddle-moderate', {
@@ -43,5 +43,7 @@ export async function moderateHuddle(
   return {
     micLock: b.micLock === true,
     readerIds: Array.isArray(b.readerIds) ? b.readerIds.filter((id: unknown) => typeof id === 'string') : [],
+    /** Unmute: LiveKit won't switch someone's mic on, so they were asked to (Nov 20 2026). */
+    asked: b.asked === true,
   };
 }
