@@ -1,4 +1,5 @@
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { setCallActive } from '../../lib/staleBuild';
 import { ConductNoticeModal, ConductSheet } from '../conduct/ConductSheet';
 import { HUDDLE_CONDUCT_TOPIC, isConductTargetId, parseConductNotice, type ConductNotice, type ConductTarget } from '../../lib/memberConduct';
 import {
@@ -1359,6 +1360,18 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       }),
     [logActivity]
   );
+
+  // In a call: an app update must not reload the page (it hung up the call the first time
+  // someone opened the Bible after a deploy). Load the Bible now, from this same version.
+  const inCall = conn === 'connected' || conn === 'reconnecting' || conn === 'connecting';
+  useEffect(() => {
+    if (!inCall) return;
+    setCallActive(true);
+    return () => setCallActive(false);
+  }, [inCall]);
+  useEffect(() => {
+    void import('../../pages/MemberBible').catch(() => undefined);
+  }, []);
 
   const leave = useCallback(async () => {
     if (roomRef.current) logActivity('huddle_left');
