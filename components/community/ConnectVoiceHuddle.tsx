@@ -178,6 +178,9 @@ import {
 /** Rejoin waits after a drop: quick first, then slower so a phone coming back has time. */
 const TRIBES_RECONNECT_DELAYS_MS = [600, 1500, 3000, 5000, 8000, 12000, 20000, 30000];
 
+/** PLCC (Nov 19): every Ka Link starts with mics locked; mods and up let people speak. */
+const TRIBES_MIC_LOCKED_NOTICE = 'Mics are locked. Raise your hand and a moderator will let you speak.';
+
 const JOIN_WATCHDOG_MS = 35_000;
 const JOIN_STALLED_MESSAGE = "Couldn't reconnect to the Ka Link. Tap Reload to rejoin.";
 
@@ -1152,6 +1155,8 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       }
       setMicEnabled(false);
       micEnabledRef.current = false;
+      // PLCC: Ka Links start with mics locked — tell members how to speak.
+      if (!huddleMicrophonePublishAllowed(room.localParticipant.permissions)) setHostMuteNotice(TRIBES_MIC_LOCKED_NOTICE);
       // Video only for moderators and the Ka Link team (Pr. Grace); members join audio-only.
       const mayUseCamera = Boolean(tokenPayload.canModerate) || teamMayUseVideo(participantTeam(room.localParticipant));
       if (camEnabled && mayUseCamera) {
@@ -1415,7 +1420,7 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
     if (next && !huddleMicrophonePublishAllowed(room.localParticipant.permissions)) {
       setMicEnabled(false);
       micEnabledRef.current = false;
-      setHostMuteNotice(HUDDLE_HOST_MUTE_NOTICE);
+      setHostMuteNotice(TRIBES_MIC_LOCKED_NOTICE);
       return;
     }
     selfMuteIntentRef.current = true;
