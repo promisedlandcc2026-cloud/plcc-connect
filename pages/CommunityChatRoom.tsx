@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { ArrowLeft, Loader2, Radio, Send, ShieldBan } from 'lucide-react';
+import { ArrowLeft, Loader2, Phone, Radio, Send, ShieldBan, Video } from 'lucide-react';
+import { useDmCall } from '../context/DmCallContext';
+import { wantsAnswerFromUrl } from '../lib/dmCall';
 import { ConductSheet } from '../components/conduct/ConductSheet';
 import { canModerateConduct, isConductTargetId, type ConductTarget } from '../lib/memberConduct';
 import { useAuth } from '../context/AuthContext';
@@ -85,6 +87,23 @@ export const CommunityChatRoomPage: React.FC = () => {
     locState.channelName ||
     dmDisplayName(channelId, '') ||
     (isDm ? 'Direct message' : 'Channel');
+
+  /** Private voice / video calls (DMs only, every member). */
+  const dmCall = useDmCall();
+  const callBusy = Boolean(dmCall && dmCall.call.phase !== 'idle' && dmCall.call.phase !== 'ended');
+  const placeCall = (video: boolean) => {
+    if (!dmCall || !validChannel) return;
+    void dmCall.startCall({ channelId, partnerName: roomTitle, video });
+  };
+  // Opened from a "… is calling you" phone alert: show the ringing screen if it still rings.
+  const checkIncomingRef = useRef(dmCall?.checkIncoming);
+  checkIncomingRef.current = dmCall?.checkIncoming;
+  useEffect(() => {
+    if (!isDm || !validChannel || memberAccessState !== 'approved_member') return;
+    if (!wantsAnswerFromUrl(location.search)) return;
+    void checkIncomingRef.current?.(channelId, roomTitle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channelId, isDm, memberAccessState, validChannel, location.search]);
 
   const load = useCallback(
     async (opts?: { quiet?: boolean }) => {
@@ -276,6 +295,32 @@ export const CommunityChatRoomPage: React.FC = () => {
           <ArrowLeft size={18} aria-hidden />
           Channels
         </Link>
+        {isDm && dmCall ? (
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => placeCall(false)}
+              disabled={callBusy}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-burgundy rounded-xl active:bg-burgundy/10 disabled:opacity-40"
+              aria-label={`Voice call ${roomTitle}`}
+              title="Voice call"
+              data-dm-call="voice"
+            >
+              <Phone size={19} aria-hidden />
+            </button>
+            <button
+              type="button"
+              onClick={() => placeCall(true)}
+              disabled={callBusy}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-burgundy rounded-xl active:bg-burgundy/10 disabled:opacity-40"
+              aria-label={`Video call ${roomTitle}`}
+              title="Video call"
+              data-dm-call="video"
+            >
+              <Video size={20} aria-hidden />
+            </button>
+          </div>
+        ) : null}
         {!isDm && !huddleLive && !huddleOpen ? (
           <button
             type="button"

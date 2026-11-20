@@ -7,6 +7,7 @@ import { NotificationsProvider } from './context/NotificationsContext';
 import BirthdayPopup from './components/BirthdayPopup';
 import { SeasonThemeProvider } from './components/season/SeasonThemeProvider';
 import { HuddleLiveProvider } from './context/HuddleLiveContext';
+import { DmCallProvider } from './context/DmCallContext';
 import { MemberGate } from './components/auth/MemberGate';
 import { LazyRoute } from './components/routing/LazyRoute';
 import { ArkHandoff } from './components/routing/ArkHandoff';
@@ -586,11 +587,14 @@ const App: React.FC = () => {
         <SeasonThemeProvider>
           <NotificationsProvider>
             <HuddleLiveProvider>
-              <AppShell
-                hasSeenSplash={hasSeenSplash}
-                onSplashComplete={() => setHasSeenSplash(true)}
-              />
-              <ReportHost />
+              {/* Private calls in DMs (voice / video): rings anywhere in the app. */}
+              <DmCallProvider>
+                <AppShell
+                  hasSeenSplash={hasSeenSplash}
+                  onSplashComplete={() => setHasSeenSplash(true)}
+                />
+                <ReportHost />
+              </DmCallProvider>
             </HuddleLiveProvider>
           </NotificationsProvider>
         </SeasonThemeProvider>

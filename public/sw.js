@@ -24,14 +24,23 @@ self.addEventListener('push', (event) => {
     data = { body: event.data ? event.data.text() : '' };
   }
   const title = String(data.title || 'Tribes').slice(0, 80);
+  // Incoming private call: the open app already rings on screen, so only alert when it isn't open.
+  const isCall = String(data.tag || '').startsWith('call:');
   event.waitUntil(
-    self.registration.showNotification(title, {
-      body: String(data.body || '').slice(0, 200),
-      icon: '/icon-192.png',
-      badge: '/icon-192.png',
-      tag: data.tag ? String(data.tag).slice(0, 100) : undefined,
-      data: { url: safeUrl(data.url) },
-    })
+    (async () => {
+      if (isCall) {
+        const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        if (windows.some((c) => c.visibilityState === 'visible')) return undefined;
+      }
+      return self.registration.showNotification(title, {
+        body: String(data.body || '').slice(0, 200),
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
+        tag: data.tag ? String(data.tag).slice(0, 100) : undefined,
+        ...(isCall ? { renotify: true, requireInteraction: true, vibrate: [400, 150, 400, 150, 400] } : {}),
+        data: { url: safeUrl(data.url) },
+      });
+    })()
   );
 });
 

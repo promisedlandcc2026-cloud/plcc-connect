@@ -516,10 +516,10 @@ export function buildVaultIntercessorsUrl(origin, q = {}) {
 /**
  * Issues (Account → Issues): report a problem / read the log on Canaan.
  * @param {string} origin
- * @param {'issue-report' | 'issues' | 'member-conduct' | 'ka-link-songs'} sub
+ * @param {'dm-call' | 'issue-report' | 'issues' | 'member-conduct' | 'ka-link-songs'} sub
  */
 export function buildVaultCommunityChatIssuesUrl(origin, sub) {
-  const ok = ['issue-report', 'issues', 'member-conduct', 'ka-link-songs', 'voice-participant-mute', 'voice-hand-lower', 'voice-huddle-stage'];
+  const ok = ['dm-call', 'issue-report', 'issues', 'member-conduct', 'ka-link-songs', 'voice-participant-mute', 'voice-hand-lower', 'voice-huddle-stage'];
   if (!ok.includes(sub)) throw new Error('unknown route');
   const base = String(origin || '').replace(/\/+$/, '');
   return `${base}${VAULT_COMMUNITY_CHAT_BASE}&subResource=${sub}`;
