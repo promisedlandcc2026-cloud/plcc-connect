@@ -63,4 +63,22 @@ describe('Tribes private calls', () => {
     assert.match(ctx, /addEventListener\('visibilitychange', onVisible\)/);
     assert.match(ctx, /setInterval\(\(\) => void checkPending\(\), 20_000\)/);
   });
+
+  it('a call can be minimized or floated over other apps', () => {
+    const screen = read('components/call/DmCallScreen.tsx');
+    assert.match(screen, /data-testid="call-minimize"/);
+    assert.match(screen, /data-testid="call-float"/);
+    const pip = read('components/call/CallPip.tsx');
+    assert.match(pip, /autopictureinpicture/);
+    assert.match(pip, /set\('hangup', ctx\.hangUp\)/);
+    assert.match(read('context/DmCallContext.tsx'), /<CallPip \/>/);
+  });
+
+  it('the bottom bar has Apps: Ka Link (signed in), Canaan for staff, all PLCC apps', () => {
+    assert.match(read('components/MemberNav.tsx'), /data-testid="dock-apps"/);
+    const sheet = read('components/AppsSheet.tsx');
+    assert.match(sheet, /awcChatSignedInUrl\('\/community\/chat'\)/);
+    assert.match(sheet, /canOpenVaultStaffLink\(identity\?\.role\)/);
+    assert.match(sheet, /if \(isCallActive\(\)\) window\.open\(url, '_blank', 'noopener'\)/);
+  });
 });

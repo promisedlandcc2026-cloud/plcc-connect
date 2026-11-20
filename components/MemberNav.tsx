@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Calendar,
   HandHeart,
   Home,
+  LayoutGrid,
   UserRound,
   Users,
   type LucideIcon,
@@ -12,6 +13,7 @@ import { useNotifications } from '../context/NotificationsContext';
 import { useAuth } from '../context/AuthContext';
 import { useHuddleLive } from '../context/HuddleLiveContext';
 import { HuddleLiveDot } from './huddle/HuddleLiveDot';
+import { AppsSheet } from './AppsSheet';
 import { showDock, useDockHidden } from '../lib/dockAutoHide';
 import {
   prefetchCommunityChunks,
@@ -95,7 +97,7 @@ const ITEMS: MemberNavItem[] = [
 ];
 
 /**
- * Member bottom bar — Home · Community · Events · Prayer · Me — PLCC Tribes style:
+ * Member bottom bar — Home · Community · Events · Prayer · Me · Apps — PLCC Tribes style:
  * a light ivory bar along the bottom of the app column, forest-green icons with
  * their names, and a gold underline under the tab you're on. Hides while you
  * scroll down and comes back when you scroll up or tap into it (same as before).
@@ -107,6 +109,7 @@ export const MemberNav: React.FC = () => {
   const avatarUrl = identity?.avatarUrl || null;
   const { anyLive } = useHuddleLive();
   const dockHidden = useDockHidden();
+  const [appsOpen, setAppsOpen] = useState(false);
 
   return (
     <div
@@ -177,7 +180,20 @@ export const MemberNav: React.FC = () => {
             </Link>
           );
         })}
+        {/* Apps: one tap to Ka Link (signed in), Canaan (staff) or all PLCC apps. */}
+        <button
+          type="button"
+          onClick={() => setAppsOpen(true)}
+          aria-haspopup="dialog"
+          title="Apps"
+          data-testid="dock-apps"
+          className="awc-dock-tab relative flex min-h-[64px] min-w-0 basis-0 grow flex-col items-center justify-center gap-1 pt-1.5 pb-2 text-[#5B6658] hover:text-[#12301f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C9A35A] active:bg-[#1d372c]/[0.05]"
+        >
+          <LayoutGrid size={23} strokeWidth={1.8} aria-hidden />
+          <span aria-hidden className="max-w-full truncate text-[12px] leading-none tracking-[-0.01em] font-semibold">Apps</span>
+        </button>
       </nav>
+      {appsOpen ? <AppsSheet onClose={() => setAppsOpen(false)} /> : null}
     </div>
   );
 };
