@@ -401,7 +401,7 @@ describe('Connect Ka Link bridge + UI wiring', () => {
     assert.ok(list.includes('openDirectMessage'));
     const huddleCtx = readFileSync(join(root, 'context/HuddleLiveContext.tsx'), 'utf8');
     assert.ok(huddleCtx.includes('fetchHuddleStatuses'));
-    assert.ok(huddleCtx.includes('10_000'));
+    assert.ok(huddleCtx.includes('20_000')) // Nov 20 2026: LIVE dots every 20s (lighter on the database);
     const nav = readFileSync(join(root, 'components/MemberNav.tsx'), 'utf8');
     assert.ok(nav.includes('showHuddleLive'));
     assert.ok(nav.includes('HuddleLiveDot'));

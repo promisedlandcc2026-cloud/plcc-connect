@@ -61,7 +61,7 @@ describe('Tribes private calls', () => {
     assert.match(ctx, /status === 'CHANNEL_ERROR' \|\| status === 'TIMED_OUT' \|\| status === 'CLOSED'/);
     assert.match(ctx, /fetchPendingCall\(\)/);
     assert.match(ctx, /addEventListener\('visibilitychange', onVisible\)/);
-    assert.match(ctx, /setInterval\(\(\) => void checkPending\(\), 20_000\)/);
+    assert.match(ctx, /setInterval\(\(\) => void checkPending\(\), 30_000\)/);
   });
 
   it('a call can be minimized or floated over other apps', () => {
