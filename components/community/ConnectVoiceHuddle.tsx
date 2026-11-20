@@ -1769,8 +1769,9 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
       ) : null}
     </>
   );
-  const warnButton = (tile: { identity: string; name: string; isLocal: boolean; moderator: boolean }, className: string) =>
-    canModerate && !tile.isLocal && !tile.moderator && isConductTargetId(tile.identity) ? (
+  const warnButton = (tile: { identity: string; name: string; isLocal: boolean; moderator: boolean; team?: string | null }, className: string) =>
+    // Mods and Ka Link leaders/admins can't be warned (Canaan refuses too).
+    canModerate && !tile.isLocal && !tile.moderator && tile.team !== 'admin' && tile.team !== 'leader' && isConductTargetId(tile.identity) ? (
       <button
         type="button"
         onClick={() => setConductTarget({ userId: tile.identity, name: tile.name, place: 'call', channelId })}
