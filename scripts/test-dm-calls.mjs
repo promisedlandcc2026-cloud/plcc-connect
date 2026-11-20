@@ -15,7 +15,7 @@ describe('Tribes private calls', () => {
   it('the bridge passes dm-call through to Canaan with a fixed shape', async () => {
     const bridge = read('api/_community/community-chat.js');
     assert.match(bridge, /'dm-call',\n  'huddle-moderate'/);
-    assert.match(bridge, /\['inbox', 'ring', 'join', 'decline', 'end', 'status'\]\.includes\(action\)/);
+    assert.match(bridge, /\['inbox', 'pending', 'ring', 'join', 'decline', 'end', 'status'\]\.includes\(action\)/);
     const { buildVaultCommunityChatIssuesUrl } = await import('../api/_utils/vaultOrigin.js');
     assert.match(buildVaultCommunityChatIssuesUrl('https://canaan.example', 'dm-call'), /subResource=dm-call$/);
   });
@@ -53,5 +53,14 @@ describe('Tribes private calls', () => {
     for (const f of ['lib/dmCall.ts', 'lib/callTone.ts', 'components/call/DmCallScreen.tsx']) {
       assert.ok(read(f).length > 500, f);
     }
+  });
+
+  it('a missed ring ping still rings: retries the call topic and checks for a ringing call', () => {
+    const ctx = read('context/DmCallContext.tsx');
+    assert.match(ctx, /retryLater\(\)/);
+    assert.match(ctx, /status === 'CHANNEL_ERROR' \|\| status === 'TIMED_OUT' \|\| status === 'CLOSED'/);
+    assert.match(ctx, /fetchPendingCall\(\)/);
+    assert.match(ctx, /addEventListener\('visibilitychange', onVisible\)/);
+    assert.match(ctx, /setInterval\(\(\) => void checkPending\(\), 20_000\)/);
   });
 });
