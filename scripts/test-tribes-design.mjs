@@ -74,15 +74,22 @@ describe('Scripture posts', async () => {
 });
 
 describe('PLCC Tribes look (v2)', () => {
+  it('Red Earth & Gold theme is on for the whole app', () => {
+    assert.match(read('index.html'), /<html lang="en" class="tribes-dark">/);
+    const css = read('index.css');
+    assert.match(css, /html\.tribes-dark \.bg-white,/);
+    assert.match(css, /html\.tribes-dark :is\(button, a\)\.bg-burgundy/);
+    assert.match(read('components/MemberNav.tsx'), /text-\[#F4B23E\]/);
+  });
   it('woven hero artwork is small enough for mobile data', async () => {
     const { statSync } = await import('node:fs');
     assert.ok(statSync(join(root, 'public/brand/tribes-hero.webp')).size < 90_000);
     assert.match(read('index.css'), /\.tribes-hero \{[\s\S]*url\('\/brand\/tribes-hero\.webp'\)/);
   });
-  it('weekday Home: forest bar with the mark, woven greeting, light content; Sunday live keeps the evening shell', () => {
+  it('weekday Home (Red Earth & Gold): bar with the mark and Tribes wordmark, Luganda + English greeting; Sunday live keeps the evening shell', () => {
     const h = read('components/member/MemberHomeHeader.tsx');
-    assert.match(h, /tribes-bar[\s\S]*<TribesMark[\s\S]*PLCC Tribes/);
-    assert.match(h, /tribes-hero[\s\S]*<StainedGlassGreeting/);
+    assert.match(h, /tribes-bar[\s\S]*<TribesMark[\s\S]*>Tribes<[\s\S]*PROMISED LAND CC/);
+    assert.match(h, /tribes-hero[\s\S]*lugandaGreeting\(now\)[\s\S]*memberHomeGreeting\(/);
     assert.match(h, /<TodayStories tone="light" \/>[\s\S]*<LiveHuddles tone="light" \/>/);
     assert.match(h, /if \(live\) \{[\s\S]*<SundayLiveHome/);
     assert.match(read('components/member/MemberHome.tsx'), /live \? 'awc-home-shell' : 'tribes-home'/);

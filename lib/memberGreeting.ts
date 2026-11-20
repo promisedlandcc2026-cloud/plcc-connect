@@ -34,3 +34,11 @@ export function memberHomeGreeting(
   if (!first) return 'Welcome back';
   return `${daypartGreeting(now)}, ${first}`;
 }
+
+/**
+ * Luganda greeting shown above the English one on Tribes Home:
+ * "Wasuze otya" in the morning, "Osiibye otya" from noon on.
+ */
+export function lugandaGreeting(now: Date = new Date()): string {
+  return now.getHours() < 12 ? 'Wasuze otya' : 'Osiibye otya';
+}

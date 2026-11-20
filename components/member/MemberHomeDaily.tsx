@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ChevronRight } from 'lucide-react';
+import { TribesMark } from '../tribes/TribesMark';
 import { fetchDailyWeek, localToday, type DailyDay } from '../../lib/dailyClient';
 
 /** Home: today's devotional at a glance — opens the Daily page. */
@@ -21,20 +22,23 @@ export const MemberHomeDaily: React.FC = () => {
   return (
     <Link
       to="/daily"
-      className="group flex items-center gap-4 rounded-2xl bg-white border border-gray-100 shadow-card px-4 py-4 min-h-[84px] active:scale-[0.99] transition-transform"
+      className="tribes-gold-card group relative block overflow-hidden rounded-[26px] bg-[#F4B23E] px-5 pb-5 pt-5 active:scale-[0.99] transition-transform motion-reduce:transition-none"
       aria-label={day ? `Today’s devotional: ${day.title}, ${day.ref}. Open Daily.` : 'Open today’s devotional'}
     >
-      <span className="h-12 w-12 shrink-0 rounded-2xl bg-burgundy text-[#F2D98A] flex items-center justify-center">
-        <BookOpen size={22} aria-hidden />
-      </span>
-      <span className="flex-1 min-w-0">
-        <span className="block text-xs font-black uppercase tracking-[0.18em] text-gold-ink">Today’s devotional</span>
-        <span className="block font-display text-[19px] leading-tight font-bold text-ink truncate">
-          {day ? day.title : 'Start the day in the Word'}
+      <TribesMark className="pointer-events-none absolute -bottom-7 -right-5 h-36 w-auto opacity-[0.14]" />
+      <span className="relative flex items-center justify-between gap-2">
+        <span className="text-[11px] font-extrabold uppercase tracking-[0.2em]">Word for today</span>
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[#1A120C]/10">
+          <BookOpen size={18} aria-hidden />
         </span>
-        <span className="block text-sm text-ink-muted truncate">{day ? `${day.ref} · About 4 minutes` : 'A short reading, a reflection, and a prayer'}</span>
       </span>
-      <ChevronRight size={22} className="text-ink-soft shrink-0" aria-hidden />
+      <span className="relative mt-3 block font-display text-[25px] font-bold leading-[1.12]">
+        {day ? day.title : 'Start the day in the Word'}
+      </span>
+      <span className="relative mt-2 flex items-center justify-between gap-2 text-[13px] font-bold">
+        <span className="truncate">{day ? `${day.ref} · About 4 minutes` : 'A short reading, a reflection, and a prayer'}</span>
+        <ChevronRight size={20} className="shrink-0" aria-hidden />
+      </span>
     </Link>
   );
 };

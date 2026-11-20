@@ -9,12 +9,13 @@ import { bookById } from './bibleBooks';
 export const HIGHLIGHT_COLORS = ['gold', 'rose', 'blue', 'green'] as const;
 export type HighlightColor = (typeof HIGHLIGHT_COLORS)[number];
 
-/** Background tints; each also differs in lightness so they read apart without color. */
+/** Deep tints for the dark (Red Earth & Gold) reader: ivory text stays readable on each,
+ *  and each differs in lightness so they read apart without color. */
 export const HIGHLIGHT_BG: Record<HighlightColor, string> = {
-  gold: '#E8D8B2',
-  rose: '#F3C6CF',
-  blue: '#BFD8F2',
-  green: '#C9E7CF',
+  gold: '#7A5414',
+  rose: '#6A2F45',
+  blue: '#2E3A78',
+  green: '#1F4F3C',
 };
 export const HIGHLIGHT_LABEL: Record<HighlightColor, string> = {
   gold: 'Gold',

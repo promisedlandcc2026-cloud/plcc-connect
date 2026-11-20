@@ -97,9 +97,9 @@ const ITEMS: MemberNavItem[] = [
 ];
 
 /**
- * Member bottom bar — Home · Community · Events · Prayer · Me · Apps — PLCC Tribes style:
- * a light ivory bar along the bottom of the app column, forest-green icons with
- * their names, and a gold underline under the tab you're on. Hides while you
+ * Member bottom bar — Home · Community · Events · Prayer · Me · Apps — Red Earth & Gold:
+ * a floating charcoal dock above the bottom edge, warm-grey icons with their
+ * names, and gold for the tab you're on. Hides while you
  * scroll down and comes back when you scroll up or tap into it (same as before).
  */
 export const MemberNav: React.FC = () => {
@@ -118,8 +118,9 @@ export const MemberNav: React.FC = () => {
         dockHidden ? 'translate-y-full' : 'translate-y-0'
       }`}
     >
+      <div className="px-3 pb-[max(12px,env(safe-area-inset-bottom))]">
       <nav
-        className="awc-dock pointer-events-auto flex items-stretch px-1 pb-[env(safe-area-inset-bottom)]"
+        className="awc-dock pointer-events-auto flex items-stretch px-1"
         aria-label="Member navigation"
       >
         {ITEMS.map((item) => {
@@ -144,8 +145,8 @@ export const MemberNav: React.FC = () => {
               onFocus={() => item.onPrefetch?.()}
               onMouseEnter={() => item.onPrefetch?.()}
               onTouchStart={() => item.onPrefetch?.()}
-              className={`awc-dock-tab relative flex min-h-[64px] min-w-0 basis-0 ${item.label.length > 7 ? 'grow-[1.3]' : 'grow'} flex-col items-center justify-center gap-1 pt-1.5 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C9A35A] active:bg-[#1d372c]/[0.05] ${
-                active ? 'text-[#12301f]' : 'text-[#5B6658] hover:text-[#12301f]'
+              className={`awc-dock-tab relative flex min-h-[64px] min-w-0 basis-0 ${item.label.length > 7 ? 'grow-[1.3]' : 'grow'} flex-col items-center justify-center gap-1 pt-1.5 pb-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F4B23E] active:bg-white/[0.04] ${
+                active ? 'text-[#F4B23E]' : 'text-[#BBA898] hover:text-[#F7EFE6]'
               }`}
             >
               <span className="relative inline-flex shrink-0 items-center justify-center">
@@ -153,7 +154,7 @@ export const MemberNav: React.FC = () => {
                   <img
                     src={avatarUrl}
                     alt=""
-                    className={`h-[24px] w-[24px] rounded-full object-cover ${active ? 'ring-2 ring-[#C9A35A]' : 'ring-1 ring-[#D9CDB4]'}`}
+                    className={`h-[24px] w-[24px] rounded-full object-cover ${active ? 'ring-2 ring-[#F4B23E]' : 'ring-1 ring-white/20'}`}
                   />
                 ) : (
                   <Icon size={23} strokeWidth={active ? 2.2 : 1.8} aria-hidden />
@@ -164,7 +165,7 @@ export const MemberNav: React.FC = () => {
                   </span>
                 ) : null}
                 {showBadge ? (
-                  <span className="absolute -right-3 -top-1.5 min-w-[20px] h-5 px-1 rounded-full bg-[#C9A35A] text-[#12231c] text-xs font-extrabold leading-5 text-center ring-2 ring-[#FBF7EE]">
+                  <span className="absolute -right-3 -top-1.5 min-w-[20px] h-5 px-1 rounded-full bg-[#FF7A5C] text-[#15100D] text-xs font-extrabold leading-5 text-center ring-2 ring-[#211915]">
                     {unreadBadge}
                   </span>
                 ) : null}
@@ -175,7 +176,7 @@ export const MemberNav: React.FC = () => {
               </span>
               <span
                 aria-hidden
-                className={`awc-dock-mark absolute bottom-1 h-[3px] rounded-full bg-[#C9A35A] ${active ? 'w-8 opacity-100' : 'w-0 opacity-0'}`}
+                className={`awc-dock-mark absolute bottom-1.5 h-[3px] rounded-full bg-[#F4B23E] ${active ? 'w-8 opacity-100' : 'w-0 opacity-0'}`}
               />
             </Link>
           );
@@ -187,12 +188,13 @@ export const MemberNav: React.FC = () => {
           aria-haspopup="dialog"
           title="Apps"
           data-testid="dock-apps"
-          className="awc-dock-tab relative flex min-h-[64px] min-w-0 basis-0 grow flex-col items-center justify-center gap-1 pt-1.5 pb-2 text-[#5B6658] hover:text-[#12301f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C9A35A] active:bg-[#1d372c]/[0.05]"
+          className="awc-dock-tab relative flex min-h-[64px] min-w-0 basis-0 grow flex-col items-center justify-center gap-1 pt-1.5 pb-2 text-[#BBA898] hover:text-[#F7EFE6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#F4B23E] active:bg-white/[0.04]"
         >
           <LayoutGrid size={23} strokeWidth={1.8} aria-hidden />
           <span aria-hidden className="max-w-full truncate text-[12px] leading-none tracking-[-0.01em] font-semibold">Apps</span>
         </button>
       </nav>
+      </div>
       {appsOpen ? <AppsSheet onClose={() => setAppsOpen(false)} /> : null}
     </div>
   );

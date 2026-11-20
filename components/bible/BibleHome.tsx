@@ -243,16 +243,16 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, nivRe
             </span>
           </button>
 
-          <section aria-labelledby="votd" className="rounded-3xl bg-white border border-[#EFE7D6] p-5 shadow-card">
+          <section aria-labelledby="votd" className="tribes-gold-card relative overflow-hidden rounded-[26px] bg-[#F4B23E] p-5">
             <div className="flex items-center justify-between">
-              <h2 id="votd" className="text-[13px] font-bold text-gold-ink">
+              <h2 id="votd" className="text-[11px] font-extrabold uppercase tracking-[0.2em] text-gold-ink">
                 Verse of the day
               </h2>
-              <button type="button" onClick={() => void shareVotd()} aria-label="Share verse of the day" className="h-10 w-10 -mr-1 rounded-full bg-eggshell inline-flex items-center justify-center text-burgundy">
+              <button type="button" onClick={() => void shareVotd()} aria-label="Share verse of the day" className="h-10 w-10 -mr-1 rounded-full bg-[#1A120C]/10 inline-flex items-center justify-center text-burgundy">
                 <Share2 size={16} aria-hidden />
               </button>
             </div>
-            <p className="mt-2.5 font-display text-[21px] italic font-semibold leading-snug text-wine-night">“{votdVerse}”</p>
+            <p className="mt-2.5 font-display text-[24px] font-bold leading-[1.15] text-wine-night">“{votdVerse}”</p>
             {votdRef ? (
               <button
                 type="button"

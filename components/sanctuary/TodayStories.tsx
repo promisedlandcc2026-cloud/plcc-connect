@@ -49,7 +49,7 @@ const ctaClass =
 /** tone: 'dark' on the evening shell (default), 'light' on PLCC Tribes' ivory Home. */
 export const TodayStories: React.FC<{ visitor?: boolean; tone?: 'dark' | 'light' }> = ({ visitor = false, tone = 'dark' }) => {
   const labelTone = tone === 'light' ? 'text-[#12231c]' : 'text-cream';
-  const discTone = tone === 'light' ? 'bg-[#12301f]' : 'bg-wine';
+  const discTone = tone === 'light' ? 'bg-[#211915]' : 'bg-wine';
   const navigate = useNavigate();
   const location = useLocation();
   const [seen, setSeen] = useState<Record<string, string>>(readSeen);
