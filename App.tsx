@@ -8,6 +8,7 @@ import BirthdayPopup from './components/BirthdayPopup';
 import { SeasonThemeProvider } from './components/season/SeasonThemeProvider';
 import { HuddleLiveProvider } from './context/HuddleLiveContext';
 import { DmCallProvider } from './context/DmCallContext';
+import { UpdateBanner } from './components/ui/UpdateBanner';
 import { MemberGate } from './components/auth/MemberGate';
 import { LazyRoute } from './components/routing/LazyRoute';
 import { ArkHandoff } from './components/routing/ArkHandoff';
@@ -174,6 +175,8 @@ const AppShell: React.FC<{ hasSeenSplash: boolean; onSplashComplete: () => void 
   return (
     <div className={`min-h-screen ${location.pathname === '/intercessors' ? 'max-w-[1200px]' : 'max-w-[500px]'} mx-auto bg-eggshell shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.06)] flex flex-col relative`}>
       {isApprovedMember && hasSeenSplash && <BirthdayPopup />}
+      {/* "A new version is ready — Update" after each fix or upgrade. */}
+      <UpdateBanner appName="Tribes" />
       <Routes>
         <Route
           path="/"
