@@ -199,6 +199,7 @@ export type BiblePrefs = {
   textSize: number;
   /** A second Bible shown under each verse (e.g. Luganda under English), like the website. */
   under: BibleTranslation | null;
+  comparisonLayout?: 'side' | 'under';
 };
 
 const PREFS_KEY = 'awc.bible.v1';
@@ -218,6 +219,7 @@ export function readBiblePrefs(): BiblePrefs {
     return {
       translation: normalizeId(p.translation) ?? 'kjv',
       under: normalizeId(p.under),
+      comparisonLayout: p.comparisonLayout === 'under' ? 'under' : 'side',
       bookId: book ? book.id : DEFAULT_PREFS.bookId,
       chapter: book && chapter >= 1 && chapter <= book.chapters ? chapter : 1,
       textSize: Number.isInteger(p.textSize) && p.textSize! >= 0 && p.textSize! < TEXT_SIZES.length ? p.textSize! : DEFAULT_PREFS.textSize,
