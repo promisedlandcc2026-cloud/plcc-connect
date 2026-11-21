@@ -33,7 +33,7 @@ function placeFromParams(params: URLSearchParams): { bookId: string; chapter: nu
  * NIV and NKJV (YouVersion), Bayibuli Entukuvu, Kiswahili… — comes from the PLCC
  * website, the same list as the website's /bible and Ka Link, with an optional
  * second Bible under each verse. Reading place, highlights and bookmarks are remembered on this device.
- * The reader is "?view=read", so the phone's back button returns to the Bible home.
+ * The reader opens by default; Bible tools remain available at "?view=home".
  */
 export const MemberBiblePage: React.FC = () => {
   const [params, setParams] = useSearchParams();
@@ -49,7 +49,7 @@ export const MemberBiblePage: React.FC = () => {
   const [marksOpen, setMarksOpen] = useState<'highlights' | 'bookmarks' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
-  const reading = params.get('view') === 'read';
+  const reading = params.get('view') !== 'home';
   const book = bookById(prefs.bookId) ?? BIBLE_BOOKS[42];
   // Until the list arrives, trust the saved choice; once it's here, fall back to KJV
   // if that Bible is no longer offered (e.g. a license was turned off).
@@ -100,9 +100,7 @@ export const MemberBiblePage: React.FC = () => {
   );
 
   const backToHome = () => {
-    // Came from the Bible home: go back in history so the phone's back button stays in sync.
-    if (window.history.state && (window.history.state as { idx?: number }).idx) window.history.back();
-    else setParams({}, { replace: true });
+    setParams({ view: 'home' });
   };
 
   return (
