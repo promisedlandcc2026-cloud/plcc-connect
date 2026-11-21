@@ -128,6 +128,8 @@ describe('sanitizeNotification + destinations', () => {
     assert.equal(resolveCommunityPostId('community_dm', POST_ID, '/community/chat/dm'), null);
     assert.equal(resolveCommunityPostId('assignment', POST_ID, '/follow-ups'), null);
     assert.equal(resolveNotificationDestination('assignment', POST_ID, '/follow-ups'), null);
+    assert.equal(resolveNotificationDestination('assignment', POST_ID, '/pastors-office')?.path, '/pastors-office');
+    assert.equal(resolveNotificationDestination('assignment', POST_ID, 'https://evil.example/pastors-office'), null);
   });
 
   it('deep-links huddle_started to Connect chat room (not Vault admin URL)', () => {

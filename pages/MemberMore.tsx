@@ -170,6 +170,7 @@ export const MemberMePage: React.FC = () => {
   }, []);
 
   const items: MoreLink[] = [
+    { group: 'mine', kind: 'route', to: '/pastors-office', label: 'Pastor’s Office', description: 'Request a pastoral appointment', icon: CalendarHeart },
     {
       group: 'church',
       kind: 'route',

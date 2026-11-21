@@ -1,3 +1,4 @@
+import { PastoralRequests } from './pages/PastoralRequests';
 import React, { lazy } from 'react';
 // Same as Ka Link: one broken screen shows a Reload card (and is logged) instead of a blank page.
 import { AppCrashBoundary } from './components/routing/AppCrashBoundary';
@@ -265,6 +266,7 @@ const AppShell: React.FC<{ hasSeenSplash: boolean; onSplashComplete: () => void 
             }
           />
         </Route>
+        <Route path="/pastors-office" element={<MemberGate requireAccess="approved_member"><PastoralRequests /></MemberGate>} />
         <Route
           path="/notifications"
           element={
