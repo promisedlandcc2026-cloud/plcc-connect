@@ -14,13 +14,14 @@ export default async function handler(req, res) {
   let body;
   if (req.method === 'GET') {
     const scope = String(req.query?.scope || 'mine');
-    if (!['mine','available'].includes(scope)) return res.status(400).json({ok:false,error:'Invalid request view.'});
+    if (!['mine','available','preferences'].includes(scope)) return res.status(400).json({ok:false,error:'Invalid request view.'});
     url.searchParams.set('scope',scope);
   } else {
     const raw = req.body;
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return res.status(400).json({ok:false,error:'Invalid request.'});
     if (raw.action === 'submit') body = {action:'submit',officeId:raw.officeId,category:raw.category,preferredStart:raw.preferredStart,timeZone:raw.timeZone,contactPreference:raw.contactPreference,message:raw.message};
-    else if (raw.action === 'cancel') body = {action:'cancel',requestId:raw.requestId,version:raw.version};
+    else if (raw.action === 'set_preferences') body = {action:'set_preferences',remindersEnabled:raw.remindersEnabled,reminderHours:raw.reminderHours};
+    else if (raw.action === 'cancel' || raw.action === 'request_reschedule') body = {action:raw.action,requestId:raw.requestId,version:raw.version};
     else return res.status(400).json({ok:false,error:'Invalid action.'});
     if (JSON.stringify(body).length > 3000) return res.status(413).json({ok:false,error:'Request is too large.'});
   }
@@ -29,6 +30,7 @@ export default async function handler(req, res) {
     const data = await response.json().catch(()=>null);
     if (!response.ok || data?.ok !== true) return res.status([400,401,403,409,429].includes(response.status)?response.status:503).json({ok:false,error:response.status===409?'The request changed. Please refresh and try again.':'Could not complete your request. Please try again.'});
     if (req.method === 'POST') return res.status(200).json({ok:true,...(typeof data.requestId==='string'?{requestId:data.requestId}:{})});
+    if (req.query?.scope === 'preferences') return res.status(200).json({ok:true,preferences:{reminders_enabled:data.preferences?.reminders_enabled === true,reminder_hours:Number(data.preferences?.reminder_hours) || 24}});
     if (req.query?.scope === 'available') return res.status(200).json({ok:true,offices:(Array.isArray(data.offices)?data.offices:[]).map(o=>({id:o.id,pastorName:o.pastorName}))});
     const requests=(Array.isArray(data.requests)?data.requests:[]).map(r=>({id:r.id,office_id:r.office_id,category:r.category,preferred_start:r.preferred_start,preferred_zone:r.preferred_zone,status:r.status,version:r.version,created_at:r.created_at,pastoral_appointments:(Array.isArray(r.pastoral_appointments)?r.pastoral_appointments:r.pastoral_appointments ? [r.pastoral_appointments] : []).map(a=>({starts_at:a.starts_at,ends_at:a.ends_at,display_zone:a.display_zone,status:a.status}))}));
     return res.status(200).json({ok:true,requests});
