@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Bookmark, ChevronDown, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { ErrorState, SkeletonRows } from '../ui/States';
 import { VerseSheet } from './VerseSheet';
-import { bookById, formatReference, stepChapter } from '../../lib/bibleBooks';
+import { BIBLE_BOOKS, bookById, formatReference, stepChapter } from '../../lib/bibleBooks';
 import { BibleError, loadChapter, TEXT_SIZES, translationLabel, type BibleChapter, type BiblePrefs, type BibleTranslation, type TranslationInfo } from '../../lib/bibleClient';
 import { TranslationSheet } from './TranslationSheet';
 import {
@@ -206,72 +206,61 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
     );
   };
 
+  const currentLanguage = translations.find((t) => t.id === translation)?.language ?? 'eng';
+  const languages = translations.filter((t, i, all) => all.findIndex((v) => v.language === t.language) === i);
+  const selectClass = 'w-full h-11 rounded-xl bg-[#f4ecd9] border border-[#e8dfcd] px-3 text-[15px] text-[#19261f] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold';
   const iconBtn = 'h-11 rounded-[14px] bg-white border border-gray-200 inline-flex items-center justify-center active:bg-gray-50';
 
   return (
     <>
-      <div ref={topRef} className="sticky top-0 z-20 -mx-5 px-3 py-3 bg-eggshell/95 backdrop-blur border-b border-[#E8E2DA] scroll-mt-0">
-        <div className="flex items-center gap-2">
-          <button type="button" onClick={onBack} aria-label="Back to Bible home" className="h-11 w-11 shrink-0 rounded-full inline-flex items-center justify-center text-ink active:bg-black/5">
-            <ChevronLeft size={22} aria-hidden />
-          </button>
-          <button type="button" onClick={onPicker} aria-haspopup="dialog" className={`${iconBtn} flex-1 min-w-0 justify-between px-3`}>
-            <span className="truncate font-extrabold text-ink text-[16px]">
-              {book.name} {book.chapters > 1 ? prefs.chapter : ''}
-            </span>
-            <ChevronDown size={18} className="shrink-0 text-ink-soft" aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={() => setBibleOpen(true)}
-            aria-haspopup="dialog"
-            aria-label={`Bible: ${translationLabel(translation)}${under ? `, with ${translationLabel(under)} under each verse` : ''}. Change`}
-            className={`${iconBtn} px-3 text-[13px] font-extrabold text-burgundy`}
-          >
-            {translationLabel(translation)}
-            {under ? <span className="ml-1 font-bold text-ink-soft">+{translationLabel(under)}</span> : null}
+      <div ref={topRef} className="scroll-mt-4">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <button type="button" onClick={onBack} className="inline-flex items-center gap-1 text-sm font-bold text-ink-soft hover:text-ink">
+            <ChevronLeft size={20} aria-hidden /> Bible tools
           </button>
           <div className="relative">
-            <button type="button" onClick={() => setSizeOpen((o) => !o)} aria-expanded={sizeOpen} aria-label="Text size" className={`${iconBtn} w-11 font-display text-[15px] font-bold text-ink`}>
-              Aa
-            </button>
-            {sizeOpen ? (
-              <div className="absolute right-0 top-12 z-30 flex rounded-2xl bg-white border border-gray-200 shadow-lift overflow-hidden" role="group" aria-label="Text size">
-                <button
-                  type="button"
-                  aria-label="Smaller text"
-                  disabled={prefs.textSize === 0}
-                  onClick={() => onPrefs((p) => ({ ...p, textSize: Math.max(0, p.textSize - 1) }))}
-                  className="h-12 w-12 text-[14px] font-bold text-ink disabled:text-gray-300"
-                >
-                  A
-                </button>
-                <button
-                  type="button"
-                  aria-label="Larger text"
-                  disabled={prefs.textSize === TEXT_SIZES.length - 1}
-                  onClick={() => onPrefs((p) => ({ ...p, textSize: Math.min(TEXT_SIZES.length - 1, p.textSize + 1) }))}
-                  className="h-12 w-12 text-[21px] font-bold text-ink disabled:text-gray-300 border-l border-gray-200"
-                >
-                  A
-                </button>
-              </div>
-            ) : null}
+            <button type="button" onClick={() => setSizeOpen((o) => !o)} aria-expanded={sizeOpen} aria-label="Text size" className={`${iconBtn} w-11 font-display text-[15px] font-bold text-ink`}>Aa</button>
+            {sizeOpen ? <div className="absolute right-0 top-12 z-30 flex rounded-xl bg-white border border-gray-200 shadow-lift" role="group" aria-label="Text size">
+              <button type="button" aria-label="Smaller text" disabled={prefs.textSize === 0} onClick={() => onPrefs((p) => ({ ...p, textSize: Math.max(0, p.textSize - 1) }))} className="h-12 w-12 font-bold disabled:text-gray-300">A</button>
+              <button type="button" aria-label="Larger text" disabled={prefs.textSize === TEXT_SIZES.length - 1} onClick={() => onPrefs((p) => ({ ...p, textSize: Math.min(TEXT_SIZES.length - 1, p.textSize + 1) }))} className="h-12 w-12 text-xl font-bold disabled:text-gray-300 border-l">A</button>
+            </div> : null}
           </div>
         </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <label className="text-sm font-semibold text-ink-soft">Language
+            <select className={`${selectClass} mt-1`} value={currentLanguage} onChange={(e) => { const first = translations.find((t) => t.language === e.target.value); if (first) onPrefs((p) => ({ ...p, translation: first.id, under: p.under === first.id ? null : p.under })); }}>
+              {languages.map((t) => <option key={t.language} value={t.language}>{t.languageLabel}</option>)}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-ink-soft">Bible
+            <select className={`${selectClass} mt-1`} value={translation} onChange={(e) => onPrefs((p) => ({ ...p, translation: e.target.value, under: p.under === e.target.value ? null : p.under }))}>
+              {translations.filter((t) => t.language === currentLanguage).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-ink-soft">Book
+            <select className={`${selectClass} mt-1`} value={book.id} onChange={(e) => onGoTo(e.target.value, 1)}>
+              {BIBLE_BOOKS.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-ink-soft">Chapter
+            <select className={`${selectClass} mt-1`} value={prefs.chapter} onChange={(e) => onGoTo(book.id, Number(e.target.value))}>
+              {Array.from({ length: book.chapters }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
+            </select>
+          </label>
+        </div>
+        <label className="mt-3 flex items-center gap-2 rounded-xl bg-[#eee4cc] px-3 text-sm font-semibold text-ink">
+          <span className="shrink-0">Under each verse</span>
+          <select className="min-w-0 flex-1 h-11 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold" value={under ?? ''} onChange={(e) => onPrefs((p) => ({ ...p, under: e.target.value || null }))}>
+            <option value="">None</option>
+            {translations.filter((t) => t.id !== translation).map((t) => <option key={t.id} value={t.id}>{t.languageLabel} · {t.name}</option>)}
+          </select>
+        </label>
       </div>
 
-      <article className="pt-6" aria-live="polite" aria-busy={loading}>
-        <header className="mb-4 flex items-baseline gap-3">
-          {book.chapters > 1 ? <span className="font-display text-[72px] font-bold leading-[0.9] text-burgundy">{prefs.chapter}</span> : null}
-          <div>
-            <h2 className="font-display text-[24px] font-bold text-ink">{book.name}</h2>
-            {data && !loading ? (
-              <p className="mt-0.5 text-[13px] font-semibold text-ink-soft">
-                {minutes} min read · {data.verses.length} verses
-              </p>
-            ) : null}
-          </div>
+      <article className="mt-4 rounded-2xl bg-[#fffdf8] border border-[#e9e3d6] px-4 py-5 sm:px-7" aria-live="polite" aria-busy={loading}>
+        <header className="mb-5">
+          <h2 className="font-display text-2xl font-bold text-ink">{book.name} {prefs.chapter}</h2>
+          <p className="mt-1 text-sm font-semibold text-ink-soft">{translations.find((t) => t.id === translation)?.name ?? translationLabel(translation)}{data && !loading ? ` · ${minutes} min read` : ''}</p>
         </header>
 
         {loading ? (
@@ -280,7 +269,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
           <ErrorState message={error} onRetry={() => void load()} />
         ) : data ? (
           <>
-            <p className="font-display text-ink leading-[1.75]" style={{ fontSize: fontPx + 1 }}>
+            <div className="font-display text-ink leading-[1.65]" style={{ fontSize: fontPx + 1 }}>
               {data.verses.map((v) => {
                 const key = verseKey(book.id, prefs.chapter, v.n);
                 const isSel = selected.has(v.n);
@@ -302,7 +291,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
                         toggleVerse(v.n);
                       }
                     }}
-                    className={`cursor-pointer rounded-[4px] scroll-mt-32 [box-decoration-break:clone] [-webkit-box-decoration-break:clone] transition-colors ${
+                    className={`block py-2 cursor-pointer rounded-lg scroll-mt-32 transition-colors ${
                       isSel ? 'underline decoration-gold decoration-[3px] underline-offset-[5px]' : ''
                     }`}
                     style={bg ? { background: bg } : undefined}
@@ -315,14 +304,14 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
                     ) : null}
                     {v.text}{' '}
                     {underText?.[v.n] ? (
-                      <span className="mb-2 mt-0.5 block font-sans text-ink-soft leading-snug" style={{ fontSize: Math.round(fontPx * 0.82) }}>
+                      <span className="mt-1 block border-l-2 border-gold pl-3 font-sans text-ink-soft leading-relaxed" style={{ fontSize: Math.round(fontPx * 0.82) }}>
                         {underText[v.n]}
                       </span>
                     ) : null}
                   </span>
                 );
               })}
-            </p>
+            </div>
             {data.copyright ? <p className="mt-6 text-[11px] leading-snug text-ink-soft">{data.copyright}</p> : null}
             {data.translation === 'kjv' ? <p className="mt-6 text-[11px] text-ink-soft">King James Version (public domain)</p> : null}
             {under && underText ? <p className="mt-2 text-[11px] text-ink-soft">Under each verse: {translationLabel(under)}</p> : null}

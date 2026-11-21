@@ -34,9 +34,10 @@ test('searching the bundled KJV for "everlasting life" finds John 3:16', async (
   assert.ok(hits.length > 10 && hits.length < 200);
 });
 
-test('Bible page: home + reader, deep links open the reader, back button returns home', () => {
+test('Bible page opens the reader, keeps tools available, and supports deep links', () => {
   const page = read('pages/MemberBible.tsx');
-  assert.match(page, /params\.get\('view'\) === 'read'/);
+  assert.match(page, /params\.get\('view'\) !== 'home'/);
+  assert.match(page, /setParams\(\{ view: 'home' \}\)/);
   assert.match(page, /setParams\(\{ view: 'read' \}, \{ replace: true \}\)/);
   assert.match(page, /<BibleHome/);
   assert.match(page, /<BibleReader/);

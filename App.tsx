@@ -173,7 +173,7 @@ const AppShell: React.FC<{ hasSeenSplash: boolean; onSplashComplete: () => void 
   });
 
   return (
-    <div className={`min-h-screen ${location.pathname === '/intercessors' ? 'max-w-[1200px]' : 'max-w-[500px]'} mx-auto bg-eggshell shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.06)] flex flex-col relative`}>
+    <div className={`min-h-screen ${location.pathname === '/intercessors' || location.pathname === '/bible' ? 'max-w-[1200px]' : 'max-w-[500px]'} mx-auto bg-eggshell shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_12px_40px_rgba(0,0,0,0.06)] flex flex-col relative`}>
       {isApprovedMember && hasSeenSplash && <BirthdayPopup />}
       {/* "A new version is ready — Update" after each fix or upgrade. */}
       <UpdateBanner appName="Tribes" />
