@@ -303,7 +303,7 @@ export const CommunityChatRoomPage: React.FC = () => {
   }
 
   return (
-    <main className="flex-1 px-5 pt-8 pb-28 flex flex-col min-h-[70vh]">
+    <main className="ka-link-chat-surface flex-1 bg-white px-5 pt-8 pb-28 flex flex-col min-h-[70vh]">
       <div className="flex items-center justify-between gap-2 mb-4">
         <Link
           to={locState.returnTab ? `/community/chat?tab=${encodeURIComponent(locState.returnTab)}` : '/community/chat'}
