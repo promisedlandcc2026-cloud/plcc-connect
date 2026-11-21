@@ -13,6 +13,7 @@ import {
 } from '../lib/communityChatTypes';
 import {
   fetchChatMessages,
+  fetchDmList,
   fetchHuddleStatuses,
   markChatChannelRead,
   sendChatMessage,
@@ -32,6 +33,7 @@ type LocationState = {
   partnerName?: string;
   channelName?: string;
   isDm?: boolean;
+  returnTab?: string;
 };
 
 function formatTime(iso: string): string {
@@ -49,7 +51,8 @@ export const CommunityChatRoomPage: React.FC = () => {
   const { channelId = '' } = useParams();
   const location = useLocation();
   const locState = (location.state || {}) as LocationState;
-  const { user, memberAccessState } = useAuth();
+  const { user, identity, memberAccessState } = useAuth();
+  const ownerId = identity?.id || user?.id || '';
   const [messages, setMessages] = useState<CommunityChatMessage[]>([]);
   const [draft, setDraft] = useState('');
   const [loading, setLoading] = useState(true);
@@ -77,15 +80,29 @@ export const CommunityChatRoomPage: React.FC = () => {
   /** True when this room is the Intercessor Channel and the member can open the Prayer Watch. */
   const [isPrayerWatchRoom, setIsPrayerWatchRoom] = useState(false);
 
+  const [serverDm, setServerDm] = useState<{ channelId: string; ownerId: string; name: string } | null>(null);
+  useEffect(() => {
+    if (!validChannel || memberAccessState !== 'approved_member' || !ownerId) return;
+    let alive = true;
+    void fetchDmList().then((list) => {
+      const match = list?.find((dm) => dm.channelId === channelId);
+      if (alive) setServerDm(match ? { channelId, ownerId, name: match.partnerName } : null);
+    });
+    return () => { alive = false; };
+  }, [channelId, memberAccessState, ownerId]);
+  const verifiedDm = serverDm?.channelId === channelId && serverDm.ownerId === ownerId ? serverDm : null;
+
   const isDm =
+    Boolean(verifiedDm) ||
     Boolean(locState.isDm) ||
     Boolean(locState.partnerName) ||
-    Boolean(dmDisplayName(channelId, ''));
+    Boolean(dmDisplayName(channelId, '', ownerId));
 
   const roomTitle =
     locState.partnerName ||
+    verifiedDm?.name ||
     locState.channelName ||
-    dmDisplayName(channelId, '') ||
+    dmDisplayName(channelId, '', ownerId) ||
     (isDm ? 'Direct message' : 'Channel');
 
   /** Private voice / video calls (DMs only, every member). */
@@ -274,7 +291,7 @@ export const CommunityChatRoomPage: React.FC = () => {
     return (
       <main className="flex-1 px-5 pt-10 pb-28">
         <Link
-          to="/community/chat"
+          to={locState.returnTab ? `/community/chat?tab=${encodeURIComponent(locState.returnTab)}` : '/community/chat'}
           className="inline-flex items-center gap-2 text-burgundy text-sm font-bold min-h-[44px]"
         >
           <ArrowLeft size={18} aria-hidden />
@@ -289,7 +306,7 @@ export const CommunityChatRoomPage: React.FC = () => {
     <main className="flex-1 px-5 pt-8 pb-28 flex flex-col min-h-[70vh]">
       <div className="flex items-center justify-between gap-2 mb-4">
         <Link
-          to="/community/chat"
+          to={locState.returnTab ? `/community/chat?tab=${encodeURIComponent(locState.returnTab)}` : '/community/chat'}
           className="inline-flex items-center gap-2 text-burgundy text-sm font-bold min-h-[44px]"
         >
           <ArrowLeft size={18} aria-hidden />

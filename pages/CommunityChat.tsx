@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Loader2,
@@ -21,16 +21,26 @@ import {
 } from '../lib/communityChatTypes';
 import {
   fetchChatChannels,
+  fetchDmList,
   fetchChatUnread,
   openDirectMessage,
   searchChatDirectory,
 } from '../lib/communityChatClient';
 import { HuddleLiveBadge } from '../components/huddle/HuddleLiveDot';
-import { dmDisplayName, listDmRecents, rememberDmRecent } from '../lib/dmRecents';
+import { listDmRecents, rememberDmRecent, replaceDmRecents } from '../lib/dmRecents';
 import { Button } from '../components/ui/Button';
-import { MemberPageHeader } from '../components/member/MemberPageHeader';
+import { TribesHeader } from '../components/tribes/TribesHeader';
+import { ChatSectionTabs, SECTION_LABELS } from '../components/community/ChatSectionTabs';
+import { chatSectionRooms, parseChatSection, type ChatSection } from '../lib/chatSections';
 
 const SEARCH_DEBOUNCE_MS = 280;
+const SECTION_DESCRIPTIONS: Record<ChatSection, string> = {
+  prayers: 'Gather with others in prayer.',
+  ministries: 'Find channels connected to your ministries.',
+  messages: 'Browse all your shared channels.',
+  direct: 'Private conversations with members.',
+  live: 'Join a Ka Link happening now.',
+};
 
 function visibilityLabel(visibility: string | null): string {
   const v = String(visibility || '').toLowerCase();
@@ -44,14 +54,25 @@ function visibilityLabel(visibility: string | null): string {
 }
 
 export const CommunityChatPage: React.FC = () => {
-  const { identity, memberAccessState } = useAuth();
+  const { identity, user, memberAccessState } = useAuth();
+  const ownerId = identity?.id || user?.id || '';
+  const ownerRef = useRef(ownerId);
+  ownerRef.current = ownerId;
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeSection = parseChatSection(searchParams.get('tab'));
+  const selectSection = (section: ChatSection) => {
+    const next = new URLSearchParams(searchParams);
+    next.set('tab', section);
+    setSearchParams(next, { replace: true });
+  };
   const [channels, setChannels] = useState<CommunityChatChannel[]>([]);
   const [unreadByChannel, setUnreadByChannel] = useState<Record<string, number>>({});
   const { byChannel: huddleByChannel } = useHuddleLive();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dmRecents, setDmRecents] = useState(() => listDmRecents());
+  const [dmRecents, setDmRecents] = useState<ReturnType<typeof listDmRecents>>([]);
+  const [dmListUnavailable, setDmListUnavailable] = useState(false);
 
   const [newChatOpen, setNewChatOpen] = useState(false);
   const [searchQ, setSearchQ] = useState('');
@@ -65,14 +86,19 @@ export const CommunityChatPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const [list, unread] = await Promise.all([
+      const [list, unread, dms] = await Promise.all([
         fetchChatChannels(),
         fetchChatUnread().catch(() => ({ count: 0, byChannel: {} })),
+        fetchDmList(),
       ]);
+      if (ownerRef.current !== ownerId) return;
       setChannels(list);
       setUnreadByChannel(unread.byChannel);
-      setDmRecents(listDmRecents());
+      if (dms && ownerId) replaceDmRecents(ownerId, dms.map((dm) => ({ channelId: dm.channelId, partnerId: dm.partnerId, partnerName: dm.partnerName, avatarUrl: null, updatedAt: dm.lastMessageAt ? Date.parse(dm.lastMessageAt) : 0 })));
+      setDmRecents(listDmRecents(ownerId));
+      setDmListUnavailable(dms === null);
     } catch (err) {
+      if (ownerRef.current !== ownerId) return;
       const message =
         err instanceof CommunityChatError
           ? err.message
@@ -80,13 +106,38 @@ export const CommunityChatPage: React.FC = () => {
       setError(message);
       setChannels([]);
     } finally {
-      setLoading(false);
+      if (ownerRef.current === ownerId) setLoading(false);
     }
-  }, [memberAccessState]);
+  }, [memberAccessState, ownerId]);
 
   useEffect(() => {
+    setDmRecents([]);
     void load();
   }, [load]);
+
+  // Pick up messages started on Ka Link or another device without interrupting the list.
+  useEffect(() => {
+    if (memberAccessState !== 'approved_member' || !ownerId) return;
+    let alive = true;
+    let inFlight = false;
+    const refreshInbox = async () => {
+      if (!alive || inFlight || document.visibilityState === 'hidden') return;
+      inFlight = true;
+      const [dms, unread] = await Promise.all([fetchDmList(), fetchChatUnread().catch(() => null)]);
+      inFlight = false;
+      if (!alive || ownerRef.current !== ownerId) return;
+      if (dms) {
+        replaceDmRecents(ownerId, dms.map((dm) => ({ channelId: dm.channelId, partnerId: dm.partnerId, partnerName: dm.partnerName, avatarUrl: null, updatedAt: dm.lastMessageAt ? Date.parse(dm.lastMessageAt) : 0 })));
+        setDmRecents(listDmRecents(ownerId));
+        setDmListUnavailable(false);
+      } else setDmListUnavailable(true);
+      if (unread) setUnreadByChannel(unread.byChannel);
+    };
+    const timer = window.setInterval(() => void refreshInbox(), 30_000);
+    const onVisibility = () => { if (document.visibilityState === 'visible') void refreshInbox(); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => { alive = false; window.clearInterval(timer); document.removeEventListener('visibilitychange', onVisibility); };
+  }, [memberAccessState, ownerId]);
 
   useEffect(() => {
     if (!newChatOpen) return;
@@ -124,9 +175,9 @@ export const CommunityChatPage: React.FC = () => {
     };
   }, [newChatOpen, searchQ]);
 
-  const groupChannels = useMemo(
-    () => channels.filter((c) => !isDmChannel(c)),
-    [channels]
+  const visibleRooms = useMemo(
+    () => chatSectionRooms(channels, huddleByChannel, activeSection),
+    [channels, huddleByChannel, activeSection]
   );
 
   const closeNewChat = () => {
@@ -143,11 +194,11 @@ export const CommunityChatPage: React.FC = () => {
     setSearchError(null);
     try {
       const { channel } = await openDirectMessage(partner.id);
-      rememberDmRecent({ channelId: channel.id, partner });
-      setDmRecents(listDmRecents());
+      rememberDmRecent({ ownerId, channelId: channel.id, partner });
+      setDmRecents(listDmRecents(ownerId));
       closeNewChat();
       navigate(`/community/chat/${channel.id}`, {
-        state: { partnerName: partner.name, isDm: true },
+        state: { partnerName: partner.name, isDm: true, returnTab: 'direct' },
       });
     } catch (err) {
       setSearchError(
@@ -170,11 +221,12 @@ export const CommunityChatPage: React.FC = () => {
     return (
       <li key={channel.id}>
         <Link
-          to={`/community/chat/${channel.id}`}
+          to={`/community/chat/${channel.id}${live && activeSection === 'live' ? '?huddle=join' : ''}`}
           state={{
             channelName: title,
             partnerName: opts?.isDm ? title : undefined,
             isDm: Boolean(opts?.isDm),
+            returnTab: activeSection,
           }}
           className="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-burgundy/20 transition-colors min-h-[64px]"
         >
@@ -208,6 +260,7 @@ export const CommunityChatPage: React.FC = () => {
 
   return (
     <main className="flex-1 px-5 pt-10 pb-28">
+      <div className="-mt-10 mb-3"><TribesHeader showChat={false} /></div>
       <div className="flex items-center justify-between gap-2 mb-6">
         <Link
           to="/community"
@@ -238,12 +291,12 @@ export const CommunityChatPage: React.FC = () => {
         </div>
       </div>
 
-      <MemberPageHeader
-        title="Chat"
-        backTo="/community"
-        backLabel="Community"
-        subtitle={`${identity?.name ? `Signed in as ${identity.name}. ` : ''}Message members, open shared channels, and start or join a Live Ka Link.`}
-      />
+      <header className="mb-5">
+        <h1 className="font-display text-3xl font-bold text-gold">Chat</h1>
+        <p className="mt-1 text-sm leading-relaxed text-ink-soft">Prayer, conversations, and live gatherings with your church family.</p>
+      </header>
+
+      <ChatSectionTabs active={activeSection} onSelect={selectSection} />
 
       {loading ? (
         <div className="flex items-center justify-center py-16 text-gray-500 gap-2">
@@ -258,53 +311,27 @@ export const CommunityChatPage: React.FC = () => {
           </Button>
         </div>
       ) : (
-        <div className="space-y-8">
-          {dmRecents.length > 0 ? (
-            <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 px-1">
-                Direct
-              </h2>
-              <ul className="space-y-2">
-                {dmRecents.map((dm) =>
-                  renderChannelRow(
-                    {
-                      id: dm.channelId,
-                      name: dm.partnerName,
-                      description: null,
-                      visibility: 'dm',
-                      type: 'private',
-                      ministryId: null,
-                    },
-                    dm.partnerName,
-                    { isDm: true }
-                  )
-                )}
-              </ul>
-            </section>
-          ) : null}
-
-          <section>
-            <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 px-1">
-              Channels
-            </h2>
-            {groupChannels.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 text-sm text-gray-500">
-                No group channels are available yet. Use New to message a member.
-              </div>
-            ) : (
-              <ul className="space-y-2">
-                {groupChannels.map((channel) =>
-                  renderChannelRow(
-                    channel,
-                    isDmChannel(channel)
-                      ? dmDisplayName(channel.id, channel.name)
-                      : channel.name
-                  )
-                )}
-              </ul>
-            )}
-          </section>
-        </div>
+        <section role="tabpanel" id={`chat-panel-${activeSection}`} aria-labelledby={`chat-tab-${activeSection}`} tabIndex={0}>
+          <div className="mb-3 flex items-center justify-between gap-3 px-1">
+            <div><h2 className="text-base font-bold text-ink">{SECTION_LABELS[activeSection]}</h2>
+              <p className="mt-0.5 text-sm text-ink-soft">{SECTION_DESCRIPTIONS[activeSection]}</p></div>
+            {activeSection === 'direct' ? <button type="button" onClick={() => setNewChatOpen(true)} className="min-h-[44px] shrink-0 rounded-xl border border-gray-200 bg-white px-3 text-sm font-bold text-[#12301f]">New message</button> : null}
+          </div>
+          {activeSection === 'direct' ? (
+            <>
+              {dmListUnavailable ? <p role="status" className="mb-2 text-sm text-ink-soft">Could not load all conversations. Showing messages opened on this device. Try Refresh.</p> : null}
+              {dmRecents.length ? <ul className="space-y-2">{dmRecents.map((dm) => renderChannelRow({ id: dm.channelId, name: dm.partnerName, description: null, visibility: 'dm', type: 'private', ministryId: null }, dm.partnerName, { isDm: true }))}</ul> : (
+                <div className="rounded-3xl border border-gray-100 bg-white p-5 text-sm text-gray-500 shadow-sm">No private conversations yet. Choose New message to get started. You can also make a voice or video call from a conversation.</div>
+              )}
+            </>
+          ) : visibleRooms.length ? (
+            <ul className="space-y-2">{visibleRooms.map((channel) => renderChannelRow(channel, channel.name))}</ul>
+          ) : (
+            <div className="rounded-3xl border border-gray-100 bg-white p-5 text-sm text-gray-500 shadow-sm">
+              {activeSection === 'live' ? 'No Ka Links are live right now. Open a channel to start or join one.' : activeSection === 'prayers' ? 'No prayer rooms are available right now. Check Messages for all shared channels.' : activeSection === 'ministries' ? 'No ministry channels are available right now. Check Messages for all shared channels.' : 'No shared channels are available right now.'}
+            </div>
+          )}
+        </section>
       )}
 
       {newChatOpen ? (

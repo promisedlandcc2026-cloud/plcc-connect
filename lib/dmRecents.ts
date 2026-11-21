@@ -1,10 +1,13 @@
 /**
- * Vault excludes DMs from the channels list — keep recent DMs opened on this device.
+ * Recent direct messages opened on this device — a fallback only. The real list
+ * comes from the Vault (dm-list). Stored per account, so signing in with a
+ * different account on the same browser never shows someone else's DMs.
  */
 
 import type { ChatDirectoryMember } from './communityChatTypes';
 
-const STORAGE_KEY = 'awc.chat.dmRecents.v1';
+const keyFor = (ownerId: string) => `awc.chat.dmRecents.v2.${ownerId}`;
+
 const MAX_RECENTS = 30;
 
 export type DmRecent = {
@@ -15,9 +18,10 @@ export type DmRecent = {
   updatedAt: number;
 };
 
-function readAll(): DmRecent[] {
+function readAll(ownerId: string): DmRecent[] {
+  if (!ownerId) return [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(keyFor(ownerId));
     if (!raw) return [];
     const parsed = JSON.parse(raw) as unknown;
     if (!Array.isArray(parsed)) return [];
@@ -38,19 +42,21 @@ function readAll(): DmRecent[] {
   }
 }
 
-function writeAll(rows: DmRecent[]): void {
+function writeAll(ownerId: string, rows: DmRecent[]): void {
+  if (!ownerId) return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(rows.slice(0, MAX_RECENTS)));
+    localStorage.setItem(keyFor(ownerId), JSON.stringify(rows.slice(0, MAX_RECENTS)));
   } catch {
     /* ignore quota */
   }
 }
 
-export function listDmRecents(): DmRecent[] {
-  return readAll().sort((a, b) => b.updatedAt - a.updatedAt);
+export function listDmRecents(ownerId: string): DmRecent[] {
+  return readAll(ownerId).sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
 export function rememberDmRecent(input: {
+  ownerId: string;
   channelId: string;
   partner: ChatDirectoryMember;
 }): void {
@@ -61,11 +67,21 @@ export function rememberDmRecent(input: {
     avatarUrl: input.partner.avatarUrl,
     updatedAt: Date.now(),
   };
-  const rest = readAll().filter((r) => r.channelId !== next.channelId);
-  writeAll([next, ...rest]);
+  const rest = readAll(input.ownerId).filter((r) => r.channelId !== next.channelId);
+  writeAll(input.ownerId, [next, ...rest]);
 }
 
-export function dmDisplayName(channelId: string, fallback = 'Direct message'): string {
-  const hit = readAll().find((r) => r.channelId === channelId);
+/** Keep this device's copy in step with the Vault's list (names, order). */
+export function replaceDmRecents(ownerId: string, rows: DmRecent[]): void {
+  writeAll(ownerId, rows);
+}
+
+export function dmDisplayName(channelId: string, fallback = 'Direct message', ownerId = ''): string {
+  const hit = readAll(ownerId).find((r) => r.channelId === channelId);
   return hit?.partnerName || fallback;
+}
+
+/** Drop a deleted DM from this device's copy too. */
+export function forgetDmRecent(ownerId: string, channelId: string): void {
+  writeAll(ownerId, readAll(ownerId).filter((r) => r.channelId !== channelId));
 }

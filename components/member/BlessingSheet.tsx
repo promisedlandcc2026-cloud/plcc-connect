@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Send } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import { ModalShell } from '../ui/ModalShell';
 import { openDirectMessage, sendChatMessage } from '../../lib/communityChatClient';
 import { CommunityChatError } from '../../lib/communityChatTypes';
@@ -26,6 +27,7 @@ const OCCASIONS: { id: BlessingOccasion; label: string }[] = [
  * as a private message in Community chat.
  */
 export const BlessingSheet: React.FC<{ celebration: Celebration | null; onClose: () => void }> = ({ celebration, onClose }) => {
+  const { identity, user } = useAuth();
   const [occasion, setOccasion] = useState<BlessingOccasion>('birthday');
   const [text, setText] = useState('');
   const [edited, setEdited] = useState(false);
@@ -63,6 +65,7 @@ export const BlessingSheet: React.FC<{ celebration: Celebration | null; onClose:
       const { channel } = await openDirectMessage(celebration.partnerUserId);
       await sendChatMessage(channel.id, content);
       rememberDmRecent({
+        ownerId: identity?.id || user?.id || '',
         channelId: channel.id,
         partner: { id: celebration.partnerUserId, name: celebration.displayName, avatarUrl: celebration.avatarUrl },
       });

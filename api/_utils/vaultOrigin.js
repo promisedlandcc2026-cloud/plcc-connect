@@ -524,3 +524,8 @@ export function buildVaultCommunityChatIssuesUrl(origin, sub) {
   const base = String(origin || '').replace(/\/+$/, '');
   return `${base}${VAULT_COMMUNITY_CHAT_BASE}&subResource=${sub}`;
 }
+
+/** Your direct conversations, authorized by the Vault. */
+export function buildVaultCommunityChatDmListUrl(origin) {
+  return `${String(origin || '').replace(/\/+$/, '')}${VAULT_COMMUNITY_CHAT_BASE}&subResource=dm-list`;
+}

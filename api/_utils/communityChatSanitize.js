@@ -785,3 +785,15 @@ export function parseHuddleModerateCommand(raw) {
 }
 
 
+
+/** Only the signed-in member's minimal direct-conversation metadata. */
+export function sanitizeDmList(raw) {
+  const list = Array.isArray(raw?.conversations) ? raw.conversations : [];
+  return list.slice(0, 100).map((item) => {
+    const channelId = asNullableString(item?.channelId);
+    const partnerId = asNullableString(item?.partnerId);
+    if (!channelId || !UUID_RE.test(channelId) || !partnerId || !UUID_RE.test(partnerId)) return null;
+    return { channelId, partnerId, partnerName: (asNullableString(item.partnerName) || 'Member').slice(0, 80),
+      lastMessageAt: asIsoTimestamp(item.lastMessageAt), blocked: item.blocked === true };
+  }).filter(Boolean);
+}
