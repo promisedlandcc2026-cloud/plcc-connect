@@ -43,6 +43,15 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
   useEffect(() => {
     if (!user || hidden) return;
     refresh();
+    const onReturn = () => { if (document.visibilityState !== 'hidden') refresh(); };
+    window.addEventListener('focus', onReturn);
+    window.addEventListener('pageshow', onReturn);
+    document.addEventListener('visibilitychange', onReturn);
+    return () => {
+      window.removeEventListener('focus', onReturn);
+      window.removeEventListener('pageshow', onReturn);
+      document.removeEventListener('visibilitychange', onReturn);
+    };
   }, [user, hidden, refresh]);
 
   if (!user || hidden || !state) return null;
@@ -94,10 +103,12 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
     return null;
   } else if (state.kind === 'blocked') {
     content = (
-      <p className="text-[15px] text-ink-soft">
-        Alerts are blocked for Tribes. To allow them, open your phone’s <b>Settings</b>, find <b>Tribes</b> (or your browser),
-        tap <b>Notifications</b>, and turn them on. Then come back here.
-      </p>
+      <>
+        <p className="text-[15px] text-ink-soft">
+          Alerts are blocked on this device. Allow notifications for plcc-connect.vercel.app in your browser site settings and allow your browser’s notifications in phone settings. Then return here.
+        </p>
+        <Button variant="secondary" fullWidth onClick={refresh}>Check again</Button>
+      </>
     );
   } else if (state.kind === 'off') {
     content = (
