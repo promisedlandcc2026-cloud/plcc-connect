@@ -1,12 +1,96 @@
-import { isSupabaseConfigured, supabase } from './supabase';
+import { SITE_ORIGIN } from './verseShare';
 import { bookById } from './bibleBooks';
 
-export type BibleTranslation = 'kjv' | 'niv';
+/**
+ * A Bible id. "kjv" is the bundled King James Version (works offline, powers
+ * search); every other id is one of the church Bibles served by the PLCC
+ * website (the same list as the website's /bible and Ka Link): NIV and NKJV
+ * (YouVersion), Bayibuli Entukuvu (Luganda), Kiswahili and the rest.
+ */
+export type BibleTranslation = string;
 
-export const TRANSLATION_LABEL: Record<BibleTranslation, string> = {
-  kjv: 'KJV',
-  niv: 'NIV',
+export type TranslationInfo = {
+  id: string;
+  shortName: string;
+  name: string;
+  language: string;
+  languageLabel: string;
+  licenseNotice: string | null;
 };
+
+export const KJV_INFO: TranslationInfo = {
+  id: 'kjv',
+  shortName: 'KJV',
+  name: 'King James Version',
+  language: 'eng',
+  languageLabel: 'English',
+  licenseNotice: null,
+};
+
+/** The Bibles shown as quick buttons on the Bible home, when available. */
+export const FEATURED_TRANSLATIONS = ['kjv', 'yv_niv', 'yv_nkjv'];
+
+const registry = new Map<string, TranslationInfo>([['kjv', KJV_INFO]]);
+
+export function translationInfo(id: string): TranslationInfo | undefined {
+  return registry.get(id);
+}
+
+/** "KJV", "NIV", "LCB"… */
+export function translationLabel(id: string): string {
+  return registry.get(id)?.shortName ?? (id === 'yv_niv' ? 'NIV' : id === 'yv_nkjv' ? 'NKJV' : id.toUpperCase());
+}
+
+export function translationName(id: string): string {
+  return registry.get(id)?.name ?? translationLabel(id);
+}
+
+type SiteTranslation = {
+  id: string;
+  name: string;
+  englishName: string;
+  shortName: string;
+  language: string;
+  languageLabel: string;
+  licenseNotice: string | null;
+};
+
+export type TranslationList = { list: TranslationInfo[]; luganda: string | null };
+
+let translationsPending: Promise<TranslationList> | null = null;
+
+/** Every Bible the church offers (KJV first). Falls back to KJV alone when offline. */
+export function loadTranslations(): Promise<TranslationList> {
+  if (!translationsPending) {
+    translationsPending = fetch(`${SITE_ORIGIN}/api/bible/translations`, { headers: { Accept: 'application/json' } })
+      .then(async (r) => {
+        const body = (await r.json().catch(() => null)) as { ok?: boolean; translations?: SiteTranslation[]; defaults?: { luganda?: string | null } } | null;
+        if (!r.ok || !body?.ok || !Array.isArray(body.translations)) throw new Error('unavailable');
+        const list: TranslationInfo[] = [KJV_INFO];
+        for (const t of body.translations) {
+          // The website's own KJV is the same text we bundle; keep one.
+          const isKjv = t.language === 'eng' && !t.id.startsWith('yv_') && (/(^|_)kjv$/i.test(t.id) || /king james/i.test(t.englishName || ''));
+          if (isKjv) continue;
+          const info: TranslationInfo = {
+            id: t.id,
+            shortName: t.shortName || t.id,
+            name: t.englishName && t.englishName !== t.name ? `${t.name} (${t.englishName})` : t.name,
+            language: t.language,
+            languageLabel: t.languageLabel || t.language,
+            licenseNotice: t.licenseNotice ?? null,
+          };
+          registry.set(info.id, info);
+          list.push(info);
+        }
+        return { list, luganda: body.defaults?.luganda ?? null };
+      })
+      .catch(() => {
+        translationsPending = null; // try again next time
+        return { list: [KJV_INFO], luganda: null };
+      });
+  }
+  return translationsPending;
+}
 
 export type BibleVerse = { n: number; text: string };
 
@@ -64,92 +148,38 @@ async function loadKjvChapter(bookId: string, chapter: number): Promise<BibleCha
   };
 }
 
-/* ---------------- NIV: licensed, served through /api/bible (API.Bible) ---------------- */
+/* ---------------- Church Bibles: served by the PLCC website (/api/bible/chapter) ---------------- */
 
-async function authHeaders(): Promise<Record<string, string>> {
-  if (!isSupabaseConfigured) throw new BibleError('Please sign in again to continue.', 'unauthorized');
-  const { data } = await supabase.auth.getSession();
-  const token = data.session?.access_token;
-  if (!token || token.split('.').length !== 3) throw new BibleError('Please sign in again to continue.', 'unauthorized');
-  return { Accept: 'application/json', Authorization: `Bearer ${token}` };
-}
+const siteCache = new Map<string, Promise<BibleChapter>>();
 
-let nivStatus: Promise<boolean> | null = null;
-
-/** True once the church has set up its NIV access (API key on the server). */
-export function isNivAvailable(): Promise<boolean> {
-  if (!nivStatus) {
-    nivStatus = fetch('/api/bible?status=1', { headers: { Accept: 'application/json' } })
-      .then(async (r) => {
-        if (!r.ok) return false;
-        const body = (await r.json()) as { ok?: boolean; niv?: boolean };
-        return body.ok === true && body.niv === true;
-      })
-      .catch(() => false);
-    nivStatus.then((ok) => {
-      if (!ok) nivStatus = null; // re-check on a later visit
-    });
+function loadSiteChapter(translation: string, bookId: string, chapter: number): Promise<BibleChapter> {
+  const key = `${translation}:${bookId}.${chapter}`;
+  let p = siteCache.get(key);
+  if (!p) {
+    p = (async () => {
+      let r: Response;
+      try {
+        r = await fetch(
+          `${SITE_ORIGIN}/api/bible/chapter?t=${encodeURIComponent(translation)}&b=${bookId}&c=${chapter}`,
+          { headers: { Accept: 'application/json' } },
+        );
+      } catch {
+        throw new BibleError(UNAVAILABLE);
+      }
+      const body = (await r.json().catch(() => null)) as { ok?: boolean; error?: string; verses?: Record<string, string> } | null;
+      if (r.status === 404 && body?.error === 'missing_book') throw new BibleError('This book isn’t in this Bible yet.', 'not_found');
+      if (!r.ok || !body?.ok || !body.verses) throw new BibleError(UNAVAILABLE);
+      const verses = Object.entries(body.verses)
+        .map(([n, text]) => ({ n: Number(n), text: String(text) }))
+        .filter((v) => Number.isInteger(v.n) && v.n > 0 && v.text)
+        .sort((x, y) => x.n - y.n);
+      if (!verses.length) throw new BibleError(UNAVAILABLE);
+      return { translation, bookId, chapter, verses, copyright: registry.get(translation)?.licenseNotice ?? undefined };
+    })();
+    p.catch(() => siteCache.delete(key));
+    siteCache.set(key, p);
   }
-  return nivStatus;
-}
-
-type NivResponse = {
-  ok?: boolean;
-  message?: string;
-  code?: string;
-  verses?: BibleVerse[];
-  copyright?: string;
-  fumsToken?: string;
-};
-
-const nivCache = new Map<string, BibleChapter>();
-
-async function loadNivChapter(bookId: string, chapter: number): Promise<BibleChapter> {
-  const key = `${bookId}.${chapter}`;
-  const cached = nivCache.get(key);
-  if (cached) return cached;
-  let r: Response;
-  try {
-    r = await fetch(`/api/bible?t=niv&chapter=${encodeURIComponent(key)}`, { headers: await authHeaders() });
-  } catch (err) {
-    if (err instanceof BibleError) throw err;
-    throw new BibleError(UNAVAILABLE);
-  }
-  const body = (await r.json().catch(() => ({}))) as NivResponse;
-  if (!r.ok || body.ok !== true || !Array.isArray(body.verses)) {
-    throw new BibleError(body.message || UNAVAILABLE, body.code || 'unavailable');
-  }
-  if (body.fumsToken) trackFums(body.fumsToken);
-  const result: BibleChapter = { translation: 'niv', bookId, chapter, verses: body.verses, copyright: body.copyright };
-  nivCache.set(key, result);
-  return result;
-}
-
-/* API.Bible requires its usage tracker (FUMS) on web apps that show licensed text. */
-type FumsWindow = Window & { fumsData?: unknown[]; fums?: (...args: unknown[]) => void };
-let fumsLoaded = false;
-
-function trackFums(token: string): void {
-  if (typeof window === 'undefined') return;
-  const w = window as FumsWindow;
-  if (!fumsLoaded) {
-    fumsLoaded = true;
-    w.fumsData = w.fumsData || [];
-    w.fums =
-      w.fums ||
-      function (...args: unknown[]) {
-        w.fumsData!.push(args);
-      };
-    const s = document.createElement('script');
-    s.src = 'https://pkg.api.bible/fumsV3.min.js';
-    s.async = true;
-    document.body.appendChild(s);
-  }
-  try {
-    w.fums?.('trackView', token);
-  } catch {
-    /* tracking must never break reading */
-  }
+  return p;
 }
 
 /* ---------------- Public API ---------------- */
@@ -157,16 +187,26 @@ function trackFums(token: string): void {
 export async function loadChapter(translation: BibleTranslation, bookId: string, chapter: number): Promise<BibleChapter> {
   const book = bookById(bookId);
   if (!book || chapter < 1 || chapter > book.chapters) throw new BibleError('That chapter wasn’t found.', 'not_found');
-  return translation === 'niv' ? loadNivChapter(book.id, chapter) : loadKjvChapter(book.id, chapter);
+  return translation === 'kjv' ? loadKjvChapter(book.id, chapter) : loadSiteChapter(translation, book.id, chapter);
 }
 
 /* ---------------- Reading place + text size, remembered on this device ---------------- */
 
-export type BiblePrefs = { translation: BibleTranslation; bookId: string; chapter: number; textSize: number };
+export type BiblePrefs = {
+  translation: BibleTranslation;
+  bookId: string;
+  chapter: number;
+  textSize: number;
+  /** A second Bible shown under each verse (e.g. Luganda under English), like the website. */
+  under: BibleTranslation | null;
+};
 
 const PREFS_KEY = 'awc.bible.v1';
 export const TEXT_SIZES = [16, 18, 20, 23, 26] as const;
-const DEFAULT_PREFS: BiblePrefs = { translation: 'kjv', bookId: 'JHN', chapter: 1, textSize: 1 };
+const DEFAULT_PREFS: BiblePrefs = { translation: 'kjv', bookId: 'JHN', chapter: 1, textSize: 1, under: null };
+const ID_RE = /^[A-Za-z0-9_-]{1,40}$/;
+/** Older saves used 'niv' for the API.Bible NIV; that is YouVersion's NIV now. */
+const normalizeId = (v: unknown): string | null => (v === 'niv' ? 'yv_niv' : typeof v === 'string' && ID_RE.test(v) ? v : null);
 
 export function readBiblePrefs(): BiblePrefs {
   try {
@@ -176,7 +216,8 @@ export function readBiblePrefs(): BiblePrefs {
     const book = bookById(p.bookId);
     const chapter = Number(p.chapter);
     return {
-      translation: p.translation === 'niv' ? 'niv' : 'kjv',
+      translation: normalizeId(p.translation) ?? 'kjv',
+      under: normalizeId(p.under),
       bookId: book ? book.id : DEFAULT_PREFS.bookId,
       chapter: book && chapter >= 1 && chapter <= book.chapters ? chapter : 1,
       textSize: Number.isInteger(p.textSize) && p.textSize! >= 0 && p.textSize! < TEXT_SIZES.length ? p.textSize! : DEFAULT_PREFS.textSize,

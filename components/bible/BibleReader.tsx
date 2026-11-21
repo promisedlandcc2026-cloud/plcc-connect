@@ -5,7 +5,8 @@ import { Bookmark, ChevronDown, ChevronLeft, ChevronRight, Pause, Play } from 'l
 import { ErrorState, SkeletonRows } from '../ui/States';
 import { VerseSheet } from './VerseSheet';
 import { bookById, formatReference, stepChapter } from '../../lib/bibleBooks';
-import { BibleError, loadChapter, TEXT_SIZES, TRANSLATION_LABEL, type BibleChapter, type BiblePrefs, type BibleTranslation } from '../../lib/bibleClient';
+import { BibleError, loadChapter, TEXT_SIZES, translationLabel, type BibleChapter, type BiblePrefs, type BibleTranslation, type TranslationInfo } from '../../lib/bibleClient';
+import { TranslationSheet } from './TranslationSheet';
 import {
   getMarks,
   HIGHLIGHT_BG,
@@ -23,7 +24,8 @@ export type Highlight = { from: number; to: number } | null;
 type Props = {
   prefs: BiblePrefs;
   translation: BibleTranslation;
-  nivReady: boolean;
+  /** Every Bible the church offers (from the website). */
+  translations: TranslationInfo[];
   highlight: Highlight;
   onPrefs: (update: (p: BiblePrefs) => BiblePrefs) => void;
   onGoTo: (bookId: string, chapter: number, hl?: Highlight) => void;
@@ -34,7 +36,7 @@ type Props = {
 
 const WORDS_PER_MINUTE = 200;
 
-export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, highlight, onPrefs, onGoTo, onBack, onPicker, onToast }) => {
+export const BibleReader: React.FC<Props> = ({ prefs, translation, translations, highlight, onPrefs, onGoTo, onBack, onPicker, onToast }) => {
   const navigate = useNavigate();
   const book = bookById(prefs.bookId)!;
   const [data, setData] = useState<BibleChapter | null>(null);
@@ -43,6 +45,9 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [marks, setMarks] = useState(() => getMarks());
   const [sizeOpen, setSizeOpen] = useState(false);
+  const [bibleOpen, setBibleOpen] = useState(false);
+  const [underText, setUnderText] = useState<Record<number, string> | null>(null);
+  const under = prefs.under && prefs.under !== translation ? prefs.under : null;
   const [speakingVerse, setSpeakingVerse] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
   const readingRef = useRef<Reading | null>(null);
@@ -75,6 +80,23 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
       setLoading(false);
     }
   }, [translation, prefs.bookId, prefs.chapter]);
+
+  // A second Bible under each verse (e.g. Luganda under English), like the website.
+  useEffect(() => {
+    let alive = true;
+    setUnderText(null);
+    if (!under) return;
+    loadChapter(under, prefs.bookId, prefs.chapter)
+      .then((c) => {
+        if (alive) setUnderText(Object.fromEntries(c.verses.map((v) => [v.n, v.text])));
+      })
+      .catch(() => {
+        /* the main text still shows */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [under, prefs.bookId, prefs.chapter]);
 
   useEffect(() => {
     void load();
@@ -116,7 +138,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
       .filter((v) => selected.has(v.n))
       .map((v) => (nums.length > 1 ? `${v.n} ${v.text}` : v.text))
       .join(' ');
-    return `“${body}”\n— ${reference} ${TRANSLATION_LABEL[data.translation]}`;
+    return `“${body}”\n— ${reference} ${translationLabel(data.translation)}`;
   }, [data, nums, selected, reference]);
 
   const selColor: HighlightColor | null = useMemo(() => {
@@ -201,12 +223,13 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
           </button>
           <button
             type="button"
-            disabled={!nivReady}
-            onClick={() => onPrefs((p) => ({ ...p, translation: translation === 'kjv' ? 'niv' : 'kjv' }))}
-            aria-label={nivReady ? `Translation: ${TRANSLATION_LABEL[translation]}. Switch to ${translation === 'kjv' ? 'NIV' : 'KJV'}` : 'King James Version. NIV is coming soon'}
-            className={`${iconBtn} px-3 text-[13px] font-extrabold text-burgundy disabled:text-burgundy`}
+            onClick={() => setBibleOpen(true)}
+            aria-haspopup="dialog"
+            aria-label={`Bible: ${translationLabel(translation)}${under ? `, with ${translationLabel(under)} under each verse` : ''}. Change`}
+            className={`${iconBtn} px-3 text-[13px] font-extrabold text-burgundy`}
           >
-            {TRANSLATION_LABEL[translation]}
+            {translationLabel(translation)}
+            {under ? <span className="ml-1 font-bold text-ink-soft">+{translationLabel(under)}</span> : null}
           </button>
           <div className="relative">
             <button type="button" onClick={() => setSizeOpen((o) => !o)} aria-expanded={sizeOpen} aria-label="Text size" className={`${iconBtn} w-11 font-display text-[15px] font-bold text-ink`}>
@@ -291,12 +314,18 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
                       <Bookmark size={Math.round(fontPx * 0.7)} className="inline -mt-1 mr-1 text-burgundy" fill="currentColor" aria-label="Bookmarked" />
                     ) : null}
                     {v.text}{' '}
+                    {underText?.[v.n] ? (
+                      <span className="mb-2 mt-0.5 block font-sans text-ink-soft leading-snug" style={{ fontSize: Math.round(fontPx * 0.82) }}>
+                        {underText[v.n]}
+                      </span>
+                    ) : null}
                   </span>
                 );
               })}
             </p>
             {data.copyright ? <p className="mt-6 text-[11px] leading-snug text-ink-soft">{data.copyright}</p> : null}
             {data.translation === 'kjv' ? <p className="mt-6 text-[11px] text-ink-soft">King James Version (public domain)</p> : null}
+            {under && underText ? <p className="mt-2 text-[11px] text-ink-soft">Under each verse: {translationLabel(under)}</p> : null}
           </>
         ) : null}
       </article>
@@ -364,6 +393,20 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
           }}
           onAddToNotes={addToNotes}
           onClose={clear}
+        />
+      ) : null}
+
+      {bibleOpen ? (
+        <TranslationSheet
+          list={translations}
+          current={translation}
+          under={under}
+          onPick={(id) => {
+            onPrefs((p) => ({ ...p, translation: id, under: p.under === id ? null : p.under }));
+            setBibleOpen(false);
+          }}
+          onUnder={(id) => onPrefs((p) => ({ ...p, under: id }))}
+          onClose={() => setBibleOpen(false)}
         />
       ) : null}
     </>

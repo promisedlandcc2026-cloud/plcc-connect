@@ -2,7 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Bookmark, BookOpenText, Highlighter, Search, Share2, X } from 'lucide-react';
 import { MemberPageHeader } from '../member/MemberPageHeader';
 import { bookById, parseReference } from '../../lib/bibleBooks';
-import { loadKjvBookText, TRANSLATION_LABEL, type BibleTranslation } from '../../lib/bibleClient';
+import { FEATURED_TRANSLATIONS, loadKjvBookText, translationLabel, translationName, type BibleTranslation, type TranslationInfo } from '../../lib/bibleClient';
+import { TranslationSheet } from './TranslationSheet';
 import { readRecent } from '../../lib/bibleMarks';
 import { searchKjv, type SearchHit, type SearchProgress } from '../../lib/bibleSearch';
 import { getTodaysWord } from '../../lib/todaysWord';
@@ -11,7 +12,8 @@ type Props = {
   bookId: string;
   chapter: number;
   translation: BibleTranslation;
-  nivReady: boolean;
+  /** Every Bible the church offers (from the website). */
+  translations: TranslationInfo[];
   onTranslation: (t: BibleTranslation) => void;
   onRead: (bookId: string, chapter: number, verse?: number, verseEnd?: number) => void;
   onBooks: () => void;
@@ -54,7 +56,10 @@ function exactFirst<T extends { text: string }>(hits: T[], query: string): T[] {
   return [...hits.filter((h) => norm(h.text).includes(phrase)), ...hits.filter((h) => !norm(h.text).includes(phrase))];
 }
 
-export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, nivReady, onTranslation, onRead, onBooks, onMarks, onToast }) => {
+export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, translations, onTranslation, onRead, onBooks, onMarks, onToast }) => {
+  const [bibleOpen, setBibleOpen] = useState(false);
+  const quick = FEATURED_TRANSLATIONS.filter((id) => translations.some((t) => t.id === id));
+  if (!quick.includes(translation)) quick.push(translation);
   const [query, setQuery] = useState('');
   const [hint, setHint] = useState<string | null>(null);
   const [search, setSearch] = useState<{ q: string; p: SearchProgress } | null>(null);
@@ -142,8 +147,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, nivRe
         backLabel="Me"
         action={
           <div role="radiogroup" aria-label="Translation" className="flex h-10 rounded-full bg-white border border-gray-200 p-[3px]">
-            {(['kjv', 'niv'] as const).map((t) => {
-              const disabled = t === 'niv' && !nivReady;
+            {quick.map((t) => {
               const active = translation === t;
               return (
                 <button
@@ -151,15 +155,24 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, nivRe
                   type="button"
                   role="radio"
                   aria-checked={active}
-                  disabled={disabled}
                   onClick={() => onTranslation(t)}
-                  title={disabled ? 'NIV is coming soon' : undefined}
-                  className={`px-3.5 rounded-full text-[13px] font-bold ${active ? 'bg-burgundy text-white' : disabled ? 'text-gray-300' : 'text-ink-soft'}`}
+                  className={`px-3 rounded-full text-[13px] font-bold ${active ? 'bg-burgundy text-white' : 'text-ink-soft'}`}
                 >
-                  {TRANSLATION_LABEL[t]}
+                  {translationLabel(t)}
                 </button>
               );
             })}
+            {translations.length > quick.length ? (
+              <button
+                type="button"
+                onClick={() => setBibleOpen(true)}
+                aria-haspopup="dialog"
+                aria-label="More Bibles"
+                className="px-2.5 rounded-full text-[13px] font-bold text-ink-soft"
+              >
+                More
+              </button>
+            ) : null}
           </div>
         }
       />
@@ -232,7 +245,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, nivRe
             <span className="mt-1.5 block font-display text-[30px] font-bold text-white leading-tight">
               {book.name} {book.chapters > 1 ? chapter : ''}
             </span>
-            <span className="mt-1 block text-[14px] text-cream/75">{translation === 'niv' ? 'New International Version' : 'King James Version'}</span>
+            <span className="mt-1 block text-[14px] text-cream/75">{translationName(translation)}</span>
             <span className="mt-4 flex items-center gap-3">
               <span className="flex-1 h-1.5 rounded-full bg-white/15 overflow-hidden" aria-hidden>
                 <span className="block h-full rounded-full bg-leaf" style={{ width: `${Math.max(4, Math.round((chapter / book.chapters) * 100))}%` }} />
@@ -302,6 +315,20 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, nivRe
           ) : null}
         </div>
       )}
+      {bibleOpen ? (
+        <TranslationSheet
+          list={translations}
+          current={translation}
+          under={null}
+          showUnder={false}
+          onPick={(id) => {
+            onTranslation(id);
+            setBibleOpen(false);
+          }}
+          onUnder={() => {}}
+          onClose={() => setBibleOpen(false)}
+        />
+      ) : null}
     </>
   );
 };

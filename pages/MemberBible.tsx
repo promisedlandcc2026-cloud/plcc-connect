@@ -5,7 +5,7 @@ import { BibleReader, type Highlight } from '../components/bible/BibleReader';
 import { BookPicker } from '../components/bible/BookPicker';
 import { MarksSheet } from '../components/bible/MarksSheet';
 import { BIBLE_BOOKS, bookById, parseReference } from '../lib/bibleBooks';
-import { isNivAvailable, readBiblePrefs, saveBiblePrefs, type BiblePrefs, type BibleTranslation } from '../lib/bibleClient';
+import { KJV_INFO, loadTranslations, readBiblePrefs, saveBiblePrefs, type BiblePrefs, type BibleTranslation, type TranslationInfo } from '../lib/bibleClient';
 
 /** Read "?ref=JHN.3.16" (deep links) or "?q=John 3:16" into a place in the Bible. */
 function placeFromParams(params: URLSearchParams): { bookId: string; chapter: number; highlight: Highlight } | null {
@@ -29,8 +29,10 @@ function placeFromParams(params: URLSearchParams): { bookId: string; chapter: nu
 
 /**
  * Bible — home (search, continue reading, verse of the day, highlights, bookmarks) and
- * the reader. KJV is bundled (public domain); NIV turns on once the church's API.Bible
- * key is set. Reading place, highlights and bookmarks are remembered on this device.
+ * the reader. KJV is bundled (public domain, works offline); every other Bible —
+ * NIV and NKJV (YouVersion), Bayibuli Entukuvu, Kiswahili… — comes from the PLCC
+ * website, the same list as the website's /bible and Ka Link, with an optional
+ * second Bible under each verse. Reading place, highlights and bookmarks are remembered on this device.
  * The reader is "?view=read", so the phone's back button returns to the Bible home.
  */
 export const MemberBiblePage: React.FC = () => {
@@ -41,18 +43,26 @@ export const MemberBiblePage: React.FC = () => {
     return fromLink ? { ...saved, bookId: fromLink.bookId, chapter: fromLink.chapter } : saved;
   });
   const [highlight, setHighlight] = useState<Highlight>(() => placeFromParams(params)?.highlight ?? null);
-  const [nivReady, setNivReady] = useState(false);
+  const [translations, setTranslations] = useState<TranslationInfo[]>([KJV_INFO]);
+  const [listLoaded, setListLoaded] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [marksOpen, setMarksOpen] = useState<'highlights' | 'bookmarks' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const reading = params.get('view') === 'read';
   const book = bookById(prefs.bookId) ?? BIBLE_BOOKS[42];
-  const translation: BibleTranslation = prefs.translation === 'niv' && nivReady ? 'niv' : 'kjv';
+  // Until the list arrives, trust the saved choice; once it's here, fall back to KJV
+  // if that Bible is no longer offered (e.g. a license was turned off).
+  const translation: BibleTranslation =
+    !listLoaded || translations.some((t) => t.id === prefs.translation) ? prefs.translation : 'kjv';
 
   useEffect(() => {
     let alive = true;
-    void isNivAvailable().then((ok) => alive && setNivReady(ok));
+    void loadTranslations().then(({ list }) => {
+      if (!alive) return;
+      setTranslations(list);
+      setListLoaded(list.length > 1);
+    });
     return () => {
       alive = false;
     };
@@ -101,7 +111,7 @@ export const MemberBiblePage: React.FC = () => {
         <BibleReader
           prefs={{ ...prefs, bookId: book.id }}
           translation={translation}
-          nivReady={nivReady}
+          translations={translations}
           highlight={highlight}
           onPrefs={setPrefs}
           onGoTo={goTo}
@@ -114,7 +124,7 @@ export const MemberBiblePage: React.FC = () => {
           bookId={book.id}
           chapter={prefs.chapter}
           translation={translation}
-          nivReady={nivReady}
+          translations={translations}
           onTranslation={(t) => setPrefs((p) => ({ ...p, translation: t }))}
           onRead={(b, c, v, ve) => goTo(b, c, v ? { from: v, to: ve ?? v } : null)}
           onBooks={() => setPickerOpen(true)}
