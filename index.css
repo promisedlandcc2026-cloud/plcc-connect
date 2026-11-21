@@ -511,6 +511,9 @@ html.tribes-forest .bg-white\/60,
 html.tribes-forest .bg-white\/70,
 html.tribes-forest .bg-white\/80 { background-color: rgba(247, 239, 221, 0.06); border-color: rgba(217, 180, 94, 0.3); }
 
+/* Inside a card, the old ivory "eggshell" stays a light inset (not forest). */
+html.tribes-forest :is(.bg-white, .bg-\[\#FBF7EE\], .bg-\[\#FDF9EF\], .bg-\[\#fffcf4\], .tribes-ticket, .awc-ticket, .pr-bible, [role='dialog']) :is(.bg-eggshell, .bg-cream, .bg-gold-cream) { background-color: #EFE5CF; }
+
 /* Paper cards */
 html.tribes-forest .bg-white,
 html.tribes-forest .bg-\[\#FBF7EE\],
