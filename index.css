@@ -617,3 +617,6 @@ html.tribes-forest :is(button, a).bg-white:not(:is(.bg-white, .tribes-ticket, .a
   background-clip: text;
   color: transparent;
 }
+
+/* Keep chat composition readable on its warm, light surface. */
+html.tribes-forest .ka-link-chat-surface .bg-eggshell\/95 { background-color: rgba(247, 239, 221, .97); }
