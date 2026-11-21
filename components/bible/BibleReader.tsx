@@ -248,7 +248,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
             </select>
           </label>
         </div>
-        <label className="mt-3 flex items-center gap-2 rounded-xl bg-[#eee4cc] px-3 text-sm font-semibold text-ink">
+        <label className="mt-3 flex items-center gap-2 rounded-xl bg-[#F3EBD8] px-3 text-sm font-semibold text-[#19261f]">
           <span className="shrink-0">Under each verse</span>
           <select className="min-w-0 flex-1 h-11 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold" value={under ?? ''} onChange={(e) => onPrefs((p) => ({ ...p, under: e.target.value || null }))}>
             <option value="">None</option>
@@ -257,7 +257,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
         </label>
       </div>
 
-      <article className="mt-4 rounded-2xl bg-[#fffdf8] border border-[#e9e3d6] px-4 py-5 sm:px-7" aria-live="polite" aria-busy={loading}>
+      <article className="mt-4 rounded-2xl bg-white border border-[#e9e3d6] px-4 py-5 sm:px-7" aria-live="polite" aria-busy={loading}>
         <header className="mb-5">
           <h2 className="font-display text-2xl font-bold text-ink">{book.name} {prefs.chapter}</h2>
           <p className="mt-1 text-sm font-semibold text-ink-soft">{translations.find((t) => t.id === translation)?.name ?? translationLabel(translation)}{data && !loading ? ` · ${minutes} min read` : ''}</p>
