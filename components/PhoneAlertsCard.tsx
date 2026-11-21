@@ -56,7 +56,7 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
 
   if (!user || hidden || !state) return null;
   if (variant === 'nudge' && !(state.kind === 'off' || state.kind === 'needs-install')) return null;
-  if (state.kind === 'signed-out' || (variant === 'full' && state.kind === 'not-set-up')) return null;
+  if (state.kind === 'signed-out') return null;
 
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
@@ -100,14 +100,18 @@ export const PhoneAlertsCard: React.FC<{ variant?: 'full' | 'nudge' }> = ({ vari
   } else if (state.kind === 'unsupported') {
     content = <p className="text-[15px] text-ink-soft">This browser can’t show alerts. Try Chrome or Safari on your phone.</p>;
   } else if (state.kind === 'not-set-up') {
-    return null;
+    content = <p className="text-[15px] text-ink-soft">Phone alerts are not available right now. Please try again later.</p>;
   } else if (state.kind === 'blocked') {
     content = (
       <>
         <p className="text-[15px] text-ink-soft">
-          Alerts are blocked on this device. Allow notifications for plcc-connect.vercel.app in your browser site settings and allow your browser’s notifications in phone settings. Then return here.
+          The browser still reports notifications blocked for this site. In Chrome, open plcc-connect.vercel.app, then tap the icon beside the address → Permissions → Notifications → Allow. Return here and check again.
         </p>
-        <Button variant="secondary" fullWidth onClick={refresh}>Check again</Button>
+        <Button variant="secondary" fullWidth disabled={busy} onClick={() => void run(async () => {
+          const next = await getAlertsState();
+          setState(next);
+          setNote({ ok: next.kind === 'on' || next.kind === 'off', text: next.kind === 'blocked' ? 'Still blocked in this browser. Check the site permission in Chrome, then close and reopen Tribes.' : next.kind === 'off' ? 'Permission checked. Tap Turn on alerts to finish.' : next.kind === 'on' ? 'Alerts are on for this browser. Send a test to check delivery.' : 'Permission checked. See the message above for the next step.' });
+        })}>{busy ? 'Checking…' : 'Check again'}</Button>
       </>
     );
   } else if (state.kind === 'off') {
