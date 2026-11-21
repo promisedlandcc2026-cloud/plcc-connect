@@ -303,8 +303,8 @@ export const CommunityChatRoomPage: React.FC = () => {
   }
 
   return (
-    <main className="ka-link-chat-surface flex-1 bg-white px-5 pt-8 pb-28 flex flex-col min-h-[70vh]">
-      <div className="flex items-center justify-between gap-2 mb-4">
+    <main className="ka-link-chat-surface min-w-0 flex-1 bg-white px-4 pt-4 pb-28 flex flex-col min-h-[70vh]">
+      <div className="mb-4 flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-[#ded8cb] pb-3">
         <Link
           to={locState.returnTab ? `/community/chat?tab=${encodeURIComponent(locState.returnTab)}` : '/community/chat'}
           className="inline-flex items-center gap-2 text-burgundy text-sm font-bold min-h-[44px]"
@@ -312,6 +312,7 @@ export const CommunityChatRoomPage: React.FC = () => {
           <ArrowLeft size={18} aria-hidden />
           Channels
         </Link>
+        <h1 className="min-w-0 flex-1 truncate text-base font-bold text-[#123527]" title={roomTitle}>{!isDm && <span aria-hidden="true" className="mr-2 text-gold-ink">#</span>}{roomTitle}{huddleLive && !isDm && <span className="ml-2 inline-block h-2 w-2 rounded-full bg-emerald-500" role="status" aria-label="Live Ka Link"/>}</h1>
         {isDm && dmCall ? (
           <div className="flex items-center gap-1">
             <button
@@ -319,8 +320,8 @@ export const CommunityChatRoomPage: React.FC = () => {
               onClick={() => placeCall(false)}
               disabled={callBusy}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-burgundy rounded-xl active:bg-burgundy/10 disabled:opacity-40"
-              aria-label={`Voice call ${roomTitle}`}
-              title="Voice call"
+              aria-label={`Audio call ${roomTitle}`}
+              title="Audio call"
               data-dm-call="voice"
             >
               <Phone size={19} aria-hidden />
@@ -342,7 +343,7 @@ export const CommunityChatRoomPage: React.FC = () => {
           <button
             type="button"
             onClick={() => openHuddle('start')}
-            className="inline-flex items-center gap-1.5 text-burgundy text-sm font-bold min-h-[44px] px-2"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-[#d9ae50] text-[#123527] text-sm font-bold min-h-[44px] px-3"
           >
             <Radio size={16} aria-hidden />
             Start Ka Link
@@ -359,16 +360,7 @@ export const CommunityChatRoomPage: React.FC = () => {
         </Link>
       ) : null}
 
-      <h1 className="text-lg font-bold text-[#1A1A1A] mb-3 truncate flex items-center gap-2">
-        {roomTitle}
-        {huddleLive && !isDm ? (
-          <span
-            className="shrink-0 w-2 h-2 rounded-full bg-emerald-500 animate-pulse"
-            role="status"
-            aria-label="Live Ka Link"
-          />
-        ) : null}
-      </h1>
+
 
       {huddleIntent && !huddleOpen && !isDm ? (
         <div className="mb-4 rounded-2xl bg-wine p-4 text-cream shadow-lg">
