@@ -46,7 +46,11 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
   const [marks, setMarks] = useState(() => getMarks());
   const [sizeOpen, setSizeOpen] = useState(false);
   const [bibleOpen, setBibleOpen] = useState(false);
-  const [underText, setUnderText] = useState<Record<number, string> | null>(null);
+  const [comparison, setComparison] = useState<BibleChapter | null>(null);
+  const [comparisonError, setComparisonError] = useState(false);
+  const [comparisonLoading, setComparisonLoading] = useState(false);
+  const underText = useMemo(() => comparison ? Object.fromEntries(comparison.verses.map((v) => [v.n, v.text])) : null, [comparison]);
+  const sideBySide = prefs.comparisonLayout !== 'under';
   const under = prefs.under && prefs.under !== translation ? prefs.under : null;
   const [speakingVerse, setSpeakingVerse] = useState<number | null>(null);
   const [listening, setListening] = useState(false);
@@ -84,15 +88,18 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
   // A second Bible under each verse (e.g. Luganda under English), like the website.
   useEffect(() => {
     let alive = true;
-    setUnderText(null);
+    setComparison(null);
+    setComparisonError(false);
+    setComparisonLoading(Boolean(under));
     if (!under) return;
     loadChapter(under, prefs.bookId, prefs.chapter)
       .then((c) => {
-        if (alive) setUnderText(Object.fromEntries(c.verses.map((v) => [v.n, v.text])));
+        if (alive) setComparison(c);
       })
       .catch(() => {
-        /* the main text still shows */
-      });
+        if (alive) setComparisonError(true);
+      })
+      .finally(() => { if (alive) setComparisonLoading(false); });
     return () => {
       alive = false;
     };
@@ -249,12 +256,24 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
           </label>
         </div>
         <label className="mt-3 flex items-center gap-2 rounded-xl bg-[#F3EBD8] px-3 text-sm font-semibold text-[#19261f]">
-          <span className="shrink-0">Under each verse</span>
+          <span className="shrink-0">Compare with</span>
           <select className="min-w-0 flex-1 h-11 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold" value={under ?? ''} onChange={(e) => onPrefs((p) => ({ ...p, under: e.target.value || null }))}>
             <option value="">None</option>
             {translations.filter((t) => t.id !== translation).map((t) => <option key={t.id} value={t.id}>{t.languageLabel} · {t.name}</option>)}
           </select>
         </label>
+        {under ? (
+          <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="Comparison layout">
+            <span className="mr-1 text-sm font-semibold text-ink-soft">Display</span>
+            {([['side', 'Side by side'], ['under', 'Under each verse']] as const).map(([value, label]) => (
+              <button key={value} type="button" aria-pressed={(prefs.comparisonLayout ?? 'side') === value}
+                onClick={() => onPrefs((p) => ({ ...p, comparisonLayout: value }))}
+                className={`rounded-full border px-4 py-2 text-sm font-bold ${ (prefs.comparisonLayout ?? 'side') === value ? 'bg-leaf border-leaf text-[#12231c]' : 'bg-white border-gray-200 text-[#19261f]' }`}>
+                {label}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <article className="mt-4 rounded-2xl bg-white border border-[#e9e3d6] px-4 py-5 sm:px-7" aria-live="polite" aria-busy={loading}>
@@ -269,6 +288,9 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
           <ErrorState message={error} onRetry={() => void load()} />
         ) : data ? (
           <>
+            {under && comparisonLoading ? <p role="status" className="mb-3 text-sm text-ink-soft">Loading comparison…</p> : null}
+            {under && comparisonError ? <p role="status" className="mb-3 text-sm text-ink-soft">The comparison translation could not be loaded for this chapter. Please choose another translation or try again.</p> : null}
+            {under && sideBySide && underText ? <div className="grid grid-cols-2 gap-4 border-b border-gray-200 pb-2 text-sm font-bold text-ink-soft"><span>{translations.find((t) => t.id === translation)?.shortName ?? translationLabel(translation)}</span><span>{translations.find((t) => t.id === under)?.shortName ?? translationLabel(under)}</span></div> : null}
             <div className="font-display text-ink leading-[1.65]" style={{ fontSize: fontPx + 1 }}>
               {data.verses.map((v) => {
                 const key = verseKey(book.id, prefs.chapter, v.n);
@@ -291,21 +313,21 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
                         toggleVerse(v.n);
                       }
                     }}
-                    className={`block py-2 cursor-pointer rounded-lg scroll-mt-32 transition-colors ${
+                    className={`${under && sideBySide && underText ? 'grid grid-cols-2 gap-4' : 'block'} py-2 cursor-pointer rounded-lg scroll-mt-32 transition-colors ${
                       isSel ? 'underline decoration-gold decoration-[3px] underline-offset-[5px]' : ''
                     }`}
                     style={bg ? { background: bg } : undefined}
                   >
-                    <sup className="mr-1 ml-0.5 font-sans font-extrabold text-burgundy" style={{ fontSize: Math.round(fontPx * 0.6) }}>
+                    <span className="min-w-0 break-words"><sup className="mr-1 ml-0.5 font-sans font-extrabold text-burgundy" style={{ fontSize: Math.round(fontPx * 0.6) }}>
                       {v.n}
                     </sup>
                     {marks.bookmarks[key] ? (
                       <Bookmark size={Math.round(fontPx * 0.7)} className="inline -mt-1 mr-1 text-burgundy" fill="currentColor" aria-label="Bookmarked" />
                     ) : null}
-                    {v.text}{' '}
-                    {underText?.[v.n] ? (
-                      <span className="mt-1 block border-l-2 border-gold pl-3 font-sans text-ink-soft leading-relaxed" style={{ fontSize: Math.round(fontPx * 0.82) }}>
-                        {underText[v.n]}
+                    {v.text}</span>
+                    {underText ? (
+                      <span className={`${sideBySide ? 'min-w-0 break-words border-l border-gray-200 pl-3' : 'mt-1 block border-l-2 border-gold pl-3'} font-sans text-ink-soft leading-relaxed`} style={{ fontSize: Math.round(fontPx * 0.82) }}>
+                        {underText[v.n] ?? 'Verse unavailable in this translation.'}
                       </span>
                     ) : null}
                   </span>
@@ -314,7 +336,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
             </div>
             {data.copyright ? <p className="mt-6 text-[11px] leading-snug text-ink-soft">{data.copyright}</p> : null}
             {data.translation === 'kjv' ? <p className="mt-6 text-[11px] text-ink-soft">King James Version (public domain)</p> : null}
-            {under && underText ? <p className="mt-2 text-[11px] text-ink-soft">Under each verse: {translationLabel(under)}</p> : null}
+            {under && comparison ? <p className="mt-2 text-[11px] text-ink-soft">Comparison: {translationLabel(under)}{comparison.copyright ? ` · ${comparison.copyright}` : comparison.translation === 'kjv' ? ' · King James Version (public domain)' : ''}</p> : null}
           </>
         ) : null}
       </article>
