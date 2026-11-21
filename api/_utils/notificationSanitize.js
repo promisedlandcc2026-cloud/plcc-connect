@@ -192,6 +192,9 @@ export function isVaultNewsNotification(type, rawLink) {
  */
 export function resolveNotificationDestination(type, sourceId, rawLink) {
   const t = String(type || '').trim();
+  if (t === 'assignment' && rawLink === '/pastors-office') {
+    return { path: '/pastors-office', label: 'Open Pastor’s Office', kind: 'pastoral_office' };
+  }
   if (isVaultNewsNotification(t, rawLink || null)) {
     return {
       path: '/?section=vault-news',
