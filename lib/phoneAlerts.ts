@@ -76,7 +76,7 @@ export async function getAlertsState(): Promise<AlertsState> {
   const sub = await currentSubscription().catch(() => null);
   const status = await api(`?action=status${sub ? `&endpoint=${encodeURIComponent(sub.endpoint)}` : ''}`);
   if (!status.enabled) return { kind: 'not-set-up' };
-  if (sub && status.subscribed) return { kind: 'on', topics: status.topics || ['church'] };
+  if (sub && status.subscribed && Notification.permission === 'granted') return { kind: 'on', topics: status.topics || ['church'] };
   if (sub && Notification.permission === 'granted') {
     // Phone still has a subscription the Vault doesn't know (new account on
     // this phone, or the browser renewed it): quietly save it again.
@@ -96,11 +96,11 @@ export async function getAlertsState(): Promise<AlertsState> {
 /** Ask permission (must run from a tap) and save this phone. */
 export async function turnOnAlerts(topics: AlertTopic[] = ['church', 'prayer', 'community']): Promise<AlertsState> {
   if (!supported()) return { kind: 'unsupported' };
+  // Keep the permission request in the user's tap, before any network request.
+  const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if (permission !== 'granted') return permission === 'denied' ? { kind: 'blocked' } : { kind: 'off' };
   const status = await api('?action=status');
   if (!status.enabled || !status.publicKey) return { kind: 'not-set-up' };
-
-  const permission = await Notification.requestPermission();
-  if (permission !== 'granted') return permission === 'denied' ? { kind: 'blocked' } : { kind: 'off' };
 
   const reg = (await registerAlertsWorker()) || (await navigator.serviceWorker.ready);
   await navigator.serviceWorker.ready;

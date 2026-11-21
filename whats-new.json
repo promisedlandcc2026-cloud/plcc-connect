@@ -1,4 +1,4 @@
 {
-  "notes": "Chat conversations have a clearer header with separate audio and video call controls.",
+  "notes": "Phone alerts now recheck permission when you return from your device settings.",
   "critical": false
 }
