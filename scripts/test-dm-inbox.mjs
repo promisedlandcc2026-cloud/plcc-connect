@@ -57,3 +57,55 @@ test('recent conversation fallback is isolated by account and leaves the legacy 
     assert.equal(store.get('awc.chat.dmRecents.v1'), 'legacy-data');
   } finally { if (previous === undefined) delete globalThis.localStorage; else globalThis.localStorage = previous; }
 });
+
+test('smoke: open a private conversation and start a voice or video call', async () => {
+  const oldFetch = globalThis.fetch;
+  const oldOrigin = process.env.VAULT_API_ORIGIN;
+  process.env.VAULT_API_ORIGIN = 'https://vault.example.com';
+  const calls = [];
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url: String(url), options });
+    if (String(url).includes('subResource=dm-channel')) return new Response(JSON.stringify({ id: channelId, name: 'DM_hidden', visibility: 'dm', type: 'private' }), { status: 200 });
+    if (String(url).includes('subResource=dm-call')) return new Response(JSON.stringify({ channelId, partnerId, token: 'test-call-token', url: 'wss://calls.example.com', video: JSON.parse(options.body).video }), { status: 200 });
+    throw new Error('unexpected upstream route');
+  };
+  const headers = { authorization: 'Bearer aaa.bbb.ccc', 'content-type': 'application/json' };
+  try {
+    let res = response();
+    await handler({ method: 'POST', query: { resource: 'dm' }, headers, body: { partnerId } }, res);
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.channel.id, channelId);
+    assert.equal(res.body.channel.visibility, 'dm');
+    assert.match(calls[0].url, /subResource=dm-channel/);
+    assert.match(calls[0].url, new RegExp(`partnerId=${partnerId}`));
+    for (const video of [false, true]) {
+      res = response();
+      await handler({ method: 'POST', query: { resource: 'dm-call' }, headers, body: { action: 'ring', channelId, video } }, res);
+      assert.equal(res.statusCode, 200);
+      assert.equal(res.body.channelId, channelId);
+      assert.equal(res.body.video, video);
+      assert.equal(res.body.token, 'test-call-token');
+      const last = calls.at(-1);
+      assert.equal(last.options.headers.Authorization, headers.authorization);
+      assert.deepEqual(JSON.parse(last.options.body), { action: 'ring', channelId, video });
+    }
+    res = response();
+    await handler({ method: 'POST', query: { resource: 'dm-call' }, headers, body: { action: 'ring', channelId: 'not-a-uuid' } }, res);
+    assert.equal(res.statusCode, 400);
+    assert.equal(calls.length, 3);
+  } finally { globalThis.fetch = oldFetch; if (oldOrigin === undefined) delete process.env.VAULT_API_ORIGIN; else process.env.VAULT_API_ORIGIN = oldOrigin; }
+});
+
+test('smoke: inbox errors are not mistaken for an empty inbox', async () => {
+  const oldFetch = globalThis.fetch;
+  const oldOrigin = process.env.VAULT_API_ORIGIN;
+  process.env.VAULT_API_ORIGIN = 'https://vault.example.com';
+  try {
+    globalThis.fetch = async () => new Response(JSON.stringify({ ok: false }), { status: 200 });
+    const res = response();
+    await handler({ method: 'GET', query: { resource: 'dm-list' }, headers: { authorization: 'Bearer aaa.bbb.ccc' } }, res);
+    assert.equal(res.statusCode, 502);
+    assert.equal(res.body.ok, false);
+    assert.equal(res.body.conversations, undefined);
+  } finally { globalThis.fetch = oldFetch; if (oldOrigin === undefined) delete process.env.VAULT_API_ORIGIN; else process.env.VAULT_API_ORIGIN = oldOrigin; }
+});
