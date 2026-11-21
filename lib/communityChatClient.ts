@@ -437,3 +437,15 @@ export async function openDirectMessage(
     partnerId: typeof body.partnerId === 'string' ? body.partnerId : partnerId,
   };
 }
+
+export type ChatDmConversation = { channelId: string; partnerId: string; partnerName: string; lastMessageAt: string | null; blocked: boolean };
+
+/** Returns null on failure so callers can distinguish an outage from an empty inbox. */
+export async function fetchDmList(): Promise<ChatDmConversation[] | null> {
+  try {
+    const res = await authedFetch('/api/community-chat?resource=dm-list', { method: 'GET' });
+    if (!res.ok) return null;
+    const body = await res.json();
+    return body?.ok && Array.isArray(body.conversations) ? body.conversations : null;
+  } catch { return null; }
+}

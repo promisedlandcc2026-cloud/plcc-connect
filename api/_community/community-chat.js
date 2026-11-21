@@ -11,6 +11,7 @@ import {
   parseHuddleTokenCommand,
   parseMarkChatReadCommand,
   parseOpenDmCommand,
+  sanitizeDmList,
   parseSendChatMessageCommand,
   parseVaultChatChannelsResponse,
   parseVaultChatMessageMutationResponse,
@@ -30,6 +31,7 @@ import {
 import {
   buildVaultCommunityChatChannelsUrl,
   buildVaultCommunityChatDmChannelUrl,
+  buildVaultCommunityChatDmListUrl,
   buildVaultCommunityChatHuddleStatusesUrl,
   buildVaultCommunityChatMarkReadUrl,
   buildVaultCommunityChatMentorsUrl,
@@ -68,6 +70,7 @@ import {
 const UPSTREAM_TIMEOUT_MS = 15000;
 const TOKEN_UPSTREAM_TIMEOUT_MS = 20000;
 const ALLOWED_RESOURCES = new Set([
+  'dm-list',
   'dm-call',
   'huddle-moderate',
   'huddle-songs',
@@ -391,6 +394,22 @@ async function handleBridge(req, res) {
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    if (resource === 'dm-list') {
+      if (req.method !== 'GET') {
+        res.setHeader('Allow', 'GET');
+        return json(res, 405, { ok: false, code: 'method_not_allowed', message: 'Only GET is supported.' });
+      }
+      if (Object.keys(query).some((key) => key !== 'resource')) return json(res, 400, { ok: false, code: 'invalid_query', message: 'That chat request was not valid.' });
+      const upstream = await fetch(buildVaultCommunityChatDmListUrl(originResult.origin), {
+        method: 'GET', headers: { Accept: 'application/json', Authorization: `Bearer ${auth.token}` },
+        signal: controller.signal, redirect: 'error',
+      });
+      if (!upstream.ok) return mapUpstreamError(res, upstream.status);
+      const body = await upstream.json().catch(() => null);
+      if (!body || !Array.isArray(body.conversations)) return json(res, 502, { ok: false, code: 'invalid_upstream', message: 'Direct messages are temporarily unavailable.' });
+      return json(res, 200, { ok: true, conversations: sanitizeDmList(body) });
+    }
+
     if (resource === 'huddle-songs') {
       // #12 song library: play links for this room's moderators; the music team (Nov 19)
       // and managers also list, upload (bought music only) and delete. Canaan decides who may.

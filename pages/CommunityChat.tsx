@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -21,12 +21,13 @@ import {
 } from '../lib/communityChatTypes';
 import {
   fetchChatChannels,
+  fetchDmList,
   fetchChatUnread,
   openDirectMessage,
   searchChatDirectory,
 } from '../lib/communityChatClient';
 import { HuddleLiveBadge } from '../components/huddle/HuddleLiveDot';
-import { dmDisplayName, listDmRecents, rememberDmRecent } from '../lib/dmRecents';
+import { dmDisplayName, listDmRecents, rememberDmRecent, replaceDmRecents } from '../lib/dmRecents';
 import { Button } from '../components/ui/Button';
 import { MemberPageHeader } from '../components/member/MemberPageHeader';
 
@@ -44,14 +45,18 @@ function visibilityLabel(visibility: string | null): string {
 }
 
 export const CommunityChatPage: React.FC = () => {
-  const { identity, memberAccessState } = useAuth();
+  const { identity, user, memberAccessState } = useAuth();
+  const ownerId = identity?.id || user?.id || '';
+  const ownerRef = useRef(ownerId);
+  ownerRef.current = ownerId;
   const navigate = useNavigate();
   const [channels, setChannels] = useState<CommunityChatChannel[]>([]);
   const [unreadByChannel, setUnreadByChannel] = useState<Record<string, number>>({});
   const { byChannel: huddleByChannel } = useHuddleLive();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [dmRecents, setDmRecents] = useState(() => listDmRecents());
+  const [dmRecents, setDmRecents] = useState<ReturnType<typeof listDmRecents>>([]);
+  const [dmListUnavailable, setDmListUnavailable] = useState(false);
 
   const [newChatOpen, setNewChatOpen] = useState(false);
   const [searchQ, setSearchQ] = useState('');
@@ -65,14 +70,19 @@ export const CommunityChatPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const [list, unread] = await Promise.all([
+      const [list, unread, dms] = await Promise.all([
         fetchChatChannels(),
         fetchChatUnread().catch(() => ({ count: 0, byChannel: {} })),
+        fetchDmList(),
       ]);
+      if (ownerRef.current !== ownerId) return;
       setChannels(list);
       setUnreadByChannel(unread.byChannel);
-      setDmRecents(listDmRecents());
+      if (dms && ownerId) replaceDmRecents(ownerId, dms.map((dm) => ({ channelId: dm.channelId, partnerId: dm.partnerId, partnerName: dm.partnerName, avatarUrl: null, updatedAt: dm.lastMessageAt ? Date.parse(dm.lastMessageAt) : 0 })));
+      setDmRecents(listDmRecents(ownerId));
+      setDmListUnavailable(dms === null);
     } catch (err) {
+      if (ownerRef.current !== ownerId) return;
       const message =
         err instanceof CommunityChatError
           ? err.message
@@ -80,13 +90,38 @@ export const CommunityChatPage: React.FC = () => {
       setError(message);
       setChannels([]);
     } finally {
-      setLoading(false);
+      if (ownerRef.current === ownerId) setLoading(false);
     }
-  }, [memberAccessState]);
+  }, [memberAccessState, ownerId]);
 
   useEffect(() => {
+    setDmRecents([]);
     void load();
   }, [load]);
+
+  // Pick up messages started on Ka Link or another device without interrupting the list.
+  useEffect(() => {
+    if (memberAccessState !== 'approved_member' || !ownerId) return;
+    let alive = true;
+    let inFlight = false;
+    const refreshInbox = async () => {
+      if (!alive || inFlight || document.visibilityState === 'hidden') return;
+      inFlight = true;
+      const [dms, unread] = await Promise.all([fetchDmList(), fetchChatUnread().catch(() => null)]);
+      inFlight = false;
+      if (!alive || ownerRef.current !== ownerId) return;
+      if (dms) {
+        replaceDmRecents(ownerId, dms.map((dm) => ({ channelId: dm.channelId, partnerId: dm.partnerId, partnerName: dm.partnerName, avatarUrl: null, updatedAt: dm.lastMessageAt ? Date.parse(dm.lastMessageAt) : 0 })));
+        setDmRecents(listDmRecents(ownerId));
+        setDmListUnavailable(false);
+      } else setDmListUnavailable(true);
+      if (unread) setUnreadByChannel(unread.byChannel);
+    };
+    const timer = window.setInterval(() => void refreshInbox(), 30_000);
+    const onVisibility = () => { if (document.visibilityState === 'visible') void refreshInbox(); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => { alive = false; window.clearInterval(timer); document.removeEventListener('visibilitychange', onVisibility); };
+  }, [memberAccessState, ownerId]);
 
   useEffect(() => {
     if (!newChatOpen) return;
@@ -143,8 +178,8 @@ export const CommunityChatPage: React.FC = () => {
     setSearchError(null);
     try {
       const { channel } = await openDirectMessage(partner.id);
-      rememberDmRecent({ channelId: channel.id, partner });
-      setDmRecents(listDmRecents());
+      rememberDmRecent({ ownerId, channelId: channel.id, partner });
+      setDmRecents(listDmRecents(ownerId));
       closeNewChat();
       navigate(`/community/chat/${channel.id}`, {
         state: { partnerName: partner.name, isDm: true },
@@ -259,29 +294,16 @@ export const CommunityChatPage: React.FC = () => {
         </div>
       ) : (
         <div className="space-y-8">
-          {dmRecents.length > 0 ? (
-            <section>
-              <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 px-1">
-                Direct
-              </h2>
-              <ul className="space-y-2">
-                {dmRecents.map((dm) =>
-                  renderChannelRow(
-                    {
-                      id: dm.channelId,
-                      name: dm.partnerName,
-                      description: null,
-                      visibility: 'dm',
-                      type: 'private',
-                      ministryId: null,
-                    },
-                    dm.partnerName,
-                    { isDm: true }
-                  )
-                )}
-              </ul>
-            </section>
-          ) : null}
+          <section aria-labelledby="direct-messages-title">
+            <div className="mb-2 flex items-center justify-between gap-3 px-1">
+              <h2 id="direct-messages-title" className="text-xs font-black uppercase tracking-widest text-gray-500">Direct messages</h2>
+              <button type="button" onClick={() => setNewChatOpen(true)} className="min-h-[44px] px-3 rounded-xl bg-white text-[#12301f] font-bold text-sm border border-gray-200">New message</button>
+            </div>
+            {dmListUnavailable ? <p role="status" className="mb-2 text-sm text-ink-soft">Could not load all conversations. Showing messages opened on this device. Try Refresh.</p> : null}
+            {dmRecents.length ? <ul className="space-y-2">{dmRecents.map((dm) => renderChannelRow({ id: dm.channelId, name: dm.partnerName, description: null, visibility: 'dm', type: 'private', ministryId: null }, dm.partnerName, { isDm: true }))}</ul> : (
+              <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 text-sm text-gray-500">Message a member privately, then use the phone or video button in your conversation to call.</div>
+            )}
+          </section>
 
           <section>
             <h2 className="text-xs font-black uppercase tracking-widest text-gray-500 mb-2 px-1">
@@ -297,7 +319,7 @@ export const CommunityChatPage: React.FC = () => {
                   renderChannelRow(
                     channel,
                     isDmChannel(channel)
-                      ? dmDisplayName(channel.id, channel.name)
+                      ? dmDisplayName(channel.id, channel.name, ownerId)
                       : channel.name
                   )
                 )}
