@@ -14,7 +14,7 @@ export const VerseCard: React.FC<{ verse: SharedVerse; lines?: number }> = ({ ve
       <blockquote
         className="mt-1.5 text-[16px] leading-relaxed"
         style={{
-          fontFamily: "'Bricolage Grotesque', 'Figtree', sans-serif",
+          fontFamily: "'Fraunces', Georgia, serif",
           ...(long && !open ? { display: '-webkit-box', WebkitLineClamp: lines, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' } : {}),
         }}
       >

@@ -47,7 +47,7 @@ export const NextUpTicket: React.FC<Props> = ({ next, liveUrl, visitor = false }
   }, [planKey]);
 
   if (!next) {
-    return <div className={`h-[214px] rounded-[26px] animate-pulse motion-reduce:animate-none border border-white/10 bg-[#211915]`} aria-hidden />;
+    return <div className={`h-[214px] rounded-[26px] animate-pulse motion-reduce:animate-none border border-[#E8DCC2] bg-white/70`} aria-hidden />;
   }
 
   const startsAt = nextUpStartsAt(next, now);

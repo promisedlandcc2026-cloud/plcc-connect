@@ -1,5 +1,6 @@
 import React from 'react';
 import { TribesMark } from './TribesMark';
+import { SkyArchHero } from './SkyArchHero';
 
 /** Thin gold rule with the official mark in the middle — shared by the hero and the Scripture card. */
 export const GoldRuleMark: React.FC<{ size?: number; tone?: 'dark' | 'light'; className?: string }> = ({
@@ -18,20 +19,21 @@ export const GoldRuleMark: React.FC<{ size?: number; tone?: 'dark' | 'light'; cl
   );
 };
 
-/** Woven-pattern welcome band: "One family. Many nations. One purpose." */
+/** Sky arch welcome band: "One family. Many nations. One purpose." */
 export const TribesHero: React.FC = () => (
-  <section className="tribes-weave -mx-5 px-6 pb-5 pt-6 text-center" aria-labelledby="tribes-hero-title">
-    <h1
-      id="tribes-hero-title"
-      className="font-display text-[28px] font-bold leading-[1.15] tracking-[-0.01em] text-[#F6E7B8] min-[360px]:text-[31px]"
-    >
-      One family.
-      <br />
-      Many nations.
-      <br />
-      One purpose.
-    </h1>
-    <GoldRuleMark className="mt-4" size={30} />
-    <p className="sr-only">PLCC Tribes community feed</p>
-  </section>
+  <SkyArchHero minHeight={236} ariaLabel="PLCC Tribes community feed">
+    <div className="px-6 pb-6 pt-9 text-center">
+      <h1
+        id="tribes-hero-title"
+        className="font-display text-[30px] font-bold leading-[1.12] tracking-[-0.01em] text-[#F6E7B8] [text-shadow:0_2px_12px_rgba(0,0,0,0.55)] min-[360px]:text-[33px]"
+      >
+        One family.
+        <br />
+        Many nations.
+        <br />
+        One purpose.
+      </h1>
+      <GoldRuleMark className="mt-4" size={30} />
+    </div>
+  </SkyArchHero>
 );

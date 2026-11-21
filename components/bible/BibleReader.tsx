@@ -188,7 +188,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
 
   return (
     <>
-      <div ref={topRef} className="sticky top-0 z-20 -mx-5 px-3 py-3 bg-[#15100D]/95 backdrop-blur border-b border-white/10 scroll-mt-0">
+      <div ref={topRef} className="sticky top-0 z-20 -mx-5 px-3 py-3 bg-eggshell/95 backdrop-blur border-b border-[#E8E2DA] scroll-mt-0">
         <div className="flex items-center gap-2">
           <button type="button" onClick={onBack} aria-label="Back to Bible home" className="h-11 w-11 shrink-0 rounded-full inline-flex items-center justify-center text-ink active:bg-black/5">
             <ChevronLeft size={22} aria-hidden />
@@ -264,7 +264,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, nivReady, hig
                 const isSpeaking = speakingVerse === v.n;
                 const isLinked = highlight && v.n >= highlight.from && v.n <= highlight.to;
                 const color = marks.highlights[key]?.color;
-                const bg = color ? HIGHLIGHT_BG[color] : isLinked || isSpeaking ? 'rgba(244,178,62,0.22)' : undefined;
+                const bg = color ? HIGHLIGHT_BG[color] : isLinked || isSpeaking ? '#F4E7B3B3' : undefined;
                 return (
                   <span
                     key={v.n}

@@ -14,6 +14,7 @@ import { BookOpen, Heart, PlayCircle, QrCode, Sparkles } from 'lucide-react';
 import { openAssistant } from '../AWCAssistant';
 import { useAuth } from '../../context/AuthContext';
 import { lugandaGreeting, memberHomeGreeting } from '../../lib/memberGreeting';
+import { SkyArchHero } from '../tribes/SkyArchHero';
 import { fetchMemberHomeEvents } from '../../lib/memberHomeData';
 import { eventStartMs } from '../../lib/memberHomeEvents';
 import { pickNextUp, type NextUp } from '../../lib/nextUp';
@@ -53,7 +54,7 @@ const AskPlccButton: React.FC = () => (
 );
 
 const lightActionClass =
-  'flex flex-col items-center justify-center gap-1.5 rounded-[20px] border border-white/[0.08] bg-[#211915] text-[#F7EFE6] min-h-[72px] px-0.5 active:scale-95 transition-transform motion-reduce:transition-none hover:border-[#F4B23E]/50';
+  'flex flex-col items-center justify-center gap-1.5 rounded-[18px] border border-[#E3D6BA] bg-white text-[#12231c] min-h-[68px] px-0.5 shadow-[0_1px_2px_rgba(18,35,28,0.04)] active:scale-95 transition-transform motion-reduce:transition-none hover:border-[#C9A35A]';
 
 const actionClass =
   'flex flex-col items-center justify-center gap-1.5 rounded-[18px] bg-white/[0.06] border border-[#F2D98A]/20 text-cream min-h-[68px] px-0.5 active:scale-95 transition-transform motion-reduce:transition-none';
@@ -151,22 +152,23 @@ export const MemberHomeHeader: React.FC<{ onLiveChange?: (live: boolean) => void
     );
   }
 
-  // Weekdays: PLCC Tribes — Red Earth & Gold bar, Luganda greeting, then the feed.
+  // Weekdays: PLCC Tribes — forest bar, sky arch (weather + time of day), then ivory cards on forest.
   return (
     <header>
       <div className="tribes-bar flex items-center gap-2 px-4 pb-3 pt-[max(12px,env(safe-area-inset-top))]">
         <div className="flex min-w-0 flex-1 items-center gap-2.5 min-[360px]:gap-3">
-          <TribesMark className="h-8 w-auto shrink-0 text-[#F4B23E] min-[360px]:h-9" />
+          <TribesMark className="h-10 w-auto shrink-0 text-[#E4C36A] min-[360px]:h-11" />
+          <span aria-hidden className="h-9 w-px shrink-0 bg-[#E4C36A]/55" />
           <span className="flex min-w-0 flex-col leading-none">
-            <span className="truncate font-display text-[23px] font-extrabold text-[#F7EFE6]">Tribes</span>
-            <span className="mt-1 truncate text-[11px] font-semibold tracking-[0.18em] text-[#BBA898]">PROMISED LAND CC</span>
+            <span className="tribes-gold-text truncate font-display text-[26px] font-bold min-[360px]:text-[28px]">Tribes</span>
+            <span className="mt-1 truncate text-[11px] font-semibold tracking-[0.24em] text-[#F4ECDB]/85">PROMISED LAND CC</span>
           </span>
         </div>
         <HomeHeroActions showBell />
       </div>
 
-      <section className="tribes-hero relative px-5 pb-8 pt-4" aria-label="Welcome">
-        <div className="flex items-center justify-between gap-2">
+      <SkyArchHero bleed={false} minHeight={268} ariaLabel="Welcome">
+        <div className="flex items-center justify-between gap-2 px-4 pt-3">
           <BackToAwcOne className="!h-10 !text-[13px] !border !shadow-none" />
           <button
             type="button"
@@ -178,14 +180,15 @@ export const MemberHomeHeader: React.FC<{ onLiveChange?: (live: boolean) => void
             Ask PLCC
           </button>
         </div>
-        <div className="mt-7">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.24em] text-[#F4B23E]">{lugandaGreeting(now)}</p>
-          <h1 className="mt-1.5 font-display text-[36px] font-extrabold leading-[1.02] text-[#F7EFE6] min-[360px]:text-[40px]">
-            {memberHomeGreeting(identity?.name ?? null, now)}.
+        <div className="max-w-[64%] px-7 pb-8 pt-6 min-[400px]:px-9">
+          <p className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#E4C36A]">{lugandaGreeting(now)}</p>
+          <h1 className="tribes-gold-text mt-1.5 font-display text-[34px] font-bold leading-[1.05] min-[380px]:text-[38px]">
+            {memberHomeGreeting(identity?.name ?? null, now)}
           </h1>
-          <p className="mt-2 text-[14px] font-medium text-[#BBA898]">One family. Many nations. One purpose.</p>
+          <span aria-hidden className="mt-3 block h-[3px] w-12 rounded-full bg-[#E4C36A]" />
+          <p className="mt-3 text-[14px] font-medium leading-snug text-[#F4ECDB]">One family. Many nations. One purpose.</p>
         </div>
-      </section>
+      </SkyArchHero>
 
       <div className="tribes-home-top space-y-6 px-5 pt-5">
         <NextUpTicket next={next} liveUrl={liveUrl} />

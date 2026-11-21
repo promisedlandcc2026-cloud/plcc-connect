@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, Heart, Shield, Loader2, Sparkles, RefreshCcw, X, PenLine } from 'lucide-react';
+import { MessageSquare, Heart, Shield, Loader2, RefreshCcw, X, PenLine } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { supabasePublic } from '../lib/supabasePublic';
 import { isPublicPrayerRow } from '../lib/memberHomeData';
@@ -155,14 +155,11 @@ export const PrayerWall: React.FC = () => {
     return (
         <>
         <div className="space-y-6">
-            <div className="flex items-center justify-between px-1">
-                <div className="flex items-center gap-3">
-                    <div className="bg-burgundy p-2 rounded-xl shadow-lg shadow-burgundy/10">
-                        <Sparkles size={18} className="text-gold" />
-                    </div>
+            <div className="flex items-center justify-between gap-2 px-1">
+                <div className="flex min-w-0 items-center gap-3">
                     <div>
-                        <h2 className="text-xl font-black text-[#1A1A1A] tracking-tight">🙏 Prayer Wall</h2>
-                        <p className="text-xs text-burgundy font-bold uppercase tracking-widest">Standing in Agreement</p>
+                        <h2 className="font-display text-[24px] font-bold tracking-tight text-[#F4ECDB]">Prayer Wall</h2>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#F4ECDB]/85">Standing in agreement</p>
                     </div>
                 </div>
                 <button
@@ -176,76 +173,70 @@ export const PrayerWall: React.FC = () => {
                 </button>
                 <button
                     onClick={() => setIsPrayerModuleOpen(true)}
-                    className="flex items-center gap-1.5 min-h-[44px] px-3.5 bg-burgundy text-white rounded-xl text-sm font-bold shadow-sm active:scale-95 transition-all hover:bg-burgundy-dark"
+                    className="tribes-gold-btn flex shrink-0 items-center gap-1.5 whitespace-nowrap min-h-[44px] px-4 rounded-full text-[15px] font-bold active:scale-95 transition-all"
                 >
-                    <PenLine size={12} /> Add a prayer
+                    <PenLine size={16} aria-hidden /> Add a prayer
                 </button>
             </div>
 
             <div className="relative">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 bg-white/50 rounded-[32px] border border-dashed border-gray-200">
+                    <div className="flex flex-col items-center justify-center py-16 rounded-[24px] border border-dashed border-[#D9B45E]/40">
                         <Loader2 size={32} className="text-gold animate-spin mb-4" />
                         <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">Loading Requests...</p>
                     </div>
                 ) : requests.length > 0 ? (
-                    <div className="flex overflow-x-auto no-scrollbar gap-4 pb-4 px-1 -mx-1 snap-x snap-mandatory">
+                    <div className="flex flex-col gap-4">
                         {requests.map((prayer) => (
+                            <div key={prayer.id} className="tribes-ticket-shadow">
                             <div
-                                key={prayer.id}
+                                role="button"
+                                tabIndex={0}
                                 onClick={() => setSelectedPrayer(prayer)}
-                                className="min-w-[280px] max-w-[280px] bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm snap-center flex flex-col justify-between relative group hover:shadow-md transition-all duration-300 cursor-pointer"
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedPrayer(prayer); } }}
+                                className="tribes-ticket cursor-pointer px-6 pb-4 pt-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E4C36A]"
                             >
-                                <div
-                                    onClick={(e) => handleAgree(e, prayer)}
-                                    className={`absolute top-6 right-6 transition-all duration-500 cursor-pointer active:scale-150 active:rotate-12
-                                        ${agreedIds.has(prayer.id) ? 'opacity-20 text-burgundy' : 'opacity-10 text-gray-500 hover:opacity-30 hover:text-burgundy'}
-                                    `}
-                                >
-                                    <Heart size={40} fill={agreedIds.has(prayer.id) ? "currentColor" : "none"} />
-                                </div>
-
-                                <div>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <div className="w-8 h-8 bg-burgundy/5 rounded-full flex items-center justify-center text-burgundy font-black text-xs">
-                                            {(prayer.member_name || 'A').charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold text-[#1A1A1A]">{prayer.member_name}</p>
-                                            <p className="text-xs text-gray-500 font-medium tracking-tight">{getTimeAgo(prayer.created_at)}</p>
-                                        </div>
+                                <div className="flex items-start gap-4">
+                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#0B3322] font-display text-[22px] font-bold text-[#F6E7B8] ring-1 ring-[#C9A35A]/70">
+                                        {(prayer.member_name || 'A').charAt(0).toUpperCase()}
                                     </div>
-
-                                    <p className="text-xs text-gray-600 leading-relaxed font-medium line-clamp-4">
-                                        "{prayer.content}"
-                                    </p>
-                                    {prayer.intercessor_prayed_at && (
-                                        <p className="mt-3 inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[11px] font-bold text-emerald-700">
-                                            🙏 Prayed for by the Intercessors
+                                    <div className="min-w-0 flex-1 border-l border-[#C9A35A]/60 pl-4">
+                                        <p className="text-[13px] font-medium text-[#3F5246]">
+                                            {prayer.member_name ? <span className="font-bold text-[#0E2A1C]">{prayer.member_name} · </span> : null}
+                                            {getTimeAgo(prayer.created_at)}
                                         </p>
-                                    )}
+                                        <p className="mt-1 text-[15px] leading-snug text-[#0E2A1C] line-clamp-4">{prayer.content}</p>
+                                        {prayer.intercessor_prayed_at && (
+                                            <p className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-1 text-[12px] font-bold text-emerald-800">
+                                                🙏 Prayed for by the Intercessors
+                                            </p>
+                                        )}
+                                    </div>
                                 </div>
-
-                                <div className="mt-6 pt-4 border-t border-gray-50 flex items-center justify-between">
-                                    <div className="flex items-center gap-1.5 text-xs font-black text-burgundy uppercase tracking-widest">
-                                        <Shield size={10} className="text-gold" /> Public Request
+                                <div className="mt-4 flex items-center justify-between border-t border-[#C9A35A]/45 pt-3">
+                                    <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.22em] text-[#0E2A1C]">
+                                        <Shield size={14} className="text-[#B8893A]" aria-hidden /> Public request
                                     </div>
                                     <button
+                                        type="button"
                                         onClick={(e) => handleAgree(e, prayer)}
                                         disabled={processingIds.has(prayer.id)}
-                                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95
-                                            ${agreedIds.has(prayer.id)
-                                                ? 'bg-burgundy text-white shadow-lg shadow-burgundy/20'
-                                                : 'bg-gray-50 text-gray-500 hover:text-burgundy'}`}
+                                        aria-label={agreedIds.has(prayer.id) ? 'You are standing in agreement' : 'Stand in agreement'}
+                                        className={`flex min-h-[40px] items-center gap-1.5 rounded-full border px-4 text-[15px] font-bold transition-all active:scale-95 ${
+                                            agreedIds.has(prayer.id)
+                                                ? 'border-[#0B3322] bg-[#0B3322] text-[#F6E7B8]'
+                                                : 'border-[#0E2A1C]/60 bg-transparent text-[#0E2A1C]'
+                                        }`}
                                     >
                                         {processingIds.has(prayer.id) ? (
-                                            <Loader2 size={12} className="animate-spin" />
+                                            <Loader2 size={15} className="animate-spin" />
                                         ) : (
-                                            <Heart size={12} fill={agreedIds.has(prayer.id) ? "currentColor" : "none"} />
+                                            <Heart size={16} fill={agreedIds.has(prayer.id) ? 'currentColor' : 'none'} />
                                         )}
                                         {getAgreements(prayer)}
                                     </button>
                                 </div>
+                            </div>
                             </div>
                         ))}
                     </div>

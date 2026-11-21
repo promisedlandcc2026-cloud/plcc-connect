@@ -40,12 +40,12 @@ describe('readable text', () => {
     assert.deepEqual(offenders, []);
   });
 
-  it('PLCC Tribes type is actually loaded (Figtree UI weights, Bricolage Grotesque display)', () => {
+  it('PLCC Tribes type is actually loaded (Figtree UI weights, Fraunces with italics)', () => {
     const html = read('index.html');
     assert.match(html, /Figtree:wght@400;500;600;700;800/);
-    assert.match(html, /Bricolage\+Grotesque:opsz,wght@12\.\.96,600\.\.800/);
+    assert.match(html, /Fraunces:ital,opsz,wght@0,9\.\.144,600;0,9\.\.144,700;1,9\.\.144,600/);
     assert.match(read('tailwind.config.js'), /sans: \['Figtree'/);
-    assert.match(read('tailwind.config.js'), /display: \['Bricolage Grotesque'/);
+    assert.match(read('tailwind.config.js'), /display: \['Fraunces'/);
   });
 
   it('serif is reserved for page titles via font-display', () => {
@@ -53,7 +53,7 @@ describe('readable text', () => {
     assert.match(css, /h1, h2, h3 \{\s*font-family: 'Figtree'/);
     assert.match(css, /\.font-display/);
     assert.match(read('components/member/MemberPageHeader.tsx'), /font-display/);
-    assert.match(read('tailwind.config.js'), /'gold-ink': '#F4B23E'/);
+    assert.match(read('tailwind.config.js'), /'gold-ink': '#7A5C0F'/);
   });
 });
 
@@ -80,10 +80,10 @@ describe('kit components', () => {
     }
   });
 
-  it('member bottom bar is the floating Red Earth & Gold dock: sentence case, gold underline on the current tab', () => {
+  it('member bottom bar is the PLCC Tribes forest bar: sentence case, gold underline on the current tab', () => {
     const nav = read('components/MemberNav.tsx');
     assert.match(nav, /awc-dock/);
-    assert.match(nav, /awc-dock-mark[\s\S]*bg-\[#F4B23E\][\s\S]*active \? 'w-8 opacity-100'/);
+    assert.match(nav, /awc-dock-mark[\s\S]*bg-\[#E4C36A\][\s\S]*active \? 'w-8 opacity-100'/);
     // Every tab keeps its name under the icon; "Community" gets a little more room.
     assert.match(nav, /item\.label\.length > 7 \? 'grow-\[1\.3\]'/);
     assert.match(nav, /\{item\.label\}\s*<\/span>/);

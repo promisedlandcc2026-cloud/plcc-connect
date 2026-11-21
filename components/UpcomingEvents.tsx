@@ -63,7 +63,7 @@ export const UpcomingEvents: React.FC<{ heading?: string }> = ({ heading = 'Upco
     <div className="space-y-4">
       <div className="flex items-center justify-between px-1">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-ink tracking-tight">{heading}</h2>
+          <h2 className="font-display text-[26px] font-bold tracking-tight text-[#F4ECDB]">{heading}</h2>
           <button
             onClick={handleRefresh}
             disabled={loading || isRefreshing}
@@ -95,7 +95,7 @@ export const UpcomingEvents: React.FC<{ heading?: string }> = ({ heading = 'Upco
                 setSelectedEvent(event);
                 setIsDetailOpen(true);
               }}
-              className="bg-white rounded-2xl border border-gray-100 shadow-card hover:shadow-md transition-all duration-300 overflow-hidden group cursor-pointer"
+              className="tribes-ticket transition-all duration-300 overflow-hidden group cursor-pointer"
             >
               {event.image_url && (
                 <div className="w-full overflow-hidden relative bg-[#1A1A1A]">
@@ -110,7 +110,7 @@ export const UpcomingEvents: React.FC<{ heading?: string }> = ({ heading = 'Upco
                 </div>
               )}
 
-              <div className="p-2 flex items-center gap-5">
+              <div className="p-4 flex items-center gap-4">
                 <div className="w-14 h-14 bg-burgundy rounded-xl flex flex-col items-center justify-center flex-shrink-0 ml-2">
                   <span className="text-xs font-bold text-white/80 tracking-wide leading-none mb-0.5">
                     {getMonth(event.starts_at || event.date || '')}
@@ -163,12 +163,15 @@ export const UpcomingEvents: React.FC<{ heading?: string }> = ({ heading = 'Upco
         )}
 
         {!loading && events.length === 0 && (
-          <div className="bg-white rounded-2xl p-10 border border-dashed border-gray-200 flex flex-col items-center justify-center text-center">
-            <div className="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center text-gray-500 mb-4">
-              <Calendar size={24} />
+          <div className="tribes-ticket-shadow">
+            <div className="tribes-ticket flex flex-col items-center justify-center px-8 pb-8 pt-9 text-center">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-[#C9A35A]/60 text-[#0E2A1C]">
+                <Calendar size={32} strokeWidth={1.6} aria-hidden />
+              </div>
+              <p className="font-display text-[24px] font-bold text-[#0E2A1C]">No upcoming events</p>
+              <p className="mt-1 text-[15px] text-[#0E2A1C]/85">New gatherings will appear here.</p>
+              <GoldDiamondRule />
             </div>
-            <p className="text-[15px] font-semibold text-ink">No upcoming events</p>
-            <p className="text-sm text-ink-soft mt-1">New gatherings show up here as soon as they're on the calendar.</p>
           </div>
         )}
       </div>
@@ -181,3 +184,12 @@ export const UpcomingEvents: React.FC<{ heading?: string }> = ({ heading = 'Upco
     </div>
   );
 };
+
+/** Gold rule with a small diamond, used under ticket empty states. */
+const GoldDiamondRule: React.FC = () => (
+  <div className="mt-5 flex items-center gap-3" aria-hidden>
+    <span className="h-px w-16 bg-[#C9A35A]" />
+    <span className="h-2.5 w-2.5 rotate-45 border border-[#C9A35A] bg-[#E4C36A]/40" />
+    <span className="h-px w-16 bg-[#C9A35A]" />
+  </div>
+);

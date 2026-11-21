@@ -207,7 +207,7 @@ export const CommunityChatPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-1 px-5 pt-8 pb-28">
+    <main className="flex-1 px-5 pt-10 pb-28">
       <div className="flex items-center justify-between gap-2 mb-6">
         <Link
           to="/community"

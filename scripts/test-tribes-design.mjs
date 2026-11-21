@@ -74,28 +74,44 @@ describe('Scripture posts', async () => {
 });
 
 describe('PLCC Tribes look (v2)', () => {
-  it('Red Earth & Gold theme is on for the whole app', () => {
-    assert.match(read('index.html'), /<html lang="en" class="tribes-dark">/);
-    const css = read('index.css');
-    assert.match(css, /html\.tribes-dark \.bg-white,/);
-    assert.match(css, /html\.tribes-dark :is\(button, a\)\.bg-burgundy/);
-    assert.match(read('components/MemberNav.tsx'), /text-\[#F4B23E\]/);
-  });
   it('woven hero artwork is small enough for mobile data', async () => {
     const { statSync } = await import('node:fs');
     assert.ok(statSync(join(root, 'public/brand/tribes-hero.webp')).size < 90_000);
     assert.match(read('index.css'), /\.tribes-hero \{[\s\S]*url\('\/brand\/tribes-hero\.webp'\)/);
   });
-  it('weekday Home (Red Earth & Gold): bar with the mark and Tribes wordmark, Luganda + English greeting; Sunday live keeps the evening shell', () => {
+  it('weekday Home: forest bar with the mark, sky arch greeting (Luganda + English), ivory cards; Sunday live keeps the evening shell', () => {
     const h = read('components/member/MemberHomeHeader.tsx');
     assert.match(h, /tribes-bar[\s\S]*<TribesMark[\s\S]*>Tribes<[\s\S]*PROMISED LAND CC/);
-    assert.match(h, /tribes-hero[\s\S]*lugandaGreeting\(now\)[\s\S]*memberHomeGreeting\(/);
+    assert.match(h, /<SkyArchHero[\s\S]*lugandaGreeting\(now\)[\s\S]*memberHomeGreeting\(/);
     assert.match(h, /<TodayStories tone="light" \/>[\s\S]*<LiveHuddles tone="light" \/>/);
     assert.match(h, /if \(live\) \{[\s\S]*<SundayLiveHome/);
     assert.match(read('components/member/MemberHome.tsx'), /live \? 'awc-home-shell' : 'tribes-home'/);
   });
-  it('page titles get the gold rule', () => {
-    assert.match(read('components/member/MemberPageHeader.tsx'), /h-\[3px\] w-10 rounded-full bg-\[#C9A35A\]/);
+  it('page titles sit on the sky arch with a gold rule', () => {
+    const h = read('components/member/MemberPageHeader.tsx');
+    assert.match(h, /<SkyArchHero[\s\S]*tribes-gold-text font-display[\s\S]*h-\[3px\] w-12 rounded-full bg-\[#E4C36A\]/);
+  });
+  it('sky follows time of day and weather: sunny, cloudy, rainy, night', async () => {
+    const { pickSky, skyForWeatherCode, isNightAt } = await import('../lib/tribesSky.ts').catch(() => ({}));
+    const src = read('lib/tribesSky.ts');
+    for (const k of ['sunny', 'cloudy', 'rainy', 'night']) assert.match(src, new RegExp(`/brand/sky/${k}\\.webp`));
+    assert.match(src, /api\.open-meteo\.com/);
+    assert.match(src, /saveData/);
+    if (pickSky) {
+      assert.equal(isNightAt(new Date(2026, 0, 1, 22, 0)), true);
+      assert.equal(isNightAt(new Date(2026, 0, 1, 12, 0)), false);
+      assert.equal(skyForWeatherCode(0), 'sunny');
+      assert.equal(skyForWeatherCode(3), 'cloudy');
+      assert.equal(skyForWeatherCode(63), 'rainy');
+      assert.equal(skyForWeatherCode(95), 'rainy');
+      assert.equal(pickSky(new Date(2026, 0, 1, 23, 0), 0), 'night');
+    }
+  });
+  it('the forest theme is on and ticket cards exist', () => {
+    assert.match(read('index.html'), /<html lang="en" class="tribes-forest">/);
+    const css = read('index.css');
+    assert.match(css, /\.tribes-ticket \{[\s\S]*mask:/);
+    assert.match(css, /\.tribes-ticket::before/);
   });
 });
 

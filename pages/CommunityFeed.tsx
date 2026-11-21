@@ -83,6 +83,7 @@ const PostCard: React.FC<{
   };
 
   return (
+    <div className="tribes-ticket-shadow">
     <div
       role="link"
       tabIndex={0}
@@ -94,7 +95,7 @@ const PostCard: React.FC<{
           openPost();
         }
       }}
-      className="rounded-2xl border border-[#E8DCC2] bg-[#FDF9EF] px-3.5 pt-3.5 pb-1 space-y-3 cursor-pointer shadow-[0_1px_2px_rgba(18,35,28,0.05),0_6px_18px_rgba(18,35,28,0.06)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1d372c]/40"
+      className="tribes-ticket px-5 pt-5 pb-2 space-y-3 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E4C36A]"
       aria-label={`Open ${scripture ? 'Scripture post' : 'post'} by ${post.author.name}`}
     >
       {post.pinned && (
@@ -139,12 +140,13 @@ const PostCard: React.FC<{
 
       <TribesPostActions post={post} onComment={() => openPost('#comment')} />
     </div>
+    </div>
   );
 };
 
 /** All posts | Scripture — the two feed views. */
 const FeedFilter: React.FC<{ view: FeedView; onChange: (v: FeedView) => void }> = ({ view, onChange }) => (
-  <div className="flex rounded-xl border border-[#1d372c]/70 bg-[#FDF9EF] p-0.5" role="group" aria-label="Show posts">
+  <div className="flex rounded-full border border-[#D9B45E]/55 bg-white/[0.03] p-1" role="group" aria-label="Show posts">
     {(
       [
         ['all', 'All posts'],
@@ -158,8 +160,8 @@ const FeedFilter: React.FC<{ view: FeedView; onChange: (v: FeedView) => void }> 
           type="button"
           aria-pressed={active}
           onClick={() => onChange(value)}
-          className={`flex-1 min-h-[44px] rounded-[10px] text-[15px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A35A] ${
-            active ? 'bg-[#1d372c] text-[#F6EFDD] shadow-sm' : 'text-[#12231c] hover:bg-[#1d372c]/5'
+          className={`flex-1 min-h-[44px] rounded-full text-[16px] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4C36A] ${
+            active ? 'tribes-gold-btn' : 'text-[#F4ECDB] hover:bg-white/5'
           }`}
         >
           {label}
