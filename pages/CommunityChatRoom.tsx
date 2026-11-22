@@ -303,7 +303,7 @@ export const CommunityChatRoomPage: React.FC = () => {
   }
 
   return (
-    <main className="ka-link-chat-surface min-w-0 flex-1 bg-white px-4 pt-4 pb-28 flex flex-col min-h-[70vh]">
+    <main className="ka-link-chat-surface chat-conversation min-w-0 flex-1 bg-white px-4 pt-4 pb-28 flex flex-col min-h-[70vh]">
       <div className="mb-4 flex min-w-0 flex-wrap items-center justify-between gap-2 border-b border-[#ded8cb] pb-3">
         <Link
           to={locState.returnTab ? `/community/chat?tab=${encodeURIComponent(locState.returnTab)}` : '/community/chat'}
@@ -416,7 +416,7 @@ export const CommunityChatRoomPage: React.FC = () => {
         </div>
       ) : null}
 
-      <div className="flex-1 space-y-3 overflow-y-auto no-scrollbar pb-4">
+      <div className="flex-1 space-y-2.5 overflow-y-auto no-scrollbar pt-2 pb-5">
         {loading ? (
           <div className="flex items-center justify-center py-16 text-gray-500 gap-2">
             <Loader2 className="animate-spin" size={18} aria-hidden />
@@ -439,7 +439,7 @@ export const CommunityChatRoomPage: React.FC = () => {
             return (
               <article
                 key={msg.id}
-                className={`rounded-2xl px-4 py-3 max-w-[90%] ${
+                className={`rounded-2xl px-4 py-2.5 max-w-[90%] ${
                   mine
                     ? 'ml-auto bg-burgundy text-white'
                     : 'mr-auto bg-white border border-gray-100 shadow-sm'
@@ -491,7 +491,7 @@ export const CommunityChatRoomPage: React.FC = () => {
       ) : null}
 
       <form
-        className="sticky bottom-20 bg-eggshell/95 backdrop-blur-sm pt-2 pb-2 flex gap-2 items-end"
+        className="chat-composer sticky bottom-20 mb-2 flex gap-2 items-end rounded-2xl p-2"
         onSubmit={(e) => {
           e.preventDefault();
           void onSend();
@@ -525,7 +525,7 @@ export const CommunityChatRoomPage: React.FC = () => {
           onChange={(e) => setDraft(e.target.value)}
           rows={2}
           placeholder="Write a message…"
-          className="flex-1 resize-none rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-[#1A1A1A] focus:outline-none focus:ring-2 focus:ring-burgundy/30"
+          className="chat-composer-input min-w-0 flex-1 resize-none rounded-xl border px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-burgundy/30"
           maxLength={4000}
           disabled={sending}
         />
