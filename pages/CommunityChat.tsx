@@ -228,7 +228,7 @@ export const CommunityChatPage: React.FC = () => {
             isDm: Boolean(opts?.isDm),
             returnTab: activeSection,
           }}
-          className="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 hover:border-burgundy/20 transition-colors min-h-[64px]"
+          className="chat-channel-row flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 hover:border-burgundy/20 transition-colors min-h-[64px]"
         >
           <div className="w-11 h-11 rounded-xl bg-burgundy/10 text-burgundy flex items-center justify-center shrink-0">
             {opts?.isDm ? <User size={18} aria-hidden /> : <MessageCircle size={18} aria-hidden />}
@@ -259,7 +259,7 @@ export const CommunityChatPage: React.FC = () => {
   };
 
   return (
-    <main className="flex-1 px-5 pt-10 pb-28">
+    <main className="chat-home-surface flex-1 px-5 pt-10 pb-28">
       <div className="-mt-10 mb-3"><TribesHeader showChat={false} /></div>
       <div className="flex items-center justify-between gap-2 mb-6">
         <Link

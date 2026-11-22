@@ -427,6 +427,10 @@ html[data-season='dry'] {
 .tribes-page {
   background: #022716;
 }
+@media (max-width: 1023px) {
+  html.tribes-forest .chat-home-surface .chat-channel-row { background: #fff; border-color: #dce6dd; box-shadow: 0 2px 8px rgba(20, 54, 33, .07); }
+  html.tribes-forest .chat-home-surface .chat-channel-row > div:first-child { background: #e8f0e9; color: #1a4932; }
+}
 html.tribes-forest .chat-conversation .chat-composer { background: #fff; border: 1px solid #d6dfd6; box-shadow: 0 3px 14px rgba(16, 44, 28, .06); }
 html.tribes-forest .chat-conversation .chat-composer-input { background: #fff; border-color: transparent; color: #172d22; }
 html.tribes-forest .chat-conversation .chat-composer-input::placeholder { color: #697c70; opacity: 1; }
