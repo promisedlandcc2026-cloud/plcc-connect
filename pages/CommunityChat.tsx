@@ -228,14 +228,14 @@ export const CommunityChatPage: React.FC = () => {
             isDm: Boolean(opts?.isDm),
             returnTab: activeSection,
           }}
-          className="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm p-4 hover:border-burgundy/20 transition-colors min-h-[64px]"
+          className="flex items-center gap-3 bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 hover:border-burgundy/20 transition-colors min-h-[64px]"
         >
           <div className="w-11 h-11 rounded-xl bg-burgundy/10 text-burgundy flex items-center justify-center shrink-0">
             {opts?.isDm ? <User size={18} aria-hidden /> : <MessageCircle size={18} aria-hidden />}
           </div>
           <div className="min-w-0 flex-1 text-left">
             <div className="flex items-center gap-2 min-w-0">
-              <p className="text-sm font-bold text-[#1A1A1A] truncate">{title}</p>
+              <p className="min-w-0 text-sm font-bold text-[#1A1A1A] break-words" title={title}>{title}</p>
               {live ? <HuddleLiveBadge count={huddle?.participantCount} /> : null}
             </div>
             <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
