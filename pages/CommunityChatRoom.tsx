@@ -58,7 +58,9 @@ export const CommunityChatRoomPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [huddleLive, setHuddleLive] = useState(false);
+  const [liveHuddleChannel, setLiveHuddleChannel] = useState<string | null>(null);
+  const huddleLive = liveHuddleChannel === channelId;
+  const openedInvite = useRef<string | null>(null);
   const [huddleCount, setHuddleCount] = useState(0);
   const [huddleOpen, setHuddleOpen] = useState(false);
   const [huddleMode, setHuddleMode] = useState<'join' | 'start'>('join');
@@ -151,14 +153,15 @@ export const CommunityChatRoomPage: React.FC = () => {
   const loadHuddle = useCallback(
     async (signal?: AbortSignal) => {
       if (!validChannel || memberAccessState !== 'approved_member' || isDm) {
-        setHuddleLive(false);
+        setLiveHuddleChannel(null);
         setHuddleCount(0);
         return;
       }
       try {
         const byChannel = await fetchHuddleStatuses([channelId], { signal });
         const status = byChannel[channelId];
-        setHuddleLive(isHuddleChannelLive(status));
+        const live = isHuddleChannelLive(status);
+        setLiveHuddleChannel(live ? channelId : null);
         setHuddleCount(status?.participantCount || 0);
       } catch {
         /* omit Join bar rather than fail the room */
@@ -286,6 +289,19 @@ export const CommunityChatRoomPage: React.FC = () => {
     setHuddleOpen(true);
     setHuddleIntent(null);
   };
+
+  useEffect(() => {
+    const query = new URLSearchParams(location.search);
+    if (query.get('huddle') !== 'join' || query.get('openHuddle') !== '1') return;
+    if (!validChannel || isDm || memberAccessState !== 'approved_member' || liveHuddleChannel !== channelId) return;
+    const inviteKey = `${location.key}:${channelId}`;
+    if (openedInvite.current === inviteKey) return;
+    openedInvite.current = inviteKey;
+    if (huddleOpen) return;
+    setHuddleMode('join');
+    setHuddleOpen(true);
+    setHuddleIntent(null);
+  }, [location.key, location.search, validChannel, isDm, memberAccessState, liveHuddleChannel, channelId, huddleOpen]);
 
   if (!validChannel) {
     return (
