@@ -28,7 +28,20 @@ export default async function handler(req, res) {
   try {
     const response = await fetch(url, {method:req.method,headers:{Accept:'application/json',Authorization:`Bearer ${auth.token}`,...(body ? {'Content-Type':'application/json'} : {})},...(body ? {body:JSON.stringify(body)} : {}),signal:AbortSignal.timeout(12000)});
     const data = await response.json().catch(()=>null);
-    if (!response.ok || data?.ok !== true) return res.status([400,401,403,409,429].includes(response.status)?response.status:503).json({ok:false,error:response.status===409?'The request changed. Please refresh and try again.':'Could not complete your request. Please try again.'});
+    if (!response.ok || data?.ok !== true) {
+      const messages = {
+        400: 'Check your request details and try again.',
+        401: 'Please sign in again.',
+        403: 'Your account does not have access to this Pastor’s Office action.',
+        409: 'The request changed. Check its latest status before trying again.',
+        429: 'Too many requests. Wait a moment before trying again.',
+      };
+      const error = messages[response.status];
+      return res.status(error ? response.status : 503).json({
+        ok: false,
+        error: error || 'Pastor’s Office is temporarily unavailable.',
+      });
+    }
     if (req.method === 'POST') return res.status(200).json({ok:true,...(typeof data.requestId==='string'?{requestId:data.requestId}:{})});
     if (req.query?.scope === 'preferences') return res.status(200).json({ok:true,preferences:{reminders_enabled:data.preferences?.reminders_enabled === true,reminder_hours:Number(data.preferences?.reminder_hours) || 24}});
     if (req.query?.scope === 'available') return res.status(200).json({ok:true,offices:(Array.isArray(data.offices)?data.offices:[]).map(o=>({id:o.id,pastorName:o.pastorName}))});

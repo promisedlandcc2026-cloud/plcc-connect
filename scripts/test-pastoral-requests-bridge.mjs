@@ -9,4 +9,23 @@ describe('member pastoral requests bridge',()=>{
  it('rejects staff scope and privileged actions',async()=>{const r=res(),t=res();await handler({method:'GET',headers:{authorization:'Bearer a.b.c'},query:{scope:'office'}},r);await handler({method:'POST',headers:{authorization:'Bearer a.b.c'},body:{action:'approve'}},t);assert.equal(r.statusCode,400);assert.equal(t.statusCode,400)});
  it('forwards only approved fields and bearer token to a fixed destination',async()=>{let captured;globalThis.fetch=async(url,init)=>{captured={url:String(url),init};return {ok:true,status:200,json:async()=>({ok:true,requestId:'id',secret:'not-for-client'})}};const r=res();await handler({method:'POST',headers:{authorization:'Bearer a.b.c'},body:{action:'submit',officeId:'o',category:'appointment',preferredStart:'2027-01-01T07:00Z',timeZone:'Africa/Kampala',contactPreference:'app',actorId:'forged'}},r);assert.equal(captured.url,'https://vault.example/api/vault?resource=pastors-office-requests');assert.equal(JSON.parse(captured.init.body).actorId,undefined);assert.equal(captured.init.headers.Authorization,'Bearer a.b.c');assert.deepEqual(r.body,{ok:true,requestId:'id'});assert.equal(r.headers['Cache-Control'],'private, no-store')});
  it('strips non-allowlisted member and appointment fields',async()=>{globalThis.fetch=async()=>({ok:true,status:200,json:async()=>({ok:true,requests:[{id:'r',status:'requested',brief_message:'secret',requester_user_id:'secret',pastoral_appointments:[{starts_at:'s',ends_at:'e',status:'confirmed',private_note:'secret'}]}]})});const r=res();await handler({method:'GET',headers:{authorization:'Bearer a.b.c'},query:{scope:'mine'}},r);assert.equal(r.body.requests[0].brief_message,undefined);assert.equal(r.body.requests[0].requester_user_id,undefined);assert.equal(r.body.requests[0].pastoral_appointments[0].private_note,undefined)});
+ it('preserves actionable upstream statuses without exposing upstream error details', async () => {
+   for (const [status, expected] of [
+     [401, 'Please sign in again.'],
+     [403, 'Your account does not have access to this Pastor’s Office action.'],
+     [409, 'The request changed. Check its latest status before trying again.'],
+     [503, 'Pastor’s Office is temporarily unavailable.'],
+   ]) {
+     let calls = 0;
+     globalThis.fetch = async () => {
+       calls += 1;
+       return { ok: false, status, json: async () => ({ ok: false, error: 'private upstream detail' }) };
+     };
+     const r = res();
+     await handler({ method: 'POST', headers: { authorization: 'Bearer a.b.c' }, body: { action: 'cancel', requestId: 'r', version: 1 } }, r);
+     assert.equal(calls, 1);
+     assert.equal(r.statusCode, status);
+     assert.deepEqual(r.body, { ok: false, error: expected });
+   }
+ });
 });
