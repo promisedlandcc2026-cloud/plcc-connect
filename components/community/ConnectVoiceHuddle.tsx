@@ -1134,7 +1134,8 @@ export const ConnectVoiceHuddle: React.FC<Props> = ({
                   : 'huddle_ended_for_all'
             );
             callStartedAtRef.current = 0;
-            lostConnectionRef.current = true;
+            // Foreground recovery is only for temporary connection loss.
+            lostConnectionRef.current = false;
             setError(huddleDisconnectMessage(reason));
             setConn('error');
             return;
