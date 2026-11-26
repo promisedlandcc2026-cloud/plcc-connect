@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { getValidAccessToken } from '../lib/authAccessToken';
 import { pastoralService, pastoralMessage } from '../lib/pastoralService';
+import { useAuth } from '../context/AuthContext';
 const scopes = ['available', 'mine', 'preferences'] as const;
 type Scope = typeof scopes[number];
 const sectionNames: Record<Scope, string> = {
@@ -41,6 +42,18 @@ export function PastoralRequests() {
   const [offices,setOffices]=useState<Office[]>([]), [requests,setRequests]=useState<Request[]>([]);
   const [office,setOffice]=useState(''), [category,setCategory]=useState(initialCategory), [preferred,setPreferred]=useState(''), [contact,setContact]=useState('app'), [message,setMessage]=useState('');
   const [reminders,setReminders]=useState(true),[reminderHours,setReminderHours]=useState(24);
+  // So the office can reach you: filled in from your account, you can change them.
+  const { identity, user } = useAuth();
+  const [phone,setPhone]=useState(''),[email,setEmail]=useState('');
+  const prefilled=useRef(false);
+  useEffect(()=>{
+    if(prefilled.current||(!identity&&!user))return;
+    prefilled.current=true;
+    const accountEmail=String(identity?.email||user?.email||'');
+    if(accountEmail&&!/@phone\.[a-z0-9.-]*\.invalid$/i.test(accountEmail))setEmail(accountEmail);
+    const accountPhone=String(user?.phone||'');
+    if(accountPhone)setPhone(accountPhone.startsWith('+')?accountPhone:`+${accountPhone}`);
+  },[identity,user]);
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('');
   const zone=Intl.DateTimeFormat().resolvedOptions().timeZone || 'Africa/Kampala';
   const [loadErrors, setLoadErrors] = useState<Partial<Record<Scope, { message: string; retryable: boolean }>>>({});
@@ -86,7 +99,7 @@ export function PastoralRequests() {
     setError(err instanceof Error ? err.message : 'Could not update your request.');
   }
 
-  async function submit(e:React.FormEvent) { e.preventDefault();const instant=localInstant(preferred);if(!instant){setError('Please choose a valid, unambiguous local time.');return;}setBusy(true);setError('');setNotice('');try{await api('',{action:'submit',officeId:office,category,preferredStart:instant,timeZone:zone,contactPreference:contact,message:pastoralMessage(serviceLabel,category,message)});setMessage('');setPreferred('');setNotice('Your request was submitted.');await load('mine')}catch(err:any){setError(err.message)}finally{setBusy(false)} }
+  async function submit(e:React.FormEvent) { e.preventDefault();const instant=localInstant(preferred);if(!instant){setError('Please choose a valid, unambiguous local time.');return;}if(!phone.trim()&&!email.trim()){setError('Please give a phone number or email so the office can reach you.');return;}setBusy(true);setError('');setNotice('');try{await api('',{action:'submit',officeId:office,category,preferredStart:instant,timeZone:zone,contactPreference:contact,contactPhone:phone.trim()||undefined,contactEmail:email.trim()||undefined,message:pastoralMessage(serviceLabel,category,message)});setMessage('');setPreferred('');setNotice('Your request was submitted.');await load('mine')}catch(err:any){setError(err.message)}finally{setBusy(false)} }
   async function cancel(r:Request){if(!window.confirm('Cancel this request?'))return;setBusy(true);try{await api('',{action:'cancel',requestId:r.id,version:r.version});setNotice('Your request was cancelled.');await load('mine')}catch(err){await handleRequestError(err)}finally{setBusy(false)}}
   async function requestReschedule(r:Request){setBusy(true);setError('');try{await api('',{action:'request_reschedule',requestId:r.id,version:r.version});setNotice('Your request to reschedule was sent. Your current appointment remains confirmed until a new time is proposed.');await load('mine')}catch(err){await handleRequestError(err)}finally{setBusy(false)}}
   async function savePreferences(e:React.FormEvent){e.preventDefault();setBusy(true);setError('');try{await api('',{action:'set_preferences',remindersEnabled:reminders,reminderHours});setNotice('Reminder preferences saved.')}catch(err:any){setError(err.message)}finally{setBusy(false)}}
@@ -107,6 +120,8 @@ export function PastoralRequests() {
       <label className="block text-sm font-semibold">Pastor<select required value={office} onChange={e=>setOffice(e.target.value)} className="mt-1 w-full rounded-lg border p-3"><option value="">Choose a pastor</option>{loaded.available && offices.length === 0 && <option disabled>No pastors are taking requests right now</option>}{offices.map(o=><option key={o.id} value={o.id}>{o.pastorName}</option>)}</select></label>
       <label className="block text-sm font-semibold">Request type<select value={category} onChange={e=>setCategory(e.target.value)} className="mt-1 w-full rounded-lg border p-3"><option value="appointment">Pastoral appointment</option><option value="counseling">Counseling</option><option value="baptism">Baptism consultation</option></select></label>
       <label className="block text-sm font-semibold">Preferred date and time<input required type="datetime-local" value={preferred} onChange={e=>setPreferred(e.target.value)} className="mt-1 w-full rounded-lg border p-3" /></label><p className="text-xs">Shown in your device’s time zone: {zone}. Your time is a preference, not a confirmed booking.</p>
+      <label className="block text-sm font-semibold">Phone number<input type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={e=>setPhone(e.target.value)} placeholder="0772 123456" className="mt-1 w-full rounded-lg border p-3" /></label>
+      <label className="block text-sm font-semibold">Email<input type="email" autoComplete="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" className="mt-1 w-full rounded-lg border p-3" /></label><p className="text-xs">Only the Pastor’s Office sees these. Give at least one.</p>
       <label className="block text-sm font-semibold">Contact preference<select value={contact} onChange={e=>setContact(e.target.value)} className="mt-1 w-full rounded-lg border p-3"><option value="app">In app</option><option value="phone">Phone</option><option value="email">Email</option></select></label>
       <label className="block text-sm font-semibold">Brief message (optional)<textarea maxLength={serviceLabel && category==='appointment' ? 470 : 500} value={message} onChange={e=>setMessage(e.target.value)} className="mt-1 w-full rounded-lg border p-3" /></label><p className="text-xs">Please don’t include private counseling details here.</p><button disabled={busy||!office} className="w-full rounded-lg bg-[#092c50] p-3 font-semibold text-white disabled:opacity-50">Submit request</button>
     </form><form onSubmit={savePreferences} className="mt-5 rounded-xl border bg-white p-4"><h2 className="font-bold">Appointment reminders</h2><p className="mt-1 text-xs">Coming soon: automatic reminders and email notifications are not available yet.</p><label className="mt-3 flex items-center gap-2 text-sm"><input type="checkbox" checked={reminders} onChange={e=>setReminders(e.target.checked)}/> Notify me in the app</label><label className="mt-3 block text-sm">Hours before appointment <input type="number" min={1} max={168} value={reminderHours} onChange={e=>setReminderHours(Number(e.target.value))} className="ml-2 w-20 rounded border p-2"/></label><button disabled={busy || !loaded.preferences} className="mt-3 rounded border px-3 py-2 text-sm">Save preferences</button></form><section className="mt-6"><h2 className="font-serif text-2xl font-bold">My requests</h2>{loaded.mine&&requests.length===0&&<p className="mt-3 text-sm">No requests to show.</p>}{requests.map(r=><article key={r.id} className="mt-3 rounded-xl border bg-white p-4"><h3 className="font-semibold capitalize">{r.category}</h3><p className="mt-1 text-sm capitalize">{r.status.replace(/_/g,' ')}</p><p className="mt-1 text-sm">Preferred: {new Date(r.preferred_start).toLocaleString(undefined,{timeZone:zone,timeZoneName:'short'})}</p>{r.pastoral_appointments?.[0]&&<p className="mt-1 text-sm">Appointment: {new Date(r.pastoral_appointments[0].starts_at).toLocaleString(undefined,{timeZone:zone,timeZoneName:'short'})}</p>}{r.status==='confirmed'&&<button type="button" disabled={busy || !loaded.mine} onClick={()=>void requestReschedule(r)} className="mt-3 mr-4 text-sm underline">Request a new time</button>}{['requested','proposed','awaiting_approval','confirmed','reschedule_requested'].includes(r.status)&&<button type="button" disabled={busy || !loaded.mine} onClick={()=>void cancel(r)} className="mt-3 text-sm underline">Cancel request</button>}</article>)}</section>

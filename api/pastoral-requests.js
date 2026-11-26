@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   } else {
     const raw = req.body;
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return res.status(400).json({ok:false,error:'Invalid request.'});
-    if (raw.action === 'submit') body = {action:'submit',officeId:raw.officeId,category:raw.category,preferredStart:raw.preferredStart,timeZone:raw.timeZone,contactPreference:raw.contactPreference,message:raw.message};
+    if (raw.action === 'submit') body = {action:'submit',officeId:raw.officeId,category:raw.category,preferredStart:raw.preferredStart,timeZone:raw.timeZone,contactPreference:raw.contactPreference,contactPhone:typeof raw.contactPhone==='string'?raw.contactPhone.slice(0,40):undefined,contactEmail:typeof raw.contactEmail==='string'?raw.contactEmail.slice(0,254):undefined,message:raw.message};
     else if (raw.action === 'set_preferences') body = {action:'set_preferences',remindersEnabled:raw.remindersEnabled,reminderHours:raw.reminderHours};
     else if (raw.action === 'cancel' || raw.action === 'request_reschedule') body = {action:raw.action,requestId:raw.requestId,version:raw.version};
     else return res.status(400).json({ok:false,error:'Invalid action.'});
