@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Bookmark, BookOpenText, Highlighter, Search, Share2, X } from 'lucide-react';
+import { Bookmark, BookOpen, BookOpenText, CalendarDays, ChevronRight, Highlighter, Languages, Search, Share2, X } from 'lucide-react';
 import { MemberPageHeader } from '../member/MemberPageHeader';
 import { bookById, parseReference } from '../../lib/bibleBooks';
 import { FEATURED_TRANSLATIONS, loadKjvBookText, translationLabel, translationName, type BibleTranslation, type TranslationInfo } from '../../lib/bibleClient';
@@ -135,8 +135,10 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
     }
   };
 
+  // PLCC Bible tiles: cream cards with deep-green icons; the first (Read) is gold.
   const tile =
-    'h-[84px] rounded-[18px] bg-white border border-gray-200 flex flex-col items-center justify-center gap-1.5 text-[13px] font-bold text-ink active:bg-gray-50';
+    'h-[88px] rounded-[18px] bg-[#fbf7ee] border border-[#ece3cf] shadow-[0_2px_8px_rgba(29,55,44,0.06)] flex flex-col items-center justify-center gap-1.5 text-[14px] font-bold text-[#16251f] active:bg-[#f4ecd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold';
+  const tileIcon = 'text-[#1d372c]';
 
   return (
     <>
@@ -156,7 +158,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
                   role="radio"
                   aria-checked={active}
                   onClick={() => onTranslation(t)}
-                  className={`px-3 rounded-full text-[13px] font-bold ${active ? 'bg-burgundy text-white' : 'text-ink-soft'}`}
+                  className={`px-3 rounded-full text-[13px] font-bold ${active ? 'bg-[#1d372c] text-[#f3d27a]' : 'text-ink-soft'}`}
                 >
                   {translationLabel(t)}
                 </button>
@@ -177,6 +179,11 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
         }
       />
 
+      {/* PLCC Bible banner (its words are part of the picture). */}
+      <div className="-mt-1 mb-4 overflow-hidden rounded-[24px] bg-[#12241c] shadow-[0_10px_30px_rgba(18,36,28,0.25)]">
+        <img src="/brand/plcc-bible-banner.webp" alt="PLCC Bible: Read, Study, Reflect, Share" width={1080} height={360} className="block h-auto w-full" />
+      </div>
+
       <form onSubmit={onSubmit} className="mb-5" role="search">
         <label className="relative flex items-center">
           <span className="sr-only">Go to a verse or search the Bible</span>
@@ -191,7 +198,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
               setHint(null);
             }}
             placeholder="John 3:16, or search “peace”"
-            className="w-full h-12 rounded-2xl bg-white border border-gray-200 pl-10 pr-4 text-[15px] text-ink placeholder:text-ink-soft outline-none focus:ring-2 focus:ring-gold"
+            className="w-full h-12 rounded-2xl bg-white border border-[#e6dcc6] pl-10 pr-4 text-[15px] text-ink placeholder:text-ink-soft outline-none focus:ring-2 focus:ring-gold"
           />
         </label>
         {hint ? <p className="mt-1.5 ml-1 text-sm text-burgundy">{hint}</p> : null}
@@ -236,60 +243,77 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
         </section>
       ) : (
         <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-3 gap-2.5">
+            <button type="button" onClick={() => onRead(bookId, chapter)} className={`${tile} !border-[#d9a83a] !bg-gradient-to-b !from-[#f6d77e] !to-[#dcae45] shadow-[0_6px_16px_rgba(201,163,90,0.45)]`}>
+              <BookOpen size={22} className={tileIcon} aria-hidden /> Bible
+            </button>
+            <button type="button" onClick={onBooks} className={tile}>
+              <BookOpenText size={22} className={tileIcon} aria-hidden /> Books
+            </button>
+            <button type="button" onClick={() => document.querySelector<HTMLInputElement>('form[role="search"] input')?.focus()} className={tile}>
+              <Search size={22} className={tileIcon} aria-hidden /> Search
+            </button>
+            <button type="button" onClick={() => onMarks('highlights')} className={tile}>
+              <Highlighter size={22} className={tileIcon} aria-hidden /> Highlights
+            </button>
+            <button type="button" onClick={() => onMarks('bookmarks')} className={tile}>
+              <Bookmark size={22} className={tileIcon} aria-hidden /> Bookmarks
+            </button>
+            <button type="button" onClick={() => setBibleOpen(true)} className={tile} aria-haspopup="dialog">
+              <Languages size={22} className={tileIcon} aria-hidden /> Bibles
+            </button>
+          </div>
+
           <button
             type="button"
             onClick={() => onRead(bookId, chapter)}
-            className="text-left rounded-3xl bg-wine text-cream p-5 active:opacity-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            className="text-left rounded-3xl bg-[#fbf7ee] border border-[#ece3cf] p-5 shadow-[0_4px_14px_rgba(29,55,44,0.06)] active:bg-[#f4ecd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
-            <span className="block text-[13px] font-semibold text-leaf">Continue reading</span>
-            <span className="mt-1.5 block font-display text-[30px] font-bold text-white leading-tight">
-              {book.name} {book.chapters > 1 ? chapter : ''}
+            <span className="flex items-center gap-2 text-[15px] font-bold text-[#3b2a12]">
+              <BookOpen size={18} className="text-[#a8833c]" aria-hidden /> Continue Reading
             </span>
-            <span className="mt-1 block text-[14px] text-cream/75">{translationName(translation)}</span>
-            <span className="mt-4 flex items-center gap-3">
-              <span className="flex-1 h-1.5 rounded-full bg-white/15 overflow-hidden" aria-hidden>
-                <span className="block h-full rounded-full bg-leaf" style={{ width: `${Math.max(4, Math.round((chapter / book.chapters) * 100))}%` }} />
+            <span className="mt-1.5 flex items-center justify-between gap-3">
+              <span className="min-w-0">
+                <span className="block font-display text-[28px] font-bold leading-tight text-[#16251f]">
+                  {book.name} {book.chapters > 1 ? chapter : ''}
+                </span>
+                <span className="mt-0.5 block text-[14px] text-ink-soft">{translationName(translation)}</span>
               </span>
-              <span className="text-[12px] font-bold text-leaf">
+              <ChevronRight size={24} className="shrink-0 text-[#a8833c]" aria-hidden />
+            </span>
+            <span className="mt-4 flex items-center gap-3">
+              <span className="flex-1 h-1.5 rounded-full bg-[#1d372c]/10 overflow-hidden" aria-hidden>
+                <span className="block h-full rounded-full bg-gradient-to-r from-[#c9a35a] to-[#e4c36a]" style={{ width: `${Math.max(4, Math.round((chapter / book.chapters) * 100))}%` }} />
+              </span>
+              <span className="text-[12px] font-bold text-gold-ink">
                 Chapter {chapter} of {book.chapters}
               </span>
             </span>
           </button>
 
-          <section aria-labelledby="votd" className="rounded-3xl bg-white border border-[#EFE7D6] p-5 shadow-card">
+          <section aria-labelledby="votd" className="rounded-3xl bg-[#fbf7ee] border border-[#ece3cf] p-5 shadow-[0_4px_14px_rgba(29,55,44,0.06)]">
             <div className="flex items-center justify-between">
-              <h2 id="votd" className="text-[13px] font-bold text-gold-ink">
-                Verse of the day
+              <h2 id="votd" className="flex items-center gap-2 text-[15px] font-bold text-[#3b2a12]">
+                <CalendarDays size={18} className="text-[#a8833c]" aria-hidden /> Verse of the Day
               </h2>
-              <button type="button" onClick={() => void shareVotd()} aria-label="Share verse of the day" className="h-10 w-10 -mr-1 rounded-full bg-eggshell inline-flex items-center justify-center text-burgundy">
+              <button type="button" onClick={() => void shareVotd()} aria-label="Share verse of the day" className="h-10 w-10 -mr-1 rounded-full bg-white border border-[#ece3cf] inline-flex items-center justify-center text-[#1d372c]">
                 <Share2 size={16} aria-hidden />
               </button>
             </div>
-            <p className="mt-2.5 font-display text-[21px] italic font-semibold leading-snug text-wine-night">“{votdVerse}”</p>
+            <p className="mt-3 text-center font-display text-[20px] italic leading-snug text-[#16251f]">“{votdVerse}”</p>
             {votdRef ? (
               <button
                 type="button"
                 onClick={() => onRead(votdRef.book.id, votdRef.chapter, votdRef.verse, votdRef.verseEnd)}
-                className="mt-2.5 text-[14px] font-bold text-burgundy underline-offset-4 hover:underline"
+                className="mx-auto mt-2.5 block text-[15px] font-bold text-[#16251f] underline-offset-4 hover:underline"
               >
                 {votdLabel}
               </button>
             ) : (
-              <p className="mt-2.5 text-[14px] font-bold text-burgundy">{votdLabel}</p>
+              <p className="mt-2.5 text-center text-[15px] font-bold text-[#16251f]">{votdLabel}</p>
             )}
+            <span aria-hidden className="mx-auto mt-3 block h-[3px] w-28 rounded-full bg-gradient-to-r from-[#c9a35a]/20 via-[#c9a35a] to-[#c9a35a]/20" />
           </section>
-
-          <div className="grid grid-cols-3 gap-2.5">
-            <button type="button" onClick={onBooks} className={tile}>
-              <BookOpenText size={20} className="text-burgundy" aria-hidden /> Books
-            </button>
-            <button type="button" onClick={() => onMarks('highlights')} className={tile}>
-              <Highlighter size={20} className="text-burgundy" aria-hidden /> Highlights
-            </button>
-            <button type="button" onClick={() => onMarks('bookmarks')} className={tile}>
-              <Bookmark size={20} className="text-burgundy" aria-hidden /> Bookmarks
-            </button>
-          </div>
 
           {recent.length > 0 ? (
             <section aria-labelledby="recent">
@@ -304,7 +328,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
                       key={`${r.bookId}.${r.chapter}`}
                       type="button"
                       onClick={() => onRead(r.bookId, r.chapter)}
-                      className="shrink-0 h-10 px-4 rounded-full bg-white border border-gray-200 text-[14px] font-semibold text-ink active:bg-gray-50"
+                      className="shrink-0 h-10 px-4 rounded-full bg-[#fbf3df] border border-[#d9b86a] text-[14px] font-semibold text-ink active:bg-[#f4ecd9]"
                     >
                       {b.name} {b.chapters > 1 ? r.chapter : ''}
                     </button>

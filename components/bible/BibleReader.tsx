@@ -215,47 +215,53 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
 
   const currentLanguage = translations.find((t) => t.id === translation)?.language ?? 'eng';
   const languages = translations.filter((t, i, all) => all.findIndex((v) => v.language === t.language) === i);
-  const selectClass = 'w-full h-11 rounded-xl bg-[#f4ecd9] border border-[#e8dfcd] px-3 text-[15px] text-[#19261f] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold';
-  const iconBtn = 'h-11 rounded-[14px] bg-white border border-gray-200 inline-flex items-center justify-center active:bg-gray-50';
+  // PLCC Bible look: deep-green pickers with cream text, gold accents.
+  const selectClass = 'w-full h-12 cursor-pointer appearance-none rounded-2xl bg-[#1d372c] pl-3.5 pr-9 text-[15px] font-semibold text-[#fbf7ee] shadow-[0_4px_12px_rgba(18,36,28,0.18)] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold [&>option]:text-[#16251f]';
+  const iconBtn = 'h-11 rounded-full bg-white/10 border border-white/20 text-[#fbf7ee] inline-flex items-center justify-center active:bg-white/20';
 
   return (
     <>
       <div ref={topRef} className="scroll-mt-4">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <button type="button" onClick={onBack} className="inline-flex items-center gap-1 text-sm font-bold text-ink-soft hover:text-ink">
-            <ChevronLeft size={20} aria-hidden /> Bible tools
+        <div className="-mx-5 -mt-6 mb-4 flex items-center justify-between gap-3 rounded-b-[24px] bg-gradient-to-b from-[#12241c] to-[#1d372c] px-4 py-3 text-[#fbf7ee] shadow-[0_8px_20px_rgba(18,36,28,0.25)]">
+          <button type="button" onClick={onBack} className="inline-flex min-h-[44px] items-center gap-2 text-[15px] font-bold text-[#fbf7ee]">
+            <span className="grid h-10 w-10 place-items-center rounded-full border border-white/25 bg-white/10"><ChevronLeft size={20} aria-hidden /></span>
+            <span className="leading-tight"><span className="block font-display text-[19px]">{book.name} {book.chapters > 1 ? prefs.chapter : ''}</span><span className="block text-[12px] font-semibold text-[#f3d27a]">Bible tools</span></span>
           </button>
           <div className="relative">
-            <button type="button" onClick={() => setSizeOpen((o) => !o)} aria-expanded={sizeOpen} aria-label="Text size" className={`${iconBtn} w-11 font-display text-[15px] font-bold text-ink`}>Aa</button>
+            <button type="button" onClick={() => setSizeOpen((o) => !o)} aria-expanded={sizeOpen} aria-label="Text size" className={`${iconBtn} w-11 font-display text-[15px] font-bold`}>Aa</button>
             {sizeOpen ? <div className="absolute right-0 top-12 z-30 flex rounded-xl bg-white border border-gray-200 shadow-lift" role="group" aria-label="Text size">
               <button type="button" aria-label="Smaller text" disabled={prefs.textSize === 0} onClick={() => onPrefs((p) => ({ ...p, textSize: Math.max(0, p.textSize - 1) }))} className="h-12 w-12 font-bold disabled:text-gray-300">A</button>
               <button type="button" aria-label="Larger text" disabled={prefs.textSize === TEXT_SIZES.length - 1} onClick={() => onPrefs((p) => ({ ...p, textSize: Math.min(TEXT_SIZES.length - 1, p.textSize + 1) }))} className="h-12 w-12 text-xl font-bold disabled:text-gray-300 border-l">A</button>
             </div> : null}
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <label className="text-sm font-semibold text-ink-soft">Language
+        <div className="grid grid-cols-2 gap-3">
+          <label className="relative text-[13px] font-bold text-[#3b2a12]">Language
             <select className={`${selectClass} mt-1`} value={currentLanguage} onChange={(e) => { const first = translations.find((t) => t.language === e.target.value); if (first) onPrefs((p) => ({ ...p, translation: first.id, under: p.under === first.id ? null : p.under })); }}>
               {languages.map((t) => <option key={t.language} value={t.language}>{t.languageLabel}</option>)}
             </select>
+            <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
-          <label className="text-sm font-semibold text-ink-soft">Bible
+          <label className="relative text-[13px] font-bold text-[#3b2a12]">Bible
             <select className={`${selectClass} mt-1`} value={translation} onChange={(e) => onPrefs((p) => ({ ...p, translation: e.target.value, under: p.under === e.target.value ? null : p.under }))}>
               {translations.filter((t) => t.language === currentLanguage).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
+            <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
-          <label className="text-sm font-semibold text-ink-soft">Book
+          <label className="relative text-[13px] font-bold text-[#3b2a12]">Book
             <select className={`${selectClass} mt-1`} value={book.id} onChange={(e) => onGoTo(e.target.value, 1)}>
               {BIBLE_BOOKS.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
+            <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
-          <label className="text-sm font-semibold text-ink-soft">Chapter
+          <label className="relative text-[13px] font-bold text-[#3b2a12]">Chapter
             <select className={`${selectClass} mt-1`} value={prefs.chapter} onChange={(e) => onGoTo(book.id, Number(e.target.value))}>
               {Array.from({ length: book.chapters }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
             </select>
+            <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
         </div>
-        <label className="mt-3 flex items-center gap-2 rounded-xl bg-[#F3EBD8] px-3 text-sm font-semibold text-[#19261f]">
+        <label className="mt-3 flex items-center gap-2 rounded-2xl border border-[#d9b86a] bg-[#fbf3df] px-3 text-sm font-semibold text-[#19261f]">
           <span className="shrink-0">Compare with</span>
           <select className="min-w-0 flex-1 h-11 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold" value={under ?? ''} onChange={(e) => onPrefs((p) => ({ ...p, under: e.target.value || null }))}>
             <option value="">None</option>
@@ -276,10 +282,11 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
         ) : null}
       </div>
 
-      <article className="mt-4 rounded-2xl bg-white border border-[#e9e3d6] px-4 py-5 sm:px-7" aria-live="polite" aria-busy={loading}>
+      <article className="mt-4 rounded-[24px] bg-[#fffdf8] border border-[#ece3cf] px-4 py-6 shadow-[0_6px_20px_rgba(29,55,44,0.06)] sm:px-7" aria-live="polite" aria-busy={loading}>
         <header className="mb-5">
-          <h2 className="font-display text-2xl font-bold text-ink">{book.name} {prefs.chapter}</h2>
-          <p className="mt-1 text-sm font-semibold text-ink-soft">{translations.find((t) => t.id === translation)?.name ?? translationLabel(translation)}{data && !loading ? ` · ${minutes} min read` : ''}</p>
+          <h2 className="font-display text-[34px] font-bold leading-none text-[#1d372c]">{book.name} {prefs.chapter}</h2>
+          <span aria-hidden className="mt-3 block h-[3px] w-14 rounded-full bg-gradient-to-r from-[#c9a35a] to-[#c9a35a]/30" />
+          <p className="mt-2 text-sm font-semibold text-ink-soft">{translations.find((t) => t.id === translation)?.name ?? translationLabel(translation)}{data && !loading ? ` · ${minutes} min read` : ''}</p>
         </header>
 
         {loading ? (
@@ -313,12 +320,12 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
                         toggleVerse(v.n);
                       }
                     }}
-                    className={`${under && sideBySide && underText ? 'grid grid-cols-2 gap-4' : 'block'} py-2 cursor-pointer rounded-lg scroll-mt-32 transition-colors ${
-                      isSel ? 'underline decoration-gold decoration-[3px] underline-offset-[5px]' : ''
+                    className={`${under && sideBySide && underText ? 'grid grid-cols-2 gap-4' : 'block'} my-0.5 px-2.5 py-2 cursor-pointer rounded-xl scroll-mt-32 transition-colors ${
+                      isSel ? 'font-semibold underline decoration-gold decoration-[3px] underline-offset-[5px] shadow-[inset_3px_0_0_#c9a35a]' : ''
                     }`}
-                    style={bg ? { background: bg } : undefined}
+                    style={bg ? { background: bg } : isSel ? { background: '#fbecc4' } : undefined}
                   >
-                    <span className="min-w-0 break-words"><sup className="mr-1 ml-0.5 font-sans font-extrabold text-burgundy" style={{ fontSize: Math.round(fontPx * 0.6) }}>
+                    <span className="min-w-0 break-words"><sup className="mr-1.5 ml-0.5 font-sans font-extrabold text-[#a8833c]" style={{ fontSize: Math.round(fontPx * 0.6) }}>
                       {v.n}
                     </sup>
                     {marks.bookmarks[key] ? (
@@ -348,7 +355,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
             dockHidden ? 'translate-y-[84px]' : 'translate-y-0'
           }`}
         >
-          <div className="flex items-center gap-1.5 rounded-[20px] bg-wine-night text-cream shadow-lift p-1.5">
+          <div className="flex items-center gap-1.5 rounded-[20px] border border-[#c9a35a]/40 bg-[#12241c] text-cream shadow-lift p-1.5">
             <button
               type="button"
               disabled={!prev}
@@ -363,7 +370,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
                 type="button"
                 onClick={toggleListen}
                 aria-pressed={listening}
-                className="flex-1 h-11 rounded-[14px] bg-leaf text-wine-night inline-flex items-center justify-center gap-2 text-[14px] font-extrabold"
+                className="flex-1 h-11 rounded-[14px] bg-gradient-to-b from-[#f3cd6b] to-[#d9a83a] text-[#12241c] inline-flex items-center justify-center gap-2 text-[14px] font-extrabold"
               >
                 {listening ? <Pause size={16} fill="currentColor" aria-hidden /> : <Play size={16} fill="currentColor" aria-hidden />}
                 <span className="truncate">{listening ? 'Stop listening' : `Listen to ${book.name} ${book.chapters > 1 ? prefs.chapter : ''}`}</span>
