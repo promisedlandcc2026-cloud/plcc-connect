@@ -216,7 +216,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
   const currentLanguage = translations.find((t) => t.id === translation)?.language ?? 'eng';
   const languages = translations.filter((t, i, all) => all.findIndex((v) => v.language === t.language) === i);
   // PLCC Bible look: deep-green pickers with cream text, gold accents.
-  const selectClass = 'w-full h-12 cursor-pointer appearance-none rounded-2xl bg-[#1d372c] pl-3.5 pr-9 text-[15px] font-semibold text-[#fbf7ee] shadow-[0_4px_12px_rgba(18,36,28,0.18)] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold [&>option]:text-[#16251f]';
+  const selectClass = 'w-full h-12 cursor-pointer appearance-none rounded-2xl bg-[#1d372c] pl-3.5 pr-9 text-[15px] font-semibold text-[#fbf7ee] border border-[#E4C36A]/45 shadow-[0_4px_12px_rgba(18,36,28,0.18)] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold [&>option]:text-[#16251f]';
   const iconBtn = 'h-11 rounded-full bg-white/10 border border-white/20 text-[#fbf7ee] inline-flex items-center justify-center active:bg-white/20';
 
   return (
@@ -236,32 +236,32 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
           </div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <label className="relative text-[13px] font-bold text-[#3b2a12]">Language
+          <label className="relative text-[13px] font-bold text-ink-soft">Language
             <select className={`${selectClass} mt-1`} value={currentLanguage} onChange={(e) => { const first = translations.find((t) => t.language === e.target.value); if (first) onPrefs((p) => ({ ...p, translation: first.id, under: p.under === first.id ? null : p.under })); }}>
               {languages.map((t) => <option key={t.language} value={t.language}>{t.languageLabel}</option>)}
             </select>
             <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
-          <label className="relative text-[13px] font-bold text-[#3b2a12]">Bible
+          <label className="relative text-[13px] font-bold text-ink-soft">Bible
             <select className={`${selectClass} mt-1`} value={translation} onChange={(e) => onPrefs((p) => ({ ...p, translation: e.target.value, under: p.under === e.target.value ? null : p.under }))}>
               {translations.filter((t) => t.language === currentLanguage).map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
             <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
-          <label className="relative text-[13px] font-bold text-[#3b2a12]">Book
+          <label className="relative text-[13px] font-bold text-ink-soft">Book
             <select className={`${selectClass} mt-1`} value={book.id} onChange={(e) => onGoTo(e.target.value, 1)}>
               {BIBLE_BOOKS.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
             </select>
             <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
-          <label className="relative text-[13px] font-bold text-[#3b2a12]">Chapter
+          <label className="relative text-[13px] font-bold text-ink-soft">Chapter
             <select className={`${selectClass} mt-1`} value={prefs.chapter} onChange={(e) => onGoTo(book.id, Number(e.target.value))}>
               {Array.from({ length: book.chapters }, (_, i) => <option key={i + 1} value={i + 1}>{i + 1}</option>)}
             </select>
             <ChevronDown size={18} className="pointer-events-none absolute right-3 bottom-[15px] text-[#f3d27a]" aria-hidden />
           </label>
         </div>
-        <label className="mt-3 flex items-center gap-2 rounded-2xl border border-[#d9b86a] bg-[#fbf3df] px-3 text-sm font-semibold text-[#19261f]">
+        <label className="mt-3 flex items-center gap-2 rounded-2xl border border-[#d9b86a] bg-[#FBF7EE] px-3 text-sm font-semibold text-[#19261f]">
           <span className="shrink-0">Compare with</span>
           <select className="min-w-0 flex-1 h-11 bg-transparent text-sm text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-gold" value={under ?? ''} onChange={(e) => onPrefs((p) => ({ ...p, under: e.target.value || null }))}>
             <option value="">None</option>
@@ -282,7 +282,7 @@ export const BibleReader: React.FC<Props> = ({ prefs, translation, translations,
         ) : null}
       </div>
 
-      <article className="mt-4 rounded-[24px] bg-[#fffdf8] border border-[#ece3cf] px-4 py-6 shadow-[0_6px_20px_rgba(29,55,44,0.06)] sm:px-7" aria-live="polite" aria-busy={loading}>
+      <article className="mt-4 rounded-[24px] bg-white border border-[#ece3cf] px-4 py-6 shadow-[0_6px_20px_rgba(29,55,44,0.06)] sm:px-7" aria-live="polite" aria-busy={loading}>
         <header className="mb-5">
           <h2 className="font-display text-[34px] font-bold leading-none text-[#1d372c]">{book.name} {prefs.chapter}</h2>
           <span aria-hidden className="mt-3 block h-[3px] w-14 rounded-full bg-gradient-to-r from-[#c9a35a] to-[#c9a35a]/30" />

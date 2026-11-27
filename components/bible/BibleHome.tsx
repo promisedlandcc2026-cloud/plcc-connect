@@ -137,7 +137,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
 
   // PLCC Bible tiles: cream cards with deep-green icons; the first (Read) is gold.
   const tile =
-    'h-[88px] rounded-[18px] bg-[#fbf7ee] border border-[#ece3cf] shadow-[0_2px_8px_rgba(29,55,44,0.06)] flex flex-col items-center justify-center gap-1.5 text-[14px] font-bold text-[#16251f] active:bg-[#f4ecd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold';
+    'h-[88px] rounded-[18px] bg-[#FBF7EE] border border-[#ece3cf] shadow-[0_2px_8px_rgba(29,55,44,0.06)] flex flex-col items-center justify-center gap-1.5 text-[14px] font-bold text-[#16251f] active:bg-[#f4ecd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold';
   const tileIcon = 'text-[#1d372c]';
 
   return (
@@ -178,11 +178,6 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
           </div>
         }
       />
-
-      {/* PLCC Bible banner (its words are part of the picture). */}
-      <div className="-mt-1 mb-4 overflow-hidden rounded-[24px] bg-[#12241c] shadow-[0_10px_30px_rgba(18,36,28,0.25)]">
-        <img src="/brand/plcc-bible-banner.webp" alt="PLCC Bible: Read, Study, Reflect, Share" width={1080} height={360} className="block h-auto w-full" />
-      </div>
 
       <form onSubmit={onSubmit} className="mb-5" role="search">
         <label className="relative flex items-center">
@@ -267,9 +262,9 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
           <button
             type="button"
             onClick={() => onRead(bookId, chapter)}
-            className="text-left rounded-3xl bg-[#fbf7ee] border border-[#ece3cf] p-5 shadow-[0_4px_14px_rgba(29,55,44,0.06)] active:bg-[#f4ecd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
+            className="text-left rounded-3xl bg-[#FBF7EE] border border-[#ece3cf] p-5 shadow-[0_4px_14px_rgba(29,55,44,0.06)] active:bg-[#f4ecd9] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
           >
-            <span className="flex items-center gap-2 text-[15px] font-bold text-[#3b2a12]">
+            <span className="flex items-center gap-2 text-[15px] font-bold text-[#4a3a1c]">
               <BookOpen size={18} className="text-[#a8833c]" aria-hidden /> Continue Reading
             </span>
             <span className="mt-1.5 flex items-center justify-between gap-3">
@@ -291,9 +286,9 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
             </span>
           </button>
 
-          <section aria-labelledby="votd" className="rounded-3xl bg-[#fbf7ee] border border-[#ece3cf] p-5 shadow-[0_4px_14px_rgba(29,55,44,0.06)]">
+          <section aria-labelledby="votd" className="rounded-3xl bg-[#FBF7EE] border border-[#ece3cf] p-5 shadow-[0_4px_14px_rgba(29,55,44,0.06)]">
             <div className="flex items-center justify-between">
-              <h2 id="votd" className="flex items-center gap-2 text-[15px] font-bold text-[#3b2a12]">
+              <h2 id="votd" className="flex items-center gap-2 text-[15px] font-bold text-[#4a3a1c]">
                 <CalendarDays size={18} className="text-[#a8833c]" aria-hidden /> Verse of the Day
               </h2>
               <button type="button" onClick={() => void shareVotd()} aria-label="Share verse of the day" className="h-10 w-10 -mr-1 rounded-full bg-white border border-[#ece3cf] inline-flex items-center justify-center text-[#1d372c]">
@@ -328,7 +323,7 @@ export const BibleHome: React.FC<Props> = ({ bookId, chapter, translation, trans
                       key={`${r.bookId}.${r.chapter}`}
                       type="button"
                       onClick={() => onRead(r.bookId, r.chapter)}
-                      className="shrink-0 h-10 px-4 rounded-full bg-[#fbf3df] border border-[#d9b86a] text-[14px] font-semibold text-ink active:bg-[#f4ecd9]"
+                      className="shrink-0 h-10 px-4 rounded-full bg-white border border-[#d9b86a] text-[14px] font-semibold text-ink active:bg-gray-50"
                     >
                       {b.name} {b.chapters > 1 ? r.chapter : ''}
                     </button>

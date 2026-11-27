@@ -104,7 +104,7 @@ export const MemberBiblePage: React.FC = () => {
   };
 
   return (
-    <main className="flex-1 px-5 pt-10 pb-44">
+    <main className="mx-auto w-full max-w-3xl flex-1 px-5 pt-10 pb-44">
       {reading ? (
         <BibleReader
           prefs={{ ...prefs, bookId: book.id }}
